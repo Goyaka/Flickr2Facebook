@@ -1,0 +1,28 @@
+body {
+    width: 960px;
+    margin: 0 auto;
+    font-size: 16px;
+    line-height: 16px;
+}
+small {
+    font-size: 0.8em;
+}
+
+.main {
+    text-align: center;
+    padding-top: 50px;
+}
+
+ul {
+    padding-top: 30px;
+    list-style-type: none;
+}
+
+ul li {
+    background: url('/images/tick.png') top left no-repeat; 
+}
+
+img { 
+    padding: 10px 10px;
+    vertical-align: middle;
+}

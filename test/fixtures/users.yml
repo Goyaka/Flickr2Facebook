@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  fb_uid: MyString
+  flickr_oauth_token: MyString
+  flickr_oauth_secret: MyString
+  flickr_verifier: MyString
+
+two:
+  fb_uid: MyString
+  flickr_oauth_token: MyString
+  flickr_oauth_secret: MyString
+  flickr_verifier: MyString
