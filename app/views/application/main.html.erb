@@ -1,3 +1,30 @@
 <div class="main">
-    Logged into facebook
+    <h2> Easily migrate your photos from Flickr into Facebook </h2>
+    <div class="row">
+        <div class="span3"> &nbsp; </div>
+        <div class="span4">
+            <img src = "/assets/<%= @flickr_user ? "flickr.png":"flickr-not-authenticated.png" %>">
+            <% if @fb_user and not @flickr_user %>
+                <a href="/flickr-auth" class="btn large"> Authenticate Flickr </a> <br>                
+            <% end %>
+            &nbsp;
+        </div>
+        <div class="span2">
+            <img src="/assets/arrow.png" style="padding-top: 30px;"> 
+            &nbsp;
+        </div>
+        <div class="span4">
+            <img src = "/assets/<%= @fb_user ? "facebook.png":"facebook-not-authenticated.png" %>">
+            <% if not @fb_user %>
+                <a href="facebook-auth"> <img src="/assets/facebook-login-button.png" /> </a> <br>                
+            <% end %>
+            &nbsp;
+        </div>
+        <div class="clear"></div>
+    </div>
+    
 </div>
+<pre class="prettyprint" style="position: absolute; bottom: 0; width: 960px">
+        <%= debug(@fb_user) if @user %>
+        <%= debug(@flickr_user) if @flickr_user %>
+</pre>
