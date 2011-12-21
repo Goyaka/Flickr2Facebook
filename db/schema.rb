@@ -10,15 +10,21 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111220202415) do
+ActiveRecord::Schema.define(:version => 20111221222453) do
 
   create_table "users", :force => true do |t|
-    t.string   "fb_uid"
+    t.string   "user"
+    t.string   "fb_code"
+    t.string   "fb_session"
     t.string   "flickr_oauth_token"
     t.string   "flickr_oauth_secret"
-    t.string   "flickr_verifier"
+    t.string   "flickr_oauth_verifier"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "flickr_access_token"
+    t.string   "flickr_access_secret"
+    t.string   "flickr_username"
+    t.string   "flickr_user_nsid"
   end
 
 end

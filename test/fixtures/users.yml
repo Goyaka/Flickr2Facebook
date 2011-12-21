@@ -1,13 +1,17 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
 
 one:
-  fb_uid: MyString
+  user: MyString
+  fb_code: MyString
+  fb_session: MyString
   flickr_oauth_token: MyString
   flickr_oauth_secret: MyString
-  flickr_verifier: MyString
+  flickr_oauth_verifier: MyString
 
 two:
-  fb_uid: MyString
+  user: MyString
+  fb_code: MyString
+  fb_session: MyString
   flickr_oauth_token: MyString
   flickr_oauth_secret: MyString
-  flickr_verifier: MyString
+  flickr_oauth_verifier: MyString
