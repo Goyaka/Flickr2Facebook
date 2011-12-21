@@ -7,5 +7,7 @@ class ApplicationController < ActionController::Base
   end
   
   def main
+    @fb_user = Mogli::User.find("me",Mogli::Client.new(session[:at])) if session[:at]
+    puts @fb_user
   end
 end
