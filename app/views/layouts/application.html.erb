@@ -1,14 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Flickr2facebook</title>
-  <%= stylesheet_link_tag    "application" %>
-  <%= javascript_include_tag "application" %>
-  <%= csrf_meta_tags %>
+    <title>Flickr2facebook</title>
+    <%= stylesheet_link_tag    "application" %>
+
+    <%= csrf_meta_tags %>
+    <meta property="og:title" content=""/>
+    <meta property="og:type" content=""/>
+    <meta property="og:url" content=""/>
+    <meta property="og:image" content=""/>
+    <meta property="og:site_name" content=""/>
+    <script>
+    function popup(pageURL, title,w,h) {
+        var left = (screen.width/2)-(w/2);
+        var top = (screen.height/2)-(h/2);
+        var targetWin = window.open(
+            pageURL,
+            title,
+            'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width='+w+', height='+h+', top='+top+', left='+left
+        );
+    }
+    </script>
+    <!--[if IE]>
+    <script>
+    var tags = ['header', 'section'];
+    while(tags.length)
+    document.createElement(tags.pop());
+    </script>
+    <![endif]-->
 </head>
 <body>
-
-<%= yield %>
-
+    <%= yield %>
 </body>
+<%= javascript_include_tag "application" %>
 </html>
