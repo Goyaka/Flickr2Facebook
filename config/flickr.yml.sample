@@ -1,0 +1,7 @@
+development:
+  app_id: ''
+  shared_secret: ''
+
+production:
+  app_id: ''
+  shared_secret: ''
