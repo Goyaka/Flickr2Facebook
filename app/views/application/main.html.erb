@@ -25,6 +25,7 @@
     
 </div>
 <pre class="prettyprint" style="position: absolute; bottom: 0; width: 960px">
-        <%= debug(@fb_user) if @user %>
-        <%= debug(@flickr_user) if @flickr_user %>
+        Facebook: <%= debug(@fb_user.username) if @fb_user %>
+        Flickr: <%= debug(@flickr_user.username) if @flickr_user %>
+        <%= @flickr_user.inspect %>
 </pre>
