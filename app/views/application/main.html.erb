@@ -1,5 +1,12 @@
-<div class="main">
-    <h2> Easily migrate your photos from Flickr into Facebook </h2>
+<div class="main">                                           
+    <% if not @fb_user %>
+        <h2> Step 1: Login into your Facebook Account </h2>
+    <% elsif @fb_user and not @flickr_user %>
+        <h2> Step 2: Authenticate your Flickr Account </h2>
+    <% else %>
+        <h2> Step 3: Choose the sets that you want to import </h2>
+    <% end %>
+
     <div class="row">
         <div class="span3"> &nbsp; </div>
         <div class="span4">
@@ -25,7 +32,7 @@
     
 </div>
 <pre class="prettyprint" style="position: absolute; bottom: 0; width: 960px">
-        Facebook: <%= debug(@fb_user.username) if @fb_user %>
-        Flickr: <%= debug(@flickr_user.username) if @flickr_user %>
+        Facebook: <%= debug(@fb_user) if @fb_user %>
+        Flickr: <%= debug(@flickr_user) if @flickr_user %>
         <%= @flickr_user.inspect %>
 </pre>
