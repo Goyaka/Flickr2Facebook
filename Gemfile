@@ -5,13 +5,19 @@ gem 'rails', '3.1.2'
 # Bundle edge Rails instead:
 # gem 'rails',     :git => 'git://github.com/rails/rails.git'
 
-gem 'sqlite3'
+
+gem "sqlite3"
 gem "mogli"
 gem "json"
 gem "httparty"
 gem "thin"
 gem "flickraw"
-gem 'mysql'
+gem "mongo"
+gem "mongoid"
+gem "bson"
+gem "bson_ext"
+gem "execjs"
+gem "therubyracer"
 
 
 # Gems used only for assets and not required
