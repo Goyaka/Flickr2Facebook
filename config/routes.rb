@@ -6,6 +6,7 @@ Flickr2facebook::Application.routes.draw do
   match "flickr-callback" => "auth#flickr_callback", :as => :flickr_callback
   match "fbauthenticate" => "auth#facebook_authenticate"
   match "flickr/sets" => 'flickr#get_sets'
+  match "flickr/import-sets" => 'flickr#select_sets', :via => :post
 
   root :to => 'application#index'
 end
