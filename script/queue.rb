@@ -91,22 +91,40 @@ class Job
 =end
   end
   
-  def create_fb_albums(albumname, albumcount)
+  def create_fb_albums(albumname, description, albumcount)
+    albumids = []
+    for i in range 1..albumcount do |albumindex|
+      begin
+        albumname_with_index = albumname + " " + albumindex.to_s
+        response = RestClient.post("https://graph.facebook.com/me/albums?access_token=#{@fb_access_token}", 
+                                  {:name => albumname_with_index, :message => description })
+        
+        albumids.push((JSON.parse response.to_s)['id'])
+        puts response
+      rescue Exception => error
+        puts "Erroring + " + error.to_s 
+      end
+    end
+    
+    return albumids
   end
 
   def upload_set(set_id) 
-    setinfo   = flickr.photosets.getInfo(:photoset_id => set_id)
-    albumname = setinfo.title
-    photos    = self.getphotos_from_set(set_id)
-    piclist   = []
+    setinfo     = flickr.photosets.getInfo(:photoset_id => set_id)
+    albumname   = setinfo.title
+    description = setinfo.description
+    photos      = self.getphotos_from_set(set_id)
+    piclist     = []
 
     for pic in photos.photo
        piclist.push pic.id
     end
     
-    albumcount = piclist.length / 200
-    albumids   = self.create_fb_albums(albumname, albumcount)
-    
+    albumcount = (piclist.length + 200) / 200
+    albumids   = self.create_fb_albums(albumname, description, albumcount)
+  end
+  
+  def add_job
   end
 
 end
