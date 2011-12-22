@@ -7,7 +7,7 @@ $(document).ready ->
         $.ajax
             url: '/flickr/sets'
             type: 'get'
-            data: { user: user }
+            data: { user: fb_user }
             dataType: 'json'
             beforeSend: (xhr, settings) ->
                 $("#sets").html('<center><img src= "assets/loading.gif"></center')
