@@ -8,11 +8,15 @@
     <% end %>
 
     <div class="row">
-        <div class="span3"> &nbsp; </div>
-        <div class="span4">
+        <div class="span4"> &nbsp; </div>
+        <div class="span3">
             <img src = "/assets/<%= @flickr_user ? "flickr.png":"flickr-not-authenticated.png" %>">
             <% if @fb_user and not @flickr_user %>
-                <a href="/flickr-auth" class="btn large"> Authenticate Flickr </a> <br>                
+                <a href="/flickr-auth" class="btn large" style="color: #FE63BB; font-size: 22px"> 
+                    Authenticate
+                </a> <br>                
+            <% else %>
+                Logged in as <a href="http://www.flickr.com" style="color: #FE63BB"><%= @flickr_user %> </a>
             <% end %>
             &nbsp;
         </div>
@@ -20,12 +24,14 @@
             <img src="/assets/arrow.png" style="padding-top: 30px;"> 
             &nbsp;
         </div>
-        <div class="span4">
+        <div class="span3">
             <img src = "/assets/<%= @fb_user ? "facebook.png":"facebook-not-authenticated.png" %>">
             <% if not @fb_user %>
                 <a href="facebook-auth"> <img src="/assets/facebook-login-button.png" /> </a> <br>                
-            <% end %>
-            &nbsp;
+            <% else %>
+                Logged in as <a href="http://www.facebook.com/<%= @fb_user %>"><%= @fb_user %></a>
+            <% end%>
+
         </div>
         <div class="clear"></div>
     </div>
@@ -54,8 +60,13 @@
 </script>
 
 <script type="text/javascript">
-var user;
-<% if @user %>
-user = "<%= @user.id %>";
+var fb_user;
+var flickr_users
+<% if @fb_user %>
+fb_user = "<%= @fb_user %>";
 <% end %>
+<% if @flickr_user %>
+flickr_user = "<%= @flickr_user %>";
+<% end %>
+
 </script>

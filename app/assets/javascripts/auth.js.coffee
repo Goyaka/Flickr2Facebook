@@ -3,7 +3,7 @@
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 
 $(document).ready -> 
-    if user
+    if fb_user and flickr_user
         $.ajax
             url: '/flickr/sets'
             type: 'get'
@@ -13,6 +13,6 @@ $(document).ready ->
                 $("#sets").html('<center><img src= "assets/loading.gif"></center')
             success: (data) ->
                 $("#sets").html('');
-                $("#sets_list_template").tmpl(data).appendTo("#sets");
+                $("#sets_list_template").tmpl(data).appendTo("#sets").animate();
     
     
