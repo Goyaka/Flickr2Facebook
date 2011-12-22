@@ -48,14 +48,15 @@
 <script id="sets_list_template" type="text/x-jquery-tmpl">
 <div>
 <h4> Choose sets that you want to import </h4>
-<form method="post" name="select-sets" action="flickr/select-sets">
+<%= form_tag("flickr/import-sets", :method => "post") do %>
 {{each(index, set) sets}}
 <div class="set">
-    <input type="checkbox" name="set" value="${set.id}" checked="true">
-    <span>${set.title}</span>
+    <input type="checkbox" name="set[]" value="${set.id}" checked="true">
+    <a target="_blank" href="http://flickr.com/photos/<%= @user.flickr_user_nsid %>/sets/${set.id}">${set.title}</a>
 </div>
 {{/each}}
-<button class="btn large success"> Import! </button>
+<button class="btn large success"> Import Sets Now! </button>
+<% end %>
 </div>
 </script>
 
