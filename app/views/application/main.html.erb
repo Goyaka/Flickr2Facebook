@@ -11,7 +11,9 @@
         <div class="span4"> &nbsp; </div>
         <div class="span3">
             <img src = "/assets/<%= @flickr_user ? "flickr.png":"flickr-not-authenticated.png" %>">
-            <% if @fb_user and not @flickr_user %>
+            <% if not @fb_user %>
+                &nbsp;
+            <% elsif @fb_user and not @flickr_user %>
                 <a href="/flickr-auth" class="btn large" style="color: #FE63BB; font-size: 22px"> 
                     Authenticate
                 </a> <br>                

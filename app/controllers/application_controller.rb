@@ -12,7 +12,7 @@ class ApplicationController < ActionController::Base
       facebook_user = Mogli::User.find("me",Mogli::Client.new(session[:at])) if session[:at]
     rescue Mogli::Client::HTTPException
       session[:at] = nil
-      redirect_to :controller => 'auth', :action => 'facebook_auth'
+      redirect_to :controller => 'auth', :action => 'facebook_auth' and return
     end
 
     if facebook_user
