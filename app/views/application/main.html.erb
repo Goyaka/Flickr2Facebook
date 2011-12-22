@@ -46,7 +46,7 @@
         Flickr: <%= debug(@flickr_user) if @flickr_user %>
         <%= @flickr_user.inspect %>
 </pre>
-
+<% if @fb_user and @flickr_user %>
 <script id="sets_list_template" type="text/x-jquery-tmpl">
 <div>
 <h4> Choose sets that you want to import </h4>
@@ -61,7 +61,7 @@
 <% end %>
 </div>
 </script>
-
+<% end %>
 <script type="text/javascript">
 var fb_user;
 var flickr_user;
