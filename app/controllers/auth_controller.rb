@@ -1,3 +1,5 @@
+require 'uri'
+
 class AuthController < ApplicationController
   def facebook_authenticator
     # get facebook app config 
@@ -86,8 +88,8 @@ class AuthController < ApplicationController
     user.flickr_oauth_verifier = verifier    
     user.flickr_access_token = token['oauth_token']
     user.flickr_access_secret = token['oauth_token_secret']
-    user.flickr_username = token['username']
-    user.flickr_user_nsid = token['user_nsid']
+    user.flickr_username = URI::unescape(token['username'])
+    user.flickr_user_nsid = URI::unescape(token['user_nsid'])
     user.save
 
     # Now go back to main page
