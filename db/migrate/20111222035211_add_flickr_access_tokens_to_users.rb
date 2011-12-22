@@ -1,4 +1,4 @@
-class AddAccessTokens < ActiveRecord::Migration
+class AddFlickrAccessTokensToUsers < ActiveRecord::Migration
   def change
     add_column :users, :flickr_access_token, :string
     add_column :users, :flickr_access_secret, :string
