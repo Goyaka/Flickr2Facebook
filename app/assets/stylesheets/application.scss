@@ -5,3 +5,15 @@
  *= require_self
  *= require_tree . 
 */
+
+#sets {
+    text-align: left;
+    margin: 0 auto;
+    width: 600px;
+    padding-top: 20px;
+    font-size: 15px;
+    
+    .set {
+        padding: 5px 0px;
+    }
+}
