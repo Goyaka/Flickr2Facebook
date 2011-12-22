@@ -10,7 +10,25 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111222035211) do
+ActiveRecord::Schema.define(:version => 20111222043712) do
+
+  create_table "photos", :force => true do |t|
+    t.string   "photo"
+    t.string   "photoset_id"
+    t.string   "facebook_photo"
+    t.string   "facebook_album"
+    t.string   "status"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "photosets", :force => true do |t|
+    t.string   "user_id"
+    t.string   "photoset"
+    t.string   "status"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "users", :force => true do |t|
     t.string   "user"
