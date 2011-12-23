@@ -13,13 +13,17 @@ FlickRaw.shared_secret = FlickrConfig[:API_SECRET]
 class Job
   
   def initialize(fb_access_token, flickr_access_token, flickr_access_secret)
+    config = YAML.load_file(Rails.root.join("config/flickr.yml"))[Rails.env]
+    FlickRaw.api_key = config['app_id']
+    FlickRaw.shared_secret = config['shared_secret']
+    
+    puts "Initializing job"
     @fb_access_token      = fb_access_token
-    #flickr.access_token   = flickr_access_token
-    #flickr.access_secret  = flickr_access_secret
+    flickr.access_token   = flickr_access_token
+    flickr.access_secret  = flickr_access_secret
   end
   
   def download(source, destination)
-    puts source
     host = source.split('/')[2]
     path = "/" + source.split('/')[3..source.length].join('/')
     Net::HTTP.start(host) do |http|
@@ -114,19 +118,28 @@ class Job
   end
 
   def upload_set(set_id) 
-    set_info    = 
-    setinfo     = flickr.photosets.getInfo(:photoset_id => set_id)
-    albumname   = setinfo.title
-    description = setinfo.description
-    photos      = self.getphotos_from_set(set_id)
-    piclist     = []
+    photoset    = Photoset.where('photoset = ? AND status = ?', set_id, FlickrController::PHOTOSET_NOTPROCESSED).first
+    if photoset
+      photoset.status = FlickrController::PHOTOSET_PROCESSING
+      setinfo         = flickr.photosets.getInfo(:photoset_id => set_id)
+      albumname       = setinfo.title
+      description     = setinfo.description
+      photos          = self.getphotos_from_set(set_id)
+      piclist         = []
 
-    for pic in photos.photo
-       piclist.push pic.id
-    end
+      for pic in photos.photo
+         piclist.push pic.id
+      end
     
-    albumcount = (piclist.length + 200) / 200
-    albumids   = self.create_fb_albums(albumname, description, albumcount)
+      albumcount = (piclist.length + 200) / 200
+      albumids   = self.create_fb_albums(albumname, description, albumcount)
+
+    
+      for pic in photos.photo
+        photo = Photo.new(:photo => pic.id, :photoset_id => photoset, :facebook_photo => '', :facebook_album => '', :status => FlickrController::PHOTO_NOTPROCESSED)
+        photo.save()
+      end
+    end
   end
   
   def add_job
