@@ -5,8 +5,6 @@ gem 'rails', '3.1.2'
 # Bundle edge Rails instead:
 # gem 'rails',     :git => 'git://github.com/rails/rails.git'
 
-
-gem "sqlite3"
 gem "mogli"
 gem "json"
 gem "httparty"
@@ -15,6 +13,14 @@ gem "flickraw"
 gem "execjs"
 gem "therubyracer"
 gem "rest-client"
+
+group :production do
+  gem "mysql2"
+end
+
+group :development do
+  gem "sqlite3"
+end
 
 
 # Gems used only for assets and not required
@@ -38,4 +44,3 @@ gem 'jquery-rails'
 
 # To use debugger
 # gem 'ruby-debug'
-
