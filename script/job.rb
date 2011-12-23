@@ -95,7 +95,10 @@ class Job
   
       #Upload photo to facebook.
       begin
-        response = RestClient.post("https://graph.facebook.com/#{album_id}/photos?access_token=#{@fb_access_token}", {:source => File.new(filename), :message => photo[:message], :backdated_time => photo[:date]})
+        response = RestClient.post("https://graph.facebook.com/#{album_id}/photos?access_token=#{@fb_access_token}",
+                                  {:source => File.new(filename),
+                                   :message => photo[:message],
+                                   :backdated_time => photo[:date]})
         fb_photo_id = (JSON.parse response.to_s)['id']  
         puts "Uploaded to http://facebook.com/#{fb_photo_id}"
       rescue Exception => error
@@ -124,7 +127,7 @@ class Job
   
   def create_album(albumname, description)
      response = RestClient.post("https://graph.facebook.com/me/albums?access_token=#{@fb_access_token}", 
-                                {:name => albumname, :message => description })
+                                {:name => albumname, :message => description, :privacy => '{"value":"SELF"}' })
      return (JSON.parse response.to_s)['id']
   end
   
