@@ -12,8 +12,8 @@
     width: 600px;
     padding-top: 20px;
     font-size: 15px;
-    
-    .set {
-        padding: 5px 0px;
-    }
+}
+
+#sets .set {
+    padding: 5px 0px;
 }
