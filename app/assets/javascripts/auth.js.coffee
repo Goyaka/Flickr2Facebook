@@ -1,5 +1,5 @@
 $(document).ready -> 
-    if fb_user and flickr_user
+    if typeof fb_user != "undefined" and typeof flickr_user != "undefined"
         $.ajax
             url: '/flickr/sets'
             type: 'get'
