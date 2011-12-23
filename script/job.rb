@@ -44,9 +44,9 @@ class Job
     end
     photo[:message]           = info.title + "\n" + info.description + "\n" + "\n\n Original: " + FlickRaw.url_photopage(info)
     t                         = Time.at(info.dateuploaded.to_i).utc
-    photo[:date]              = t.iso8601
+    photo[:date]              = info.dateuploaded.to_i
     if photo[:lat]
-      photo[:message]	+= "\n\n{'lat':#{photo[:lat]},'lon':#{photo[:lon]},'time' : #{info.dateuploaded.to_i}}"
+      photo[:message]	+= "\n\n{'lat':#{photo[:lat]},'lon':#{photo[:lon]}}}"
     else
       photo[:message] += "\n\n{'time' : #{info.dateuploaded.to_i}}"
     end
@@ -77,8 +77,10 @@ class Job
   
       #Upload photo to facebook.
       begin
-        response = RestClient.post("https://graph.facebook.com/#{album_id}/photos?access_token=#{@fb_access_token}", {:source => File.new(filename), :message => photo[:message]})
-        fb_photo_id = (JSON.parse response.to_s)['id']
+        url = "https://graph.facebook.com/#{album_id}/photos?access_token=#{@fb_access_token}"
+        puts url
+        response = RestClient.post("https://graph.facebook.com/#{album_id}/photos?access_token=#{@fb_access_token}", {:source => File.new(filename), :message => photo[:message], :backdated_time => photo[:date]})
+        fb_photo_id = (JSON.parse response.to_s)['id']  
         puts "Uploaded to http://facebook.com/#{fb_photo_id}"
       rescue Exception => error
         puts "Erroring + " + error.to_s 
