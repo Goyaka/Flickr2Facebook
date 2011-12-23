@@ -1,5 +1,5 @@
 require 'rubygems'
-require 'flickraw'
+require 'flickraw-cached'
 require 'rest-client'
 require 'config'
 require 'json'
@@ -22,6 +22,14 @@ class Job
     @fb_access_token      = fb_access_token
     flickr.access_token   = flickr_access_token
     flickr.access_secret  = flickr_access_secret
+    
+    @flickr_user = flickr.test.login
+    @user_info = flickr.people.getInfo(:user_id => @flickr_user['id'])
+    if @user_info[:ispro]
+      @pro_user = true
+    else 
+      @pro_user = false
+    end
   end
   
   def download(source, destination)
@@ -35,10 +43,22 @@ class Job
     end
   end
 
-  def getphoto_info (photo_id)
-    info                      = flickr.photos.getInfo(:photo_id => photo_id)
-    photo                     = {}
-    photo[:photo_source]      = FlickRaw.url_o(info)
+  def getphoto_url(photo_id)
+    if @pro_user 
+      photo_source = FlickRaw.url_o(photo_info)
+    else
+      sizes = flickr.photos.getSizes(:photo_id => photo_id)
+      biggest_available_photo = sizes.to_a.last.to_hash
+      photo_source = biggest_available_photo['source']
+    end
+    puts photo_source
+    return photo_source
+  end
+
+  def getphoto_info(photo_id)
+    info = flickr.photos.getInfo(:photo_id => photo_id)
+    photo = {}
+    photo[:photo_source] = getphoto_url(photo_id)
     if info.respond_to?('location')
       photo[:lat], photo[:lon]  = info.location.latitude, info.location.longitude
     end

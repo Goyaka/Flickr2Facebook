@@ -7,8 +7,8 @@ class Worker < ActiveRecord::Base
       photo = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).first
       if photo
         photoset = Photoset.find(photo.photoset_id)
-        user     = User.find(photoset.user_id)
-        job      = Job.new(user.fb_session, user.flickr_access_token, user.flickr_access_secret)              
+        user = User.find(photoset.user_id)
+        job = Job.new(user.fb_session, user.flickr_access_token, user.flickr_access_secret)              
         job.upload(photo)
       else
         # "No photo. waiting."
@@ -19,11 +19,11 @@ class Worker < ActiveRecord::Base
   
   def self.split_sets_loop
     while true
-      set  = Photoset.where("status = ?", FlickrController::PHOTOSET_NOTPROCESSED).first
+      set = Photoset.where("status = ?", FlickrController::PHOTOSET_NOTPROCESSED).first
       if set
         puts "Splitting set " + set.photoset + " to photos"
         user = User.find(set.user_id)
-        job      = Job.new(user.fb_session, user.flickr_access_token, user.flickr_access_secret)              
+        job = Job.new(user.fb_session, user.flickr_access_token, user.flickr_access_secret)              
         job.upload_set(set.photoset)
       else
         # "No photosets. waiting."
