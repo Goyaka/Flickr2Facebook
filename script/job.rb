@@ -97,8 +97,6 @@ class Job
   
       #Upload photo to facebook.
       begin
-        url = "https://graph.facebook.com/#{album_id}/photos?access_token=#{@fb_access_token}"
-        puts url
         response = RestClient.post("https://graph.facebook.com/#{album_id}/photos?access_token=#{@fb_access_token}", {:source => File.new(filename), :message => photo[:message], :backdated_time => photo[:date]})
         fb_photo_id = (JSON.parse response.to_s)['id']  
         puts "Uploaded to http://facebook.com/#{fb_photo_id}"
