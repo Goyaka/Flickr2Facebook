@@ -53,7 +53,7 @@
 <%= form_tag("flickr/import-sets", :method => "post") do %>
 {{each(index, set) sets}}
 <div class="set">
-    <input type="checkbox" name="set[]" value="${set.id}" checked="true">
+    <input type="checkbox" name="set[]" value="${set.id}">
     <a target="_blank" href="http://flickr.com/photos/<%= @user.flickr_user_nsid %>/sets/${set.id}">${set.title}</a>
 </div>
 {{/each}}
