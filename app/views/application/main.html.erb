@@ -19,7 +19,7 @@
                     Authenticate
                 </a> <br>                
             <% else %>
-                Logged in as <a href="http://www.flickr.com" style="color: #FE63BB"><%= @flickr_user %> </a>
+                Logged in as <a href="http://www.flickr.com" style="color: #FE63BB; font-weight: bold;"><%= @flickr_user %> </a>
             <% end %>
             &nbsp;
         </div>
@@ -32,7 +32,7 @@
             <% if not @fb_user %>
                 <a href="facebook-auth"> <img src="/assets/facebook-login-button.png" /> </a> <br>                
             <% else %>
-                Logged in as <a href="http://www.facebook.com/<%= @fb_user %>"><%= @fb_user %></a>
+                Logged in as <a href="http://www.facebook.com/<%= @fb_user %>" style="font-weight:bold"><%= @fb_user %></a>
             <% end%>
 
         </div>
@@ -51,11 +51,13 @@
 <div>
     <h4> Choose sets that you want to import </h4>
     <%= form_tag("flickr/import-sets", :method => "post") do %>
-        <div class="sets row">
+        <div class="sets">
             {{each(index, set) sets}}
-                <div class="set span3">
+                <div class="set">
                     <label>
-                        <img id="${set.primary}" src="http://placehold.it/75x75" style="margin: 0 auto; display: block;">
+                        <div class="cover">
+                            <img id="${set.primary}" src="/assets/circle-loading.gif" style="margin: 0 auto; display: block">
+                        </div>
                         <div style="font-size: 0.8em; font-weight: bold">
                         <input type="checkbox" name="set[]" value="${set.id}" id="${set.id}">
                         ${set.title} 
@@ -66,7 +68,6 @@
                     </label>
                 </div>
             {{/each}}
-            <div class="clear"></div>
         </div>
         <center class="push-down">
             <button class="btn large success"> Import Sets Now! </button>
@@ -75,10 +76,6 @@
 </div>
 </script>
 <% end %>
-<% end %>
-
-
-<% content_for :javsacript do %>
 <script type="text/javascript">
 var fb_user;
 var flickr_user;
@@ -89,4 +86,8 @@ fb_user = "<%= @fb_user %>";
 flickr_user = "<%= @flickr_user %>";
 <% end %>
 </script>
+<% end %>
+
+
+<% content_for :javsacript do %>
 <% end %>

@@ -16,8 +16,6 @@ $(document).ready ->
                         type: 'get'
                         data: { primary: set.primary }
                         dataType: 'json'
-                        beforeSend: (xhr, settings) ->
-                            $("#"+ set.primary).attr('src', "/assets/circle-loading.gif")
                         success: (coverData) ->
                             $("#"+ set.primary).attr('src', coverData.cover_image)
                         

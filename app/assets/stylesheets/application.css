@@ -17,16 +17,38 @@
 }
 
 #sets .set {
-    border: 1px solid #cccccc;
+    display: inline-block;
+    width: 150px;
     padding: 2px 0px;
-    height: 140px;
+    margin: 0px 5px;
     overflow: hidden;
-    background: #cccccc;
+    cursor: pointer;
+    border-radius: 5px;
+    vertical-align: top;
+}
+#sets .set label {
+    padding: 0px;
+    width: 100%;
+    text-align: center;
     cursor: pointer;
 }
 
-#sets .set label {
-    width: 80%;
-    text-align: left;
-    padding: 0 10%;
+#sets .set .cover {
+    border: 2px solid transparent;
+    background: transparent;
+    min-height: 75px;
 }
+#sets .set:hover .cover {
+    border: 2px solid #999999;
+    border-radius: 10px;
+}
+#sets .set .cover img{
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 0px;
+}
+
+#sets .set:hover .cover img{
+    padding: 0px;
+}
+

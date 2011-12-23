@@ -43,7 +43,7 @@ class FlickrController < ApplicationController
       flickr.access_token = @user.flickr_access_token
       flickr.access_secret = @user.flickr_access_secret
       photo_info = flickr.photos.getInfo(:photo_id => params[:primary])
-      response[:cover_image] = FlickRaw.url_t(photo_info)
+      response[:cover_image] = FlickRaw.url_s(photo_info)
     end
     render :json => response
   end
