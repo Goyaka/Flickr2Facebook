@@ -44,6 +44,7 @@ img {
 
 .features {
   margin:40px 0;
+  font-size: 15px;
   
   ul {
    padding : 0;   
@@ -99,13 +100,14 @@ footer {
 .faq {
  .snippet 
  {
-    width : 500px;
+    width : 600px;
     min-height : 100px;
     border : 1px solid #404040;
     border-radius: 4px;
     margin : 0 auto;
     margin-top : 10px;
     background-color : #D5D2C4;
+    padding: 5px;
     
     h3 {
      padding : 0;
