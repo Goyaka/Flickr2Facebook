@@ -44,6 +44,8 @@ GEM
     execjs (1.2.13)
       multi_json (~> 1.0)
     flickraw (0.9.5)
+    flickraw-cached (20110920)
+      flickraw (>= 0.9)
     hashie (1.1.0)
     hike (1.2.1)
     httmultiparty (0.3.6)
@@ -136,6 +138,7 @@ DEPENDENCIES
   coffee-rails (~> 3.1.1)
   execjs
   flickraw
+  flickraw-cached
   httparty
   jquery-rails
   json
