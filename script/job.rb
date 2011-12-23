@@ -182,8 +182,5 @@ class Job
       photoset.save
     end
   end
-  
-  def add_job
-  end
 
 end
