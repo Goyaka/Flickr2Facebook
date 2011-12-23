@@ -3,6 +3,8 @@ body {
     margin: 0 auto;
     font-size: 16px;
     line-height: 16px;
+    background : #E5E2D4 url("/assets/background.png") repeat-x scroll 0 0;
+    font : 13px/1.231 sans-serif;
 }
 small {
     font-size: 0.8em;
@@ -25,4 +27,35 @@ ul li {
 img { 
     padding: 10px 10px;
     vertical-align: middle;
+}
+
+.main  {
+    h2 {
+        color: #546888;
+    }
+}
+
+footer {
+    h1.logo {
+     opacity:0.45;
+     float:right;
+     position:fixed;
+     bottom:0;
+     right:10px;
+     background: transparent url("/assets/goyaka-logo.png") no-repeat 0 2px;
+     font-family: 'Salsa', cursive;
+     font-size : 21px;
+     padding-left : 36px;
+     padding-top : 13px;
+     margin-top: 10px;
+     color:#040;
+    }
+    
+    h1.logo:hover {
+        opacity:1;
+    }
+    a:hover {
+        opacity:1;
+        text-decoration:none;
+    }
 }

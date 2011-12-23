@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Flickr2facebook</title>
+    <title>Goyaka Export | Move photos to Facebook</title>
+    <%= stylesheet_link_tag "http://fonts.googleapis.com/css?family=Salsa" %>
     <%= stylesheet_link_tag    "application" %>
 
     <%= csrf_meta_tags %>
-    <meta property="og:title" content=""/>
-    <meta property="og:type" content=""/>
-    <meta property="og:url" content=""/>
+    <meta property="og:title" content="Goyaka Export - Move photos to facebook"/>
+    <meta property="og:type" content="product"/>
+    <meta property="og:url" content="http://export.goyaka.com/"/>
     <meta property="og:image" content=""/>
-    <meta property="og:site_name" content=""/>
+    <meta property="og:site_name" content="http://www.goyaka.com/"/>
     <script>
     function popup(pageURL, title,w,h) {
         var left = (screen.width/2)-(w/2);
@@ -31,6 +32,9 @@
 </head>
 <body>
     <%= yield %>
+    <footer>
+        <a href="http://www.goyaka.com/"><h1 class="logo">Goyaka Labs</h1></a>
+    </footer>
 </body>
 <%= javascript_include_tag "application" %>
 </html>
