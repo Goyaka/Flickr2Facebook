@@ -5,7 +5,6 @@ require 'config'
 require 'json'
 require 'net/http'
 require 'time'
-require 'mongo'
 
 
 FlickRaw.api_key = FlickrConfig[:API_KEY] 
@@ -15,9 +14,8 @@ class Job
   
   def initialize(fb_access_token, flickr_access_token, flickr_access_secret)
     @fb_access_token      = fb_access_token
-    flickr.access_token   = flickr_access_token
-    flickr.access_secret  = flickr_access_secret
-    @db = Mongo::Connection.new.db("jobqueue")
+    #flickr.access_token   = flickr_access_token
+    #flickr.access_secret  = flickr_access_secret
   end
   
   def download(source, destination)
@@ -91,18 +89,24 @@ class Job
 =end
   end
   
+  def create_album(albumname, description)
+     response = RestClient.post("https://graph.facebook.com/me/albums?access_token=#{@fb_access_token}", 
+                                {:name => albumname, :message => description })
+     return (JSON.parse response.to_s)['id']
+  end
+  
   def create_fb_albums(albumname, description, albumcount)
     albumids = []
-    for i in range 1..albumcount do |albumindex|
-      begin
-        albumname_with_index = albumname + " " + albumindex.to_s
-        response = RestClient.post("https://graph.facebook.com/me/albums?access_token=#{@fb_access_token}", 
-                                  {:name => albumname_with_index, :message => description })
-        
-        albumids.push((JSON.parse response.to_s)['id'])
-        puts response
-      rescue Exception => error
-        puts "Erroring + " + error.to_s 
+    if albumcount == 1
+      albumids.push(self.create_album(albumname, description))
+    else
+      for albumindex in 1..albumcount do 
+        begin
+          albumname_with_index = albumname + " " + albumindex.to_s
+          albumids.push(self.create_album(albumname_with_index, description))
+        rescue Exception => error
+          puts "Erroring + " + error.to_s 
+        end
       end
     end
     
@@ -110,6 +114,7 @@ class Job
   end
 
   def upload_set(set_id) 
+    set_info    = 
     setinfo     = flickr.photosets.getInfo(:photoset_id => set_id)
     albumname   = setinfo.title
     description = setinfo.description
