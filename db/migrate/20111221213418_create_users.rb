@@ -3,7 +3,7 @@ class CreateUsers < ActiveRecord::Migration
     create_table :users do |t|
       t.string :user
       t.string :fb_code
-      t.string :fb_session
+      t.string :fb_session #This is the access token
       t.string :flickr_oauth_token
       t.string :flickr_oauth_secret
       t.string :flickr_oauth_verifier
