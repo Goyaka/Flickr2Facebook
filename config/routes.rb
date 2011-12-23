@@ -7,6 +7,7 @@ Flickr2facebook::Application.routes.draw do
   match "fbauthenticate" => "auth#facebook_authenticate"
   match "flickr/sets" => 'flickr#get_sets'
   match "flickr/import-sets" => 'flickr#select_sets', :via => :post
+  match "flickr/cover-photo" => 'flickr#get_cover_images'
 
   root :to => 'application#index'
 end

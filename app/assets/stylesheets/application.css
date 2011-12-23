@@ -10,13 +10,23 @@
 */
 
 #sets {
-    text-align: left;
+    text-align: center;
     margin: 0 auto;
-    width: 600px;
     padding-top: 20px;
     font-size: 15px;
 }
 
 #sets .set {
-    padding: 5px 0px;
+    border: 1px solid #cccccc;
+    padding: 2px 0px;
+    height: 140px;
+    overflow: hidden;
+    background: #cccccc;
+    cursor: pointer;
+}
+
+#sets .set label {
+    width: 80%;
+    text-align: left;
+    padding: 0 10%;
 }
