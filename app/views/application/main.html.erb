@@ -15,7 +15,7 @@
             <% if not @fb_user %>
                 &nbsp;
             <% elsif @fb_user and not @flickr_user %>
-                <a href="/flickr-auth" class="btn large" style="color: #FE63BB; font-size: 22px"> 
+                <a href="/flickr-auth" class="btn large" onclick="_gaq.push(['_trackEvent', 'Auth', 'Flickr', 'start']);" style="color: #FE63BB; font-size: 22px"> 
                     Authenticate
                 </a> <br>                
             <% else %>
@@ -30,7 +30,7 @@
         <div class="span3">
             <img src = "/assets/<%= @fb_user ? "facebook.png":"facebook-not-authenticated.png" %>">
             <% if not @fb_user %>
-                <a href="facebook-auth"> <img src="/assets/facebook-login-button.png" /> </a> <br>                
+                <a href="facebook-auth" onclick="_gaq.push(['_trackEvent', 'Auth', 'Facebook', 'start']);"> <img src="/assets/facebook-login-button.png" /> </a> <br>                
             <% else %>
                 Logged in as <a href="http://www.facebook.com/<%= @fb_user %>" style="font-weight:bold"><%= @fb_user %></a>
             <% end%>
@@ -59,7 +59,7 @@
                             <img id="${set.primary}" src="/assets/circle-loading.gif" style="margin: 0 auto; display: block">
                         </div>
                         <div style="font-size: 0.8em; font-weight: bold">
-                        <input type="checkbox" name="set[]" value="${set.id}" id="${set.id}">
+                        <input type="checkbox" onclick="_gaq.push(['_trackEvent', 'Select_Sets', '#{set.id}']);" name="set[]" value="${set.id}" id="${set.id}">
                         ${set.title} 
                         <a target="_blank" href="http://flickr.com/photos/<%= @user.flickr_user_nsid %>/sets/${set.id}">
                             <img style="padding: 2px 5px; vertical-align: top" src="/assets/external-link.png">
