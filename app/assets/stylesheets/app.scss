@@ -43,12 +43,13 @@ img {
 
 
 .features {
-  margin-top:20px;
+  margin:40px 0;
   
   ul {
    padding : 0;   
   
     li {
+      height : 160px;
       display : inline-block;
       width : 33%;
       text-align: center;
@@ -96,7 +97,7 @@ footer {
 }
 
 #goyaka-chat {
-  margin-right : 180px !important;
+  margin-right : 190px !important;
   
   .goyaka-menu {
      background-color: #57663D !important;
