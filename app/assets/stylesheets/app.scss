@@ -13,6 +13,12 @@ small {
 .main {
     text-align: center;
     padding-top: 50px;
+    
+    .startnow {
+        text-shadow: #040 1px 1px;
+        font-weight: bold;
+        font-size:135%;
+    }
 }
 
 ul {
@@ -31,11 +37,39 @@ img {
 
 .main  {
     h2 {
-        color: #546888;
+     color:#040;
     }
 }
 
+
+.features {
+  margin-top:20px;
+  
+  ul {
+   padding : 0;   
+  
+    li {
+      display : inline-block;
+      width : 33%;
+      text-align: center;
+      img {
+        display : block;
+        margin : 0 auto;
+      }
+      color : #000;
+    }
+  }
+}
+
+.features h3, .faq h3 {
+  width : 200px;
+  margin : 0 auto;
+  padding : 0;
+  
+} 
+
 footer {
+    border: 0 none;
     h1.logo {
      opacity:0.45;
      float:right;
@@ -49,6 +83,7 @@ footer {
      padding-top : 13px;
      margin-top: 10px;
      color:#040;
+     margin-bottom:-2px;
     }
     
     h1.logo:hover {
@@ -58,4 +93,12 @@ footer {
         opacity:1;
         text-decoration:none;
     }
+}
+
+#goyaka-chat {
+  margin-right : 180px !important;
+  
+  .goyaka-menu {
+     background-color: #57663D !important;
+  }
 }

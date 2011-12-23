@@ -11,30 +11,37 @@
     <meta property="og:url" content="http://export.goyaka.com/"/>
     <meta property="og:image" content=""/>
     <meta property="og:site_name" content="http://www.goyaka.com/"/>
-    <script>
-    function popup(pageURL, title,w,h) {
-        var left = (screen.width/2)-(w/2);
-        var top = (screen.height/2)-(h/2);
-        var targetWin = window.open(
-            pageURL,
-            title,
-            'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width='+w+', height='+h+', top='+top+', left='+left
-        );
-    }
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27906366-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
     </script>
-    <!--[if IE]>
-    <script>
-    var tags = ['header', 'section'];
-    while(tags.length)
-    document.createElement(tags.pop());
-    </script>
-    <![endif]-->
 </head>
 <body>
     <%= yield %>
     <footer>
         <a href="http://www.goyaka.com/"><h1 class="logo">Goyaka Labs</h1></a>
     </footer>
+    <script type="text/javascript">
+
+      var goyakac = goyakac || {};
+      goyakac.client = '10001';
+
+      (function() {
+        var A = document.createElement('script'); A.type = 'text/javascript'; A.async = true;
+        A.src = 'http://chat.goyaka.com/static/chat.js';
+        var B = document.getElementsByTagName("head")[0];         
+        B.appendChild(A);
+      })();
+    </script>    
 </body>
 <%= javascript_include_tag "application" %>
 </html>
