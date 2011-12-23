@@ -10,6 +10,15 @@ $(document).ready ->
             success: (data) ->
                 $("#sets").html('');
                 $("#sets_list_template").tmpl(data).appendTo("#sets").animate();
+                
+                #add select all handler
+                if $('#select_all')
+                    $('#select_all').click ->
+                        if ($('#select_all').attr('checked'))
+                            $('.sets input').attr('checked',true)
+                        else
+                            $('.sets input').attr('checked',false)
+                
                 $.each (data.sets),  (index, set) ->
                     $.ajax
                         url: 'flickr/cover-photo'
@@ -18,4 +27,4 @@ $(document).ready ->
                         dataType: 'json'
                         success: (coverData) ->
                             $("#"+ set.primary).attr('src', coverData.cover_image)
-                        
+

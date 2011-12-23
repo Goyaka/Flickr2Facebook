@@ -19,6 +19,28 @@ small {
         font-weight: bold;
         font-size:135%;
     }
+    
+    #select_all_wrapper {
+        background: transparent url(/assets/recommend.png) 0px 0px no-repeat;
+        pointer: cursor;
+        width: 140px;
+        padding-top: 86px;
+        margin-top: -85px;
+        margin-left: -200px;
+        margin-right: 49px;
+        
+        label {
+            width : auto;
+            font-size : 105%;
+            font-weight : bold;
+        }
+        
+        input {
+            vertical-align : middle;
+            margin-left: -46px;
+            margin-top: 7px;
+        }
+    }
 }
 
 ul {
