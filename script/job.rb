@@ -67,8 +67,6 @@ class Job
     photo[:date]              = info.dateuploaded.to_i
     if photo[:lat]
       photo[:message]	+= "\n\n{'lat':#{photo[:lat]},'lon':#{photo[:lon]}}}"
-    else
-      photo[:message] += "\n\n{'time' : #{info.dateuploaded.to_i}}"
     end
     return photo
     
