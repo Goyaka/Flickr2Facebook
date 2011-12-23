@@ -2,8 +2,15 @@
 
 <div class="main">
     <% if @fb_user and @flickr_user %>
-        <div class="alert-message block-message info">
-            <b> Congrats!</b> You have now authenticated both Flickr and Facebook accounts.
+        <div class="alert-message block-message success">
+            <b> Congrats!</b> You have now authenticated both <a href="http://facebook.com/<%= @fb_user %>"> Facebook </a> and 
+            <a href="http://flickr.com/<%= @user.flickr_user_nsid %>"> Flickr</a> accounts.
+            <div class="row">
+                <div class="span5"></div>
+                <div class="span2"><img src="https://graph.facebook.com/me/picture?type=normal&access_token=<%= @client.access_token %>"> </div>
+                <div class="span5 pull-down"> Logged into Facebook as <a href="http://facebook.com/<%= @fb_user %>"><%= @fb_user %> </a>.<br> Flickr as <a href="http://flickr.com/<%= @user.flickr_user_nsid %>"> <%= @flickr_user %> </a></div>
+            </div>
+            
         </div>
         <div id="sets">
         </div>
@@ -26,8 +33,10 @@ flickr_user = "<%= @flickr_user %>";
 <% if @fb_user and @flickr_user %>
 <script id="sets_list_template" type="text/x-jquery-tmpl">
 <div>
+
     <div id="select_all_wrapper" class="pull-right span2"> <label for="select_all">Select all</label><input type="checkbox" id="select_all"></div>
-    <h4> Choose Flickr sets that you want to migrate to Facebook. </h4>
+
+    <h2> Choose Flickr sets that you want to migrate to Facebook. </h2>
     <%= form_tag("flickr/import-sets", :method => "post") do %>
         <div class="sets">
             {{each(index, set) sets}}

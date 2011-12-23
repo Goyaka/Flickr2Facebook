@@ -41,7 +41,7 @@ class ApplicationController < ActionController::Base
       @user = User.where(:user => facebook_user.username)[0]
       @fb_user = @user.user
       @flickr_user = @user.flickr_username
-      @fb_access_token = session[:at]
+      @client = Mogli::Client.new(session[:at])
     end
   end
   
