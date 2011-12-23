@@ -27,31 +27,34 @@
 </head>
 <body>
     <div id="fb-root"></div>
-    <script>(function(d, s, id) {
-      var js, fjs = d.getElementsByTagName(s)[0];
-      if (d.getElementById(id)) return;
-      js = d.createElement(s); js.id = id;
-      js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=266622343393824";
-      fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'facebook-jssdk'));</script>
     <%= yield :content %>
     <footer>
         <a href="http://www.goyaka.com/"><h1 class="logo">Goyaka Labs</h1></a>
     </footer>
-    <script type="text/javascript">
-
-      var goyakac = goyakac || {};
-      goyakac.client = '10001';
-
-      (function() {
-        var A = document.createElement('script'); A.type = 'text/javascript'; A.async = true;
-        A.src = 'http://chat.goyaka.com/static/chat.js';
-        var B = document.getElementsByTagName("head")[0];         
-        B.appendChild(A);
-      })();
-    </script>    
 </body>
 <%= javascript_include_tag "application" %>
 <%= yield :javascript %>
 
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=266622343393824";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<!--
+<script type="text/javascript">
+
+  var goyakac = goyakac || {};
+  goyakac.client = '10001';
+
+  (function() {
+    var A = document.createElement('script'); A.type = 'text/javascript'; A.async = true;
+    A.src = 'http://chat.goyaka.com/static/chat.js';
+    var B = document.getElementsByTagName("head")[0];         
+    B.appendChild(A);
+  })();
+</script>
+-->
 </html>
