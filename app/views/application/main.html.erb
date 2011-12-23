@@ -41,41 +41,6 @@
     <div id="sets"> </div>
 </div>
 
-<pre class="prettyprint hide" style="position: absolute; bottom: 0; width: 960px">
-        Facebook: <%= debug(@fb_user) if @fb_user %>
-        Flickr: <%= debug(@flickr_user) if @flickr_user %>
-        <%= @flickr_user.inspect %>
-</pre>
-<% if @fb_user and @flickr_user %>
-<script id="sets_list_template" type="text/x-jquery-tmpl">
-<div>
-    <h4> Choose sets that you want to import </h4>
-    <%= form_tag("flickr/import-sets", :method => "post") do %>
-        <div class="sets">
-            {{each(index, set) sets}}
-                <div class="set">
-                    <label>
-                        <div class="cover">
-                            <img id="${set.primary}" src="/assets/circle-loading.gif" style="margin: 0 auto; display: block">
-                        </div>
-                        <div style="font-size: 0.8em; font-weight: bold">
-                        <input type="checkbox" onclick="_gaq.push(['_trackEvent', 'Select_Sets', '#{set.id}']);" name="set[]" value="${set.id}" id="${set.id}">
-                        ${set.title} 
-                        <a target="_blank" href="http://flickr.com/photos/<%= @user.flickr_user_nsid %>/sets/${set.id}">
-                            <img style="padding: 2px 5px; vertical-align: top" src="/assets/external-link.png">
-                        </a>
-                        </div>
-                    </label>
-                </div>
-            {{/each}}
-        </div>
-        <center class="push-down">
-            <button class="btn large success"> Import Sets Now! </button>
-        </center>
-    <% end %>
-</div>
-</script>
-<% end %>
 <script type="text/javascript">
 var fb_user;
 var flickr_user;

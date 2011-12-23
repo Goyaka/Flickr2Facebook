@@ -8,6 +8,8 @@ Flickr2facebook::Application.routes.draw do
   match "flickr/sets" => 'flickr#get_sets'
   match "flickr/import-sets" => 'flickr#select_sets', :via => :post
   match "flickr/cover-photo" => 'flickr#get_cover_images'
+  match "migrate" => "application#migrate"
+  match "status" => "application#status"
 
   root :to => 'application#index'
 end
