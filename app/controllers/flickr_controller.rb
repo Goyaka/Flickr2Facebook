@@ -1,4 +1,9 @@
 class FlickrController < ApplicationController
+  
+  PHOTOSET_NOTPROCESSED = 0
+  PHOTOSET_PROCESSING   = 1
+  PHOTOSET_PROCESSED    = 2
+  
   def get_sets
     # TODO: Make the config loading part separated
     config = YAML.load_file(Rails.root.join("config/flickr.yml"))[Rails.env]
@@ -31,7 +36,7 @@ class FlickrController < ApplicationController
       @user = User.where(:user => facebook_user.username)[0]
       if @user
         params["set"].each do |set| 
-          photoset = Photoset.new(:user_id => @user, :photoset => set, :status => 'false')
+          photoset = Photoset.new(:user_id => @user, :photoset => set, :status => FlickrController::PHOTOSET_NOTPROCESSED)
           photoset.save!
         end
       end
