@@ -37,16 +37,24 @@ class FlickrController < ApplicationController
 
     flickr = FlickRaw::Flickr.new
     facebook_user = Mogli::User.find("me",Mogli::Client.new(session[:at]))
+    response = {}
     if facebook_user
       @user = User.where(:user => facebook_user.username)[0]
       if @user
         params["set"].each do |set| 
-          photoset = Photoset.new(:user_id => @user, :photoset => set, :status => FlickrController::PHOTOSET_NOTPROCESSED)
-          photoset.save!
+          photoset = Photoset.where(:user_id => @user, :photoset => set)
+          if photoset.empty?
+            photoset = Photoset.new(:user_id => @user, :photoset => set, :status => FlickrController::PHOTOSET_NOTPROCESSED)
+            photoset.save!
+            response[:success] = true
+            response[:message] = "Set has been added to be exported." 
+          else 
+            response[:success] = true
+            response[:message] = "Set is already added to be exported."
+          end
         end
       end
     end
-    response = { :success => true }
     render :json => response
   end
 
