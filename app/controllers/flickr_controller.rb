@@ -4,6 +4,11 @@ class FlickrController < ApplicationController
   PHOTOSET_PROCESSING   = 1
   PHOTOSET_PROCESSED    = 2
   
+  PHOTO_NOTPROCESSED = 0
+  PHOTO_PROCESSING   = 1
+  PHOTO_PROCESSED    = 2
+  
+  
   def get_sets
     # TODO: Make the config loading part separated
     config = YAML.load_file(Rails.root.join("config/flickr.yml"))[Rails.env]
