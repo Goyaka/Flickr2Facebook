@@ -63,7 +63,6 @@ class Job
   def upload(photo)
     verify_photo = Photo.where('id = ? AND status = ?', photo.id, FlickrController::PHOTO_NOTPROCESSED).first
     
-    puts "Trying to upload " + verify_photo.id.to_s 
     if verify_photo 
       verify_photo.status = FlickrController::PHOTO_PROCESSING
       verify_photo.save
@@ -87,7 +86,7 @@ class Job
       end
 
       File.delete(filename)
-      verify_photo.status = FlickrController::PHOTO_PROCESSING
+      verify_photo.status = FlickrController::PHOTO_PROCESSED
       verify_photo.save
     end
 =begin
