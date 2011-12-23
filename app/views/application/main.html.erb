@@ -1,3 +1,4 @@
+<% content_for :content do %>
 <div class="main">                                           
     <% if not @fb_user %>
         <h2> Step 1: Login into your Facebook Account </h2>
@@ -62,6 +63,10 @@
 </div>
 </script>
 <% end %>
+<% end %>
+
+
+<% content_for :javsacript do %>
 <script type="text/javascript">
 var fb_user;
 var flickr_user;
@@ -71,5 +76,5 @@ fb_user = "<%= @fb_user %>";
 <% if @flickr_user %>
 flickr_user = "<%= @flickr_user %>";
 <% end %>
-
 </script>
+<% end %>

@@ -75,8 +75,8 @@ footer {
      opacity:0.45;
      float:right;
      position:fixed;
-     bottom:0;
-     right:10px;
+     bottom:35px;
+     right:50px;
      background: transparent url("/assets/goyaka-logo.png") no-repeat 0 2px;
      font-family: 'Salsa', cursive;
      font-size : 21px;
@@ -96,8 +96,33 @@ footer {
     }
 }
 
+.faq {
+ .snippet 
+ {
+    width : 500px;
+    min-height : 100px;
+    border : 1px solid #404040;
+    border-radius: 4px;
+    margin : 0 auto;
+    margin-top : 10px;
+    background-color : #D5D2C4;
+    
+    h3 {
+     padding : 0;
+    }
+    
+    ul {
+        padding: 0;
+        margin : 0;
+        li {
+            color: #000;    
+        }
+    }
+    
+ }
+}
+
 #goyaka-chat {
-  margin-right : 190px !important;
   
   .goyaka-menu {
      background-color: #57663D !important;

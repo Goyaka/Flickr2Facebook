@@ -1,3 +1,5 @@
+<% content_for :content do %>
+
 <div class="main">
     <h2> Easily migrate your photos to Facebook </h2>
     <div class="row">
@@ -30,12 +32,36 @@
     
     <div class="faq">
         <h3>Questions</h3>
-        <div>
+        <div class="links">
             <a href="#whyfacebook" id="whyfacebook">Why facebook?</a>  · <a href="#spam" id="spam">We wont spam your feed</a> · 
             <a id="picasa" href="#picasa">We wont spam your feed</a> · <a href="#about">About</a> 
         </div>
         
+        <div id="whyfacebook-expand" class="hide snippet">
+            <h4>Why Facebook</h4>
+            <ul>
+                <li>Facebook photos are more social. <strong>Tagging</strong> just nails it.</li>
+                <li>Share with your <strong>schoolmates, family</strong> or no one.</li>
+                <li><strong>Timeline</strong>! We love facebook's timeline. Though it is still buggy.</li>
+            </ul>
+        </div>
         
+        <div id="spam-expand" class="hide snippet">
+            spam
+        </div>
+        
+        <div id="picasa-expand" class="hide snippet">
+            picasa
+        </div>
+        
+        <div id="about-expand" class="hide snippet">
+            about
+        </div>
     </div>
-    
 </div>
+
+<% end %>
+
+<% content_for :javascript do %>
+<%= javascript_include_tag "app" %>
+<% end %>

@@ -34,7 +34,7 @@
       js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=266622343393824";
       fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));</script>
-    <%= yield %>
+    <%= yield :content %>
     <footer>
         <a href="http://www.goyaka.com/"><h1 class="logo">Goyaka Labs</h1></a>
     </footer>
@@ -52,4 +52,6 @@
     </script>    
 </body>
 <%= javascript_include_tag "application" %>
+<%= yield :javascript %>
+
 </html>
