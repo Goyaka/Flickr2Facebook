@@ -12,6 +12,8 @@ FlickRaw.shared_secret = FlickrConfig[:API_SECRET]
 
 class Job
   
+  MAX_FACEBOOK_PHOTO_COUNT = 200
+  
   def initialize(fb_access_token, flickr_access_token, flickr_access_secret)
     config = YAML.load_file(Rails.root.join("config/flickr.yml"))[Rails.env]
     FlickRaw.api_key = config['app_id']
@@ -58,26 +60,36 @@ class Job
      return info
   end
 
-  def upload(photo_id, album_id)
-    puts "Downloading photo " + photo_id
-    photo        = getphoto_info(photo_id) 
-    filename     = '/tmp/' + (Time.now.to_f*1000).to_i.to_s
-   
-
-    download(photo[:photo_source], filename)
-    puts "Downloaded photo. Uploading to facebook. " + photo_id
+  def upload(photo)
+    verify_photo = Photo.where('id = ? AND status = ?', photo.id, FlickrController::PHOTO_NOTPROCESSED).first
     
-    #Upload photo to facebook.
-    begin
-      response = RestClient.post("https://graph.facebook.com/#{album_id}/photos?access_token=#{@fb_access_token}", {:source => File.new(filename), :message => photo[:message]})
-      fb_photo_id = (JSON.parse response.to_s)['id']
-      puts "Uploaded to http://facebook.com/#{fb_photo_id}"
-    rescue Exception => error
-      puts "Erroring + " + error.to_s 
+    puts "Trying to upload " + verify_photo.id.to_s 
+    if verify_photo 
+      verify_photo.status = FlickrController::PHOTO_PROCESSING
+      verify_photo.save
+      photo_id     = photo.photo
+      album_id     = photo.facebook_album
+
+      puts "Downloading photo " + photo_id.to_s
+      photo        = getphoto_info(photo_id) 
+      filename     = '/tmp/' + (Time.now.to_f*1000).to_i.to_s
+ 
+      download(photo[:photo_source], filename)
+      puts "Downloaded photo. Uploading to facebook. " + photo_id
+  
+      #Upload photo to facebook.
+      begin
+        response = RestClient.post("https://graph.facebook.com/#{album_id}/photos?access_token=#{@fb_access_token}", {:source => File.new(filename), :message => photo[:message]})
+        fb_photo_id = (JSON.parse response.to_s)['id']
+        puts "Uploaded to http://facebook.com/#{fb_photo_id}"
+      rescue Exception => error
+        puts "Erroring + " + error.to_s 
+      end
+
+      File.delete(filename)
+      verify_photo.status = FlickrController::PHOTO_PROCESSING
+      verify_photo.save
     end
-  
-    File.delete(filename)
-  
 =begin
     search_location = "https://graph.facebook.com/search?q=''&type=place&center=#{photo[:lat]},#{photo[:lon]}&distance=1000&access_token=#{access_token}"
     puts search_location
@@ -107,6 +119,7 @@ class Job
       for albumindex in 1..albumcount do 
         begin
           albumname_with_index = albumname + " " + albumindex.to_s
+          puts "Creating album" + albumname_with_index
           albumids.push(self.create_album(albumname_with_index, description))
         rescue Exception => error
           puts "Erroring + " + error.to_s 
@@ -121,6 +134,7 @@ class Job
     photoset    = Photoset.where('photoset = ? AND status = ?', set_id, FlickrController::PHOTOSET_NOTPROCESSED).first
     if photoset
       photoset.status = FlickrController::PHOTOSET_PROCESSING
+      photoset.save
       setinfo         = flickr.photosets.getInfo(:photoset_id => set_id)
       albumname       = setinfo.title
       description     = setinfo.description
@@ -131,14 +145,21 @@ class Job
          piclist.push pic.id
       end
     
-      albumcount = (piclist.length + 200) / 200
+      albumcount = (piclist.length + Job::MAX_FACEBOOK_PHOTO_COUNT) / Job::MAX_FACEBOOK_PHOTO_COUNT
       albumids   = self.create_fb_albums(albumname, description, albumcount)
 
-    
-      for pic in photos.photo
-        photo = Photo.new(:photo => pic.id, :photoset_id => photoset, :facebook_photo => '', :facebook_album => '', :status => FlickrController::PHOTO_NOTPROCESSED)
+      index = 0
+      photoset_photos = photos.photo
+      for pic in photoset_photos
+        facebook_album = albumids[(index + 1)/Job::MAX_FACEBOOK_PHOTO_COUNT]
+        puts "Adding photo " + pic.id.to_s + " to facebook album http://facebook.com/" + facebook_album
+        photo = Photo.new(:photo => pic.id, :photoset_id => photoset, :facebook_photo => '', :facebook_album => facebook_album, :status => FlickrController::PHOTO_NOTPROCESSED)
         photo.save()
+        index = index + 1
       end
+      
+      photoset.status = FlickrController::PHOTOSET_PROCESSED
+      photoset.save
     end
   end
   
