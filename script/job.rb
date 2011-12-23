@@ -19,7 +19,6 @@ class Job
     FlickRaw.api_key = config['app_id']
     FlickRaw.shared_secret = config['shared_secret']
     
-    puts "Initializing job"
     @fb_access_token      = fb_access_token
     flickr.access_token   = flickr_access_token
     flickr.access_secret  = flickr_access_secret
@@ -87,6 +86,7 @@ class Job
 
       File.delete(filename)
       verify_photo.status = FlickrController::PHOTO_PROCESSED
+      verify_photo.facebook_photo = "http://facebook.com/#{fb_photo_id}"
       verify_photo.save
     end
 =begin
