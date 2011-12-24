@@ -18,6 +18,8 @@ gem 'mongoid'
 gem 'bson'
 gem 'bson_ext'
 
+gem "oauth"
+gem "oauth-plugin"
 group :production do
   gem "mysql2"
 end
