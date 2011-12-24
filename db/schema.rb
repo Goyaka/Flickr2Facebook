@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111222043712) do
+ActiveRecord::Schema.define(:version => 20111224183819) do
 
   create_table "photos", :force => true do |t|
     t.string   "photo"
@@ -44,5 +44,7 @@ ActiveRecord::Schema.define(:version => 20111222043712) do
     t.string   "flickr_username"
     t.string   "flickr_user_nsid"
   end
+
+  add_index "users", ["user"], :name => "index_users_on_user"
 
 end
