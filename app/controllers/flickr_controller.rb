@@ -48,6 +48,25 @@ class FlickrController < ApplicationController
     response = { :sets => newsets}
     render :json => response
   end
+
+  def get_sets_inqueue
+    @sets, @user   = self.get_all_sets
+    
+    existingsets = Photoset.select('photoset').where('user_id = ? and status = ?',
+                                    @user,
+                                    FlickrController::PHOTO_NOTPROCESSED).map {|set| set.photoset}.compact
+                                    
+    newsets = []
+    
+    for set in @sets
+      if existingsets.include? set.id
+        newsets.push(set)
+      end
+    end
+    
+    response = { :sets => newsets}
+    render :json => response
+  end
   
   def get_sets_uploading    
     @sets, @user   = self.get_all_sets
@@ -130,7 +149,13 @@ class FlickrController < ApplicationController
         end
       end
     end
-    render :json => response
+    
+    if response[:success]
+      redirect_to :controller => 'application', :action => 'status'
+    else 
+      render :json => response
+    end
+    
   end
 
 end

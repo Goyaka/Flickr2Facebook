@@ -7,10 +7,13 @@ $(document).ready ->
                 data: { user: fb_user }
                 dataType: 'json'
                 beforeSend: (xhr, settings) ->
-                    $("#sets").html('<center><img src= "assets/loading.gif"><br>This may take a while, depending upon your Flickr Sets!</center>')
+                    selector = picker.replace('#','') + '-container';
+                    $("#sets").append('<div id="' + selector + '"></div>')
+                    $("#" + selector).html('<center><img src= "assets/loading.gif"><br>This may take a while, depending upon your Flickr Sets!</center>')
                 success: (data) ->
-                    $("#sets").html('');
-                    $(picker).tmpl(data).appendTo("#sets").animate();
+                    selector = picker.replace('#','') + '-container';
+                    $('#' + selector).html('');
+                    $(picker).tmpl(data).appendTo('#' + selector).animate();
                     
                     #add select all handler
                     if $('#select_all')
@@ -30,12 +33,17 @@ $(document).ready ->
                                 $("#"+ set.primary).attr('src', coverData.cover_image)
             
         if $("#sets_list_template").length != 0
-            loadsets('/flickr/sets','#sets_lists_template')
+            loadsets('/flickr/sets','#sets_list_template')
+            
+        if $('#inqueue_sets_list_template').length != 0
+            loadsets('/flickr/inqueue_sets','#inqueue_sets_list_template')
             
         if $("#uploading_sets_list_template").length != 0
             loadsets('/flickr/uploading_sets','#uploading_sets_list_template')
         
         if $("#uploaded_sets_list_template").length != 0
             loadsets('/flickr/uploaded_sets','#uploaded_sets_list_template')
+            
+            
         
         
