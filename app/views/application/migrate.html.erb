@@ -35,7 +35,7 @@ flickr_user = "<%= @flickr_user %>";
     <div id="select_all_wrapper" class="pull-right span2"> <label for="select_all">Select all</label><input type="checkbox" id="select_all"></div>
 
     <h2> Choose Flickr sets that you want to migrate to Facebook. </h2>
-    <%= form_tag("flickr/import-sets", :method => "post") do %>
+    <%= form_tag("flickr/import-sets", :method => "post", :id=>'upload-photos-form') do %>
         <div class="sets">
             {{each(index, set) sets}}
                 <div class="set">
