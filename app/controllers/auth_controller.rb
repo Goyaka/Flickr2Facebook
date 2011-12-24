@@ -26,33 +26,6 @@ class AuthController < ApplicationController
     redirect_to :controller => 'application', :action => 'main'
   end
   
-  def flickr_auth
-    # We recognize our users by facebook authentication.
-    fb_user = Mogli::User.find("me",Mogli::Client.new(session[:at]))
-    user = User.where(:user => fb_user.id)[0]
-    redirect_to :action => 'facebook_authenticate' and return unless user
-
-    # Flickraw implementation for Flickr authentication.
-    # Refer: http://www.flickr.com/services/api/auth.oauth.html
-
-    # Load all flickr app config
-    config = YAML.load_file(Rails.root.join("config/flickr.yml"))[Rails.env]
-    FlickRaw.api_key = config['app_id']
-    FlickRaw.shared_secret = config['shared_secret']
-
-    # Generate a request_token with callback set appropriately
-    token = flickr.get_request_token :oauth_callback => url_for(:action => "flickr_callback")
-    
-    # Save the request token to database
-    user.flickr_oauth_token = token['oauth_token']
-    user.flickr_oauth_secret = token['oauth_token_secret']
-    user.save
-        
-    # Make the user authenticate into Flickr with read permissions
-    auth_url = flickr.get_authorize_url(token['oauth_token'], :perms => 'read')
-    redirect_to auth_url 
-  end
-
   def facebook_callback
     # create access tokens from callback
     mogli_client = Mogli::Client.create_from_code_and_authenticator(params[:code], facebook_authenticator)
@@ -82,6 +55,33 @@ class AuthController < ApplicationController
     
     # Go back to main page
     redirect_to :controller => 'application', :action => 'main'
+  end
+  
+  def flickr_auth
+    # We recognize our users by facebook authentication.
+    fb_user = Mogli::User.find("me",Mogli::Client.new(session[:at]))
+    user = User.where(:user => fb_user.id)[0]
+    redirect_to :action => 'facebook_authenticate' and return unless user
+
+    # Flickraw implementation for Flickr authentication.
+    # Refer: http://www.flickr.com/services/api/auth.oauth.html
+
+    # Load all flickr app config
+    config = YAML.load_file(Rails.root.join("config/flickr.yml"))[Rails.env]
+    FlickRaw.api_key = config['app_id']
+    FlickRaw.shared_secret = config['shared_secret']
+
+    # Generate a request_token with callback set appropriately
+    token = flickr.get_request_token :oauth_callback => url_for(:action => "flickr_callback")
+    
+    # Save the request token to database
+    user.flickr_oauth_token = token['oauth_token']
+    user.flickr_oauth_secret = token['oauth_token_secret']
+    user.save
+        
+    # Make the user authenticate into Flickr with read permissions
+    auth_url = flickr.get_authorize_url(token['oauth_token'], :perms => 'read')
+    redirect_to auth_url 
   end
   
   def flickr_callback
