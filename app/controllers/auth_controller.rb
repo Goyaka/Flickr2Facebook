@@ -29,7 +29,7 @@ class AuthController < ApplicationController
   def flickr_auth
     # We recognize our users by facebook authentication.
     fb_user = Mogli::User.find("me",Mogli::Client.new(session[:at]))
-    user = User.where(:user => fb_user.username)[0]
+    user = User.where(:user => fb_user.id)[0]
     redirect_to :action => 'facebook_authenticate' and return unless user
 
     # Flickraw implementation for Flickr authentication.
@@ -60,10 +60,15 @@ class AuthController < ApplicationController
     
     # get FB user handle
     fb_user = Mogli::User.find("me",Mogli::Client.new(session[:at])) if session[:at]
+    #Check if user is already registered
+    user = User.find_by_user(fb_user.id)
     
+    #If the user is not already registered, add new user
+    if(user==nil)
     # create a new user now
-    user = User.new(:user => fb_user.username, :fb_code => params[:code], :fb_session => session[:at])
-    user.save
+      user = User.new(:user => fb_user.id, :fb_code => params[:code], :fb_session => session[:at])
+      user.save
+    end
     
     # Go back to main page
     redirect_to :controller => 'application', :action => 'main'

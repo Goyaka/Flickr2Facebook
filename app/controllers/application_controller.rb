@@ -16,7 +16,7 @@ class ApplicationController < ActionController::Base
     end
 
     if facebook_user
-      @user = User.where(:user => facebook_user.username)[0]
+      @user = User.where(:user => facebook_user.id)[0]
       if not @user
         session[:at] = nil
         redirect_to :controller => 'auth', :action => 'facebook_auth' and return
@@ -38,7 +38,7 @@ class ApplicationController < ActionController::Base
     end
 
     if facebook_user
-      @user = User.where(:user => facebook_user.username)[0]
+      @user = User.where(:user => facebook_user.id)[0]
       @fb_user = @user.user
       @flickr_user = @user.flickr_username
       @client = Mogli::Client.new(session[:at])
