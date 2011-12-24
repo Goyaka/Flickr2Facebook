@@ -26,7 +26,16 @@ class FlickrController < ApplicationController
       @sets = flickr.photosets.getList(:user_id => @user.flickr_user_nsid)
     end
     
-    response = { :sets => @sets }
+    existingsets = Photoset.select('photoset').where('user_id = ? ', @user).map {|set| set.photoset}.compact
+    
+    newsets      = []
+    for set in @sets
+      if  not existingsets.include? set.id
+        newsets.push(set)
+      end
+    end
+    
+    response = { :sets => newsets}
     render :json => response
   end
   
