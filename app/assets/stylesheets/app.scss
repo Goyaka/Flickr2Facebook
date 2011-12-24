@@ -21,13 +21,15 @@ small {
     }
     
     #select_all_wrapper {
-        background: transparent url(/assets/recommend.png) 0px 0px no-repeat;
+        background: transparent url(/assets/recommend-new.png) 89px 0.7px no-repeat;
         pointer: cursor;
         width: 140px;
-        padding-top: 86px;
-        margin-top: -85px;
         margin-left: -200px;
-        margin-right: 49px;
+        position: relative;
+        top: 0;
+        left: 155px;
+        padding-bottom: 39px;
+        padding-right: 160px;
         
         label {
             width : auto;
