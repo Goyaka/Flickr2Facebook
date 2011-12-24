@@ -46,5 +46,19 @@ class ApplicationController < ActionController::Base
   end
   
   def status
+    
+    begin 
+      facebook_user = Mogli::User.find("me",Mogli::Client.new(session[:at])) if session[:at]
+    rescue Mogli::Client::HTTPException
+      session[:at] = nil
+      redirect_to :controller => 'auth', :action => 'facebook_auth' and return
+    end
+
+    if facebook_user
+      @user = User.where(:user => facebook_user.username)[0]
+      @fb_user = @user.user
+      @flickr_user = @user.flickr_username
+      @client = Mogli::Client.new(session[:at])
+    end
   end
 end

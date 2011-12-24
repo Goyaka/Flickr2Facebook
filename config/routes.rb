@@ -5,7 +5,9 @@ Flickr2facebook::Application.routes.draw do
   match "flickr-auth" => "auth#flickr_auth", :as => :flickr_auth
   match "flickr-callback" => "auth#flickr_callback", :as => :flickr_callback
   match "fbauthenticate" => "auth#facebook_authenticate"
-  match "flickr/sets" => 'flickr#get_sets'
+  match "flickr/sets" => 'flickr#get_sets_notuploaded'
+  match "flickr/uploaded_sets" => 'flickr#get_sets_uploaded'
+  match "flickr/uploading_sets" => 'flickr#get_sets_uploading'  
   match "flickr/import-sets" => 'flickr#select_sets', :via => :post
   match "flickr/cover-photo" => 'flickr#get_cover_images'
   match "migrate" => "application#migrate"

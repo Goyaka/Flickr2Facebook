@@ -9,8 +9,8 @@ class FlickrController < ApplicationController
   PHOTO_NOTPROCESSED = 0
   PHOTO_PROCESSING   = 1
   PHOTO_PROCESSED    = 2
-    
-  def get_sets
+  
+  def get_all_sets
     # TODO: Make the config loading part separated
     config = YAML.load_file(Rails.root.join("config/flickr.yml"))[Rails.env]
     FlickRaw.api_key = config['app_id']
@@ -26,9 +26,19 @@ class FlickrController < ApplicationController
       @sets = flickr.photosets.getList(:user_id => @user.flickr_user_nsid)
     end
     
-    existingsets = Photoset.select('photoset').where('user_id = ? ', @user).map {|set| set.photoset}.compact
+    return @sets, @user
+  end
     
-    newsets      = []
+  def get_sets_notuploaded
+    @sets, @user   = self.get_all_sets
+    
+    existingsets = Photoset.select('photoset').where('user_id = ? and status = ? or status = ?',
+                                    @user,
+                                    FlickrController::PHOTO_PROCESSING,
+                                    FlickrController::PHOTO_PROCESSED).map {|set| set.photoset}.compact
+    
+    newsets = []
+    
     for set in @sets
       if  not existingsets.include? set.id
         newsets.push(set)
@@ -36,6 +46,43 @@ class FlickrController < ApplicationController
     end
     
     response = { :sets => newsets}
+    render :json => response
+  end
+  
+  def get_sets_uploading    
+    @sets, @user   = self.get_all_sets
+    
+    existingsets = Photoset.select('photoset').where('user_id = ? and status = ?',
+                                    @user,
+                                    FlickrController::PHOTO_PROCESSING).map {|set| set.photoset}.compact
+                                    
+    newsets = []
+    
+    for set in @sets
+      if existingsets.include? set.id
+        newsets.push(set)
+      end
+    end
+    
+    response = { :sets => newsets}
+    render :json => response
+  end
+  
+  def get_sets_uploaded
+    @sets, @user   = self.get_all_sets
+    existingsets = Photoset.select('photoset').where('user_id = ? and status = ?',
+                                    @user,
+                                    FlickrController::PHOTO_PROCESSED).map {|set| set.photoset}.compact
+                                    
+    newsets = []
+    
+    for set in @sets
+      if existingsets.include? set.id
+        newsets.push(set)
+      end
+    end
+    
+    response = { :sets => newsets, :user => @user}
     render :json => response
   end
   
