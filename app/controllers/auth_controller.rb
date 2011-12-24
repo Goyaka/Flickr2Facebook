@@ -66,7 +66,7 @@ class AuthController < ApplicationController
     #If the user is not already registered, add new user
     if(user==nil)
     # create a new user now
-      user = User.new(:user => fb_user.id, :fb_code => params[:code], :fb_session => session[:at])
+      user = User.new(:user => fb_user.id, :fb_first_name => fb_user.first_name, :fb_last_name => fb_user.last_name, :fb_code => params[:code], :fb_session => session[:at])
       user.save
     end
     

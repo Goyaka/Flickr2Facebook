@@ -20,7 +20,7 @@ class FlickrController < ApplicationController
 
     facebook_user = Mogli::User.find("me",Mogli::Client.new(session[:at]))
     if facebook_user
-      @user = User.where(:user => facebook_user.username)[0]
+      @user = User.where(:user => facebook_user.id)[0]
       flickr.access_token = @user.flickr_access_token
       flickr.access_secret = @user.flickr_access_secret
       @sets = flickr.photosets.getList(:user_id => @user.flickr_user_nsid)
@@ -48,7 +48,7 @@ class FlickrController < ApplicationController
     facebook_user = Mogli::User.find("me",Mogli::Client.new(session[:at]))
     response = {}
     if facebook_user
-      @user = User.where(:user => facebook_user.username)[0]
+      @user = User.where(:user => facebook_user.id)[0]
       flickr.access_token = @user.flickr_access_token
       flickr.access_secret = @user.flickr_access_secret
       photo_info = flickr.photos.getInfo(:photo_id => params[:primary])
