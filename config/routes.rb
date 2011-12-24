@@ -4,6 +4,8 @@ Flickr2facebook::Application.routes.draw do
   match "facebook-callback" => "auth#facebook_callback", :as => :facbeook_callback
   match "flickr-auth" => "auth#flickr_auth", :as => :flickr_auth
   match "flickr-callback" => "auth#flickr_callback", :as => :flickr_callback
+  match "google-auth" => "auth#google_auth", :as => :google_auth
+  match "google-callback" => "auth#google_callback", :as => :google_callback
   match "fbauthenticate" => "auth#facebook_authenticate"
   match "flickr/sets" => 'flickr#get_sets_notuploaded'
   match "flickr/uploaded_sets" => 'flickr#get_sets_uploaded'

@@ -110,4 +110,30 @@ class AuthController < ApplicationController
     # Now go back to main page
     redirect_to :controller => 'application', :action => 'main'
   end
+  
+  def google_auth
+    @consumer = OAuth::Consumer.new( "USER","SECRET", {
+      :site => "https://www.google.com", 
+      :request_token_path => "/accounts/OAuthGetRequestToken", 
+      :access_token_path => "/accounts/OAuthGetAccessToken", 
+      :authorize_path=> "/accounts/OAuthAuthorizeToken"
+    })
+    
+    @request_token = @consumer.get_request_token({
+      :oauth_callback => url_for(:action => 'google_callback'),
+    }, {
+      :scope => 'https://picasaweb.google.com/data/',
+      :response_type => 'code',
+      :access_type => 'offline'
+    })
+    session[:request_token] = @request_token
+    redirect_to @request_token.authorize_url
+  end
+  
+  def google_callback
+    @request_token = session[:request_token]
+    @access_token = @request_token.get_access_token(:oauth_verifier => params[:oauth_verifier])
+    render :json => @access_token
+  end
+  
 end
