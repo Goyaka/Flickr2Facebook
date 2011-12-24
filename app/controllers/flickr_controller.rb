@@ -150,11 +150,7 @@ class FlickrController < ApplicationController
       end
     end
     
-    if response[:success]
-      redirect_to :controller => 'application', :action => 'status'
-    else 
-      render :json => response
-    end
+    redirect_to :controller => 'application', :action => 'status'
     
   end
 
