@@ -64,11 +64,21 @@ class AuthController < ApplicationController
     user = User.find_by_user(fb_user.id)
     
     #If the user is not already registered, add new user
-    if(user==nil)
+    if not user
     # create a new user now
       user = User.new(:user => fb_user.id, :fb_first_name => fb_user.first_name, :fb_last_name => fb_user.last_name, :fb_code => params[:code], :fb_session => session[:at])
       user.save
+      
+    elsif not user.fb_last_name or not user.fb_first_name
+      # if the user's name is not updated then just update that
+      user.fb_first_name = fb_user.first_name
+      user.fb_last_name = fb_user.last_name
+      user.save
     end
+    
+    # update the session and fb_access_code
+    user.fb_session = session[:at]
+    user.fb_code = params['code']
     
     # Go back to main page
     redirect_to :controller => 'application', :action => 'main'
