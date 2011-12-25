@@ -32,7 +32,7 @@
             <% if not @fb_user %>
                 <a href="facebook-auth" onclick="_gaq.push(['_trackEvent', 'Auth', 'Facebook', 'start']);"> <img src="/assets/facebook-login-button.png" /> </a> <br>                
             <% else %>
-                Logged in as <a href="http://www.facebook.com/<%= @fb_user %>" style="font-weight:bold"><%= @fb_user %></a>
+                Logged in as <a href="http://www.facebook.com/<%= @fb_user %>" style="font-weight:bold"><%= @fb_user.fb_first_name %> <%= @fb_user.fb_last_name %></a>
             <% end%>
 
         </div>

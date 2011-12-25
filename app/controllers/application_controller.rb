@@ -17,11 +17,11 @@ class ApplicationController < ActionController::Base
 
     if facebook_user
       @user = User.where(:user => facebook_user.id)[0]
-      if not @user
+      if not @users
         session[:at] = nil
         redirect_to :controller => 'auth', :action => 'facebook_auth' and return
       end
-      @fb_user = @user.user
+      @fb_user = @user
       @flickr_user = @user.flickr_username
       if @fb_user and @flickr_user 
         redirect_to :action => 'migrate' and return
@@ -39,7 +39,7 @@ class ApplicationController < ActionController::Base
 
     if facebook_user
       @user = User.where(:user => facebook_user.id)[0]
-      @fb_user = @user.user
+      @fb_user = @user
       @flickr_user = @user.flickr_username
       @client = Mogli::Client.new(session[:at])
     end
@@ -56,7 +56,7 @@ class ApplicationController < ActionController::Base
 
     if facebook_user
       @user = User.where(:user => facebook_user.id)[0]
-      @fb_user = @user.user
+      @fb_user = @user
       @flickr_user = @user.flickr_username
       @client = Mogli::Client.new(session[:at])
     end
