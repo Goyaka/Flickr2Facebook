@@ -38,13 +38,17 @@
     background: transparent;
     min-height: 75px;
 }
-#sets .set:hover .cover img {
-    border: 2px solid #999999;
-}
+
 #sets .set .cover img{
-    padding: 4px;
-    border: 2px solid transparent;
+    padding: 0px;
+    border: 1px solid transparent;
     border-radius: 10px;
 }
+
+#sets .set:hover .cover {
+    border: 2px solid #999999;
+}
+
+
 
 

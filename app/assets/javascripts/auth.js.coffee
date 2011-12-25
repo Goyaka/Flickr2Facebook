@@ -22,15 +22,6 @@ $(document).ready ->
                                 $('.sets input').attr('checked',true)
                             else
                                 $('.sets input').attr('checked',false)
-                    
-                    $.each (data.sets),  (index, set) ->
-                        $.ajax
-                            url: 'flickr/cover-photo'
-                            type: 'get'
-                            data: { primary: set.primary }
-                            dataType: 'json'
-                            success: (coverData) ->
-                                $("#"+ set.primary).attr('src', coverData.cover_image)
             
         if $("#sets_list_template").length != 0
             loadsets('/flickr/sets','#sets_list_template')

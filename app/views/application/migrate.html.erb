@@ -41,7 +41,7 @@ flickr_user = "<%= @flickr_user %>";
                 <div class="set">
                     <label>
                         <div class="cover">
-                            <img id="${set.primary}" src="/assets/circle-loading.gif" style="margin: 0 auto; display: block">
+                            <img id="${set.primary}" src="http://farm${set.farm}.staticflickr.com/${set.server}/${set.primary}_${set.secret}_s.jpg" style="margin: 0 auto; display: block">
                         </div>
                         <div style="font-size: 0.8em; font-weight: bold">
                         <input type="checkbox" onclick="_gaq.push(['_trackEvent', 'Select_Sets', '#{set.id}']);" name="set[]" value="${set.id}" id="${set.id}">
