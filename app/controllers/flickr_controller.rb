@@ -32,94 +32,50 @@ class FlickrController < ApplicationController
   def get_sets_notuploaded
     @sets, @user   = self.get_all_sets
     
-    existingsets = Photoset.select('photoset').where('user_id = ? and status = ? or status = ?',
-                                    @user,
-                                    FlickrController::PHOTO_PROCESSING,
-                                    FlickrController::PHOTO_PROCESSED).map {|set| set.photoset}.compact
-    
-    newsets = []
-    
+    existing_sets = Photoset.select('photoset').where('user_id = ? and status IN (?, ?, ?)',
+      @user, FlickrController::PHOTO_NOTPROCESSED, FlickrController::PHOTO_PROCESSING, FlickrController::PHOTO_PROCESSED).map {|set| set.photoset}.compact
+                                    
+    ret_sets = []
     for set in @sets
-      if  not existingsets.include? set.id
-        newsets.push(set)
+      if not existing_sets.include? set.id
+        ret_sets.push(set)
       end
     end
     
-    response = { :sets => newsets}
+    response = { :sets => ret_sets}
     render :json => response
   end
 
   def get_sets_inqueue
     @sets, @user   = self.get_all_sets
     
-    existingsets = Photoset.select('photoset').where('user_id = ? and status = ?',
-                                    @user,
-                                    FlickrController::PHOTO_NOTPROCESSED).map {|set| set.photoset}.compact
-                                    
-    newsets = []
-    
+    queued_sets = Photoset.select('photoset').where('user_id = ? and status IN (?, ?)',
+      @user, FlickrController::PHOTO_NOTPROCESSED, FlickrController::PHOTO_PROCESSING).map {|set| set.photoset}.compact
+      
+    ret_sets = []
     for set in @sets
-      if existingsets.include? set.id
-        newsets.push(set)
+      if queued_sets.include? set.id
+        ret_sets.push(set)
       end
     end
     
-    response = { :sets => newsets}
-    render :json => response
-  end
-  
-  def get_sets_uploading    
-    @sets, @user   = self.get_all_sets
-    
-    existingsets = Photoset.select('photoset').where('user_id = ? and status = ?',
-                                    @user,
-                                    FlickrController::PHOTO_PROCESSING).map {|set| set.photoset}.compact
-                                    
-    newsets = []
-    
-    for set in @sets
-      if existingsets.include? set.id
-        newsets.push(set)
-      end
-    end
-    
-    response = { :sets => newsets}
+    response = { :sets => ret_sets}
     render :json => response
   end
   
   def get_sets_uploaded
     @sets, @user   = self.get_all_sets
-    existingsets = Photoset.select('photoset').where('user_id = ? and status = ?',
-                                    @user,
-                                    FlickrController::PHOTO_PROCESSED).map {|set| set.photoset}.compact
-                                    
-    newsets = []
-    
+    uploaded_sets = Photoset.select('photoset').where('user_id = ? and status = ?',
+      @user, FlickrController::PHOTO_PROCESSED).map {|set| set.photoset}.compact
+           
+    ret_sets = []
     for set in @sets
-      if existingsets.include? set.id
-        newsets.push(set)
+      if uploaded_sets.include? set.id
+        ret_sets.push(set)
       end
     end
-    
-    response = { :sets => newsets, :user => @user}
-    render :json => response
-  end
-  
-  def get_cover_images
-    config = YAML.load_file(Rails.root.join("config/flickr.yml"))[Rails.env]
-    FlickRaw.api_key = config['app_id']
-    FlickRaw.shared_secret = config['shared_secret']
 
-    flickr = FlickRaw::Flickr.new
-    facebook_user = Mogli::User.find("me",Mogli::Client.new(session[:at]))
-    response = {}
-    if facebook_user
-      @user = User.where(:user => facebook_user.id)[0]
-      flickr.access_token = @user.flickr_access_token
-      flickr.access_secret = @user.flickr_access_secret
-      photo_info = flickr.photos.getInfo(:photo_id => params[:primary])
-      response[:cover_image] = FlickRaw.url_s(photo_info)
-    end
+    response = { :sets => ret_sets}                       
     render :json => response
   end
   
@@ -133,12 +89,12 @@ class FlickrController < ApplicationController
     facebook_user = Mogli::User.find("me",Mogli::Client.new(session[:at]))
     response = {}
     if facebook_user
-      @user = User.where(:user => facebook_user.username)[0]
+      @user = User.where(:user => facebook_user.id)[0]
       if @user
         params["set"].each do |set| 
-          photoset = Photoset.where(:user_id => @user, :photoset => set)
+          photoset = Photoset.where(:user_id => @user.id, :photoset => set)
           if photoset.empty?
-            photoset = Photoset.new(:user_id => @user, :photoset => set, :status => FlickrController::PHOTOSET_NOTPROCESSED)
+            photoset = Photoset.new(:user_id => @user.id, :photoset => set, :status => FlickrController::PHOTOSET_NOTPROCESSED)
             photoset.save!
             response[:success] = true
             response[:message] = "Set has been added to be exported." 
@@ -146,6 +102,7 @@ class FlickrController < ApplicationController
             response[:success] = true
             response[:message] = "Set is already added to be exported."
           end
+          puts photoset
         end
       end
     end
