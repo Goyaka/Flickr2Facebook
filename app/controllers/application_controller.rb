@@ -17,7 +17,7 @@ class ApplicationController < ActionController::Base
 
     if facebook_user
       @user = User.where(:user => facebook_user.id)[0]
-      if not @users
+      if not @user
         session[:at] = nil
         redirect_to :controller => 'auth', :action => 'facebook_auth' and return
       end
