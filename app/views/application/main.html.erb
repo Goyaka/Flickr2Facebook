@@ -1,13 +1,13 @@
 <% content_for :content do %>
-<div class="main">                                           
-    <% if not @fb_user %>
-        <h2> Step 1: Login into your Facebook Account </h2>
-    <% elsif @fb_user and not @flickr_user %>
-        <h2> Step 2: Authenticate your Flickr Account </h2>
-    <% else %>
-        <h2> Step 3: Choose the sets that you want to import </h2>
-    <% end %>
-
+<div class="main">
+    
+    <table class="pgStyle1 circle3" cellspacing="0">
+    <tbody><tr>
+        <td class="c <%= @step1 %>"><var>1</var></td><td class="t"><b id="pagecircle1">Sign in into Facebook</b></td>
+        <td class="c <%= @step2 %>"><var>2</var></td><td class="t"><b id="pagecircle2">Sign in to Flickr</b></td>
+        <td class="c <%= @step3 %>"><var>3</var></td><td class="t"><b id="pagecircle3">Migrate photos</b></td>
+    </tr></tbody>
+    </table>
     <div class="row">
         <div class="span4"> &nbsp; </div>
         <div class="span3">
@@ -32,7 +32,7 @@
             <% if not @fb_user %>
                 <a href="facebook-auth" onclick="_gaq.push(['_trackEvent', 'Auth', 'Facebook', 'start']);"> <img src="/assets/facebook-login-button.png" /> </a> <br>                
             <% else %>
-                Logged in as <br><a href="http://www.facebook.com/<%= @fb_user %>" style="font-weight:bold"><%= @fb_user.fb_first_name %> <br><%= @fb_user.fb_last_name %></a>
+                Logged in as <br><a href="http://www.facebook.com/<%= @fb_user %>" style="font-weight:bold"><%= @fb_user.fb_first_name %> <%= @fb_user.fb_last_name %></a>
             <% end%>
 
         </div>

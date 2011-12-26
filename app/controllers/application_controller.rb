@@ -22,11 +22,22 @@ class ApplicationController < ActionController::Base
         redirect_to :controller => 'auth', :action => 'facebook_auth' and return
       end
       @fb_user = @user
+      
       @flickr_user = @user.flickr_username
       if @fb_user and @flickr_user 
         redirect_to :action => 'migrate' and return
       end
     end
+    
+    
+    if not @fb_user
+      @step1, @step2, @step3 = "selected", "", ""
+    elsif @fb_user and not @flickr_user
+      @step1, @step2, @step3 = "done", "selected", ""
+    else
+      @step1, @step2, @step3 = "done", "done", ""
+    end
+    
   end
   
   def migrate
