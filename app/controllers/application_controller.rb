@@ -43,6 +43,10 @@ class ApplicationController < ActionController::Base
       @flickr_user = @user.flickr_username
       @client = Mogli::Client.new(session[:at])
     end
+    
+    if not @flickr_user and not @fb_user
+      redirect_to :action => 'main' and return
+    end
   end
   
   def status
