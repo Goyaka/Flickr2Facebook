@@ -46,6 +46,32 @@
     border-radius: 5px;
 }
 
+#sets .set .cover .progressbar {
+    border: 1px solid black;
+    width: 90px;
+    margin: 0 auto;
+    border-radius: 2px;
+    font-size: 11px;
+    font-weight: bold;
+    background-color: white;
+    height : 15px;
+}
+
+#sets .set .cover .progressbar .fill {
+    background-color:orange;
+    position:relative;
+    height:100%;
+    top:0;
+    left:0;
+}
+
+#sets .set .cover .progressbar .data {
+    position:relative;
+    top:-17px;
+    left:0;
+}
+
+
 #sets .set:hover .cover img.thumb,
 #sets .set:hover .cover img.selected {
     background-color: #FAE65C;
