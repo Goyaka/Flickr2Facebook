@@ -21,12 +21,17 @@ $(document).ready ->
             $.ajax
                 url: api
                 type: 'get'
-                data: { user: fb_user }
                 dataType: 'json'
                 beforeSend: (xhr, settings) ->
                     $(target).html('<center><img src= "assets/loading.gif"><br>' + load_message + '</center>')
                 success: (data) ->
                     $(target).html('');
+                    if data.hasOwnProperty 'fb_albums'
+                        set['fb_albums'] = data['fb_albums'][set['id']] for set in data.sets
+                    
+                    if data.hasOwnProperty 'progress'
+                        set['progress'] = data['progress'][set['id']] for set in data.sets
+                    
                     $(picker).tmpl(data).appendTo(target);
                     addCheckHandlers()
                     
