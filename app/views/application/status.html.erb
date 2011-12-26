@@ -45,7 +45,7 @@ flickr_user = "<%= @flickr_user %>";
                     <label>
                         <div class="cover">
                             <img class="thumb" id="${set.primary}" src="http://farm${set.farm}.staticflickr.com/${set.server}/${set.primary}_${set.secret}_s.jpg" style="margin: 0 auto; display: block">
-                            <div class="progressbar" data="${set.progress.percent}">${set.progress.done}/${set.progress.total}</div>
+                            <div class="progressbar" data="${set.progress.percent}"><div class="fill" style="width:${set.progress.percent}%">&nbsp;</div><div class="data">${set.progress.done}/${set.progress.total}</div></div>
                         </div>
                     </label>
                     <div class="thumb-title">
