@@ -1,3 +1,20 @@
+addCheckHandlers =->
+    $('.set label').click ->
+        check = ($(this).find('.check'))
+        image = ($(this).find('.thumb'))
+        if ($(this).find('input').attr('checked') == 'checked')
+            check.addClass('selected')
+            image.addClass('selected')
+        else
+            check.removeClass('selected')
+            image.removeClass('selected')
+            $(this).focus ->
+                
+                check.css('visibility','hidden')
+            $(this).blur ->
+                $(this).unbind('hover')
+
+
 $(document).ready -> 
     if typeof fb_user != "undefined" and typeof flickr_user != "undefined"
         loadsets = (api, picker, target, load_message) -> 
@@ -11,6 +28,7 @@ $(document).ready ->
                 success: (data) ->
                     $(target).html('');
                     $(picker).tmpl(data).appendTo(target);
+                    addCheckHandlers()
                     
                     #add select all handler
                     if $('#select_all')

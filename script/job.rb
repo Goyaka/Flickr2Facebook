@@ -62,7 +62,7 @@ class Job
     if info.respond_to?('location')
       photo[:lat], photo[:lon]  = info.location.latitude, info.location.longitude
     end
-    photo[:message]           = info.title + "\n" + info.description + "\n" + "\n\n Original: " + FlickRaw.url_photopage(info)
+    photo[:message]           = info.title + "\n" + info.description + "\n" 
     t                         = Time.at(info.dateuploaded.to_i).utc
     photo[:date]              = info.dateuploaded.to_i
     if photo[:lat]
