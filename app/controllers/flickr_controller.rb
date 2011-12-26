@@ -29,12 +29,13 @@ class FlickrController < ApplicationController
     return @sets, @user
   end
     
+    
   def get_sets_notuploaded
     @sets, @user   = self.get_all_sets
-    
+
     existing_sets = Photoset.select('photoset').where('user_id = ? and status IN (?, ?, ?)',
       @user, FlickrController::PHOTO_NOTPROCESSED, FlickrController::PHOTO_PROCESSING, FlickrController::PHOTO_PROCESSED).map {|set| set.photoset}.compact
-                                    
+
     ret_sets = []
     for set in @sets
       if not existing_sets.include? set.id
@@ -42,40 +43,118 @@ class FlickrController < ApplicationController
       end
     end
     
-    response = { :sets => ret_sets}
-    render :json => response
-  end
-
-  def get_sets_inqueue
-    @sets, @user   = self.get_all_sets
-    
-    queued_sets = Photoset.select('photoset').where('user_id = ? and status IN (?, ?)',
-      @user, FlickrController::PHOTO_NOTPROCESSED, FlickrController::PHOTO_PROCESSING).map {|set| set.photoset}.compact
-      
-    ret_sets = []
-    for set in @sets
-      if queued_sets.include? set.id
-        ret_sets.push(set)
-      end
-    end
-    
-    response = { :sets => ret_sets}
+    response = {:sets => ret_sets}
     render :json => response
   end
   
-  def get_sets_uploaded
+    
+  def get_sets_inqueue
     @sets, @user   = self.get_all_sets
-    uploaded_sets = Photoset.select('photoset').where('user_id = ? and status = ?',
-      @user, FlickrController::PHOTO_PROCESSED).map {|set| set.photoset}.compact
-           
+    
+    inqueuesets = Photoset.select('id,photoset').where('user_id = ? and status IN (?, ?)',
+      @user, FlickrController::PHOTO_NOTPROCESSED, FlickrController::PHOTO_PROCESSING);
+
+    inqueuesets_setid  = inqueuesets.map {|set| set.photoset}.compact 
+    inqueuesets_id     = inqueuesets.map {|set| set.id}.compact
+    inqueuesets_map    = {}
+    for set in inqueuesets
+      inqueuesets_map[set.id] = set.photoset
+    end
+    
+    set_uploaded_count = Photo.select('count(status) as count, status, photoset_id').where('photoset_id IN (?)', inqueuesets_id).group('photoset_id, status')
+    
+    set_upload_progress = {}
+    for set in set_uploaded_count
+      if not set_upload_progress.has_key? set.photoset_id
+        set_upload_progress[set.photoset_id] = {}
+      end
+      
+      set_upload_progress[set.photoset_id][set.status] = set.count
+    end
+    
+    upload_progress_map = {}
+    set_upload_progress.each { |key,value|
+     upload_progress_map[inqueuesets_map[key.to_i]] = value 
+    }
+    
+    for set in @sets
+      if not upload_progress_map.has_key? set.id
+        upload_progress_map[set.id] = {}
+      end
+      
+      upload_progress_map[set.id]['total'] = set.photos
+      
+      for state in 0..2
+        if not upload_progress_map[set.id].has_key? state
+          upload_progress_map[set.id][state] = 0 
+        end 
+      end
+      if upload_progress_map[set.id]["total"].to_i == 0
+        upload_progress_map[set.id]['percent'] = 0
+      else
+        upload_progress_map[set.id]['percent'] = (upload_progress_map[set.id]["2"].to_f * 100) / upload_progress_map[set.id]["total"].to_f
+      end
+      upload_progress_map[set.id]['done'] = upload_progress_map[set.id]["2"].to_i
+    end
+    
+    puts upload_progress_map
     ret_sets = []
     for set in @sets
-      if uploaded_sets.include? set.id
+      if inqueuesets_setid.include? set.id
+        ret_sets.push(set)
+      end
+    end
+    
+    
+    response = { :sets => ret_sets, :progress => upload_progress_map}
+    render :json => response
+  end
+
+  
+  def get_sets_uploaded
+    @sets, @user   = self.get_all_sets
+    split_sets = Photoset.select('photoset, id').where('user_id = ? and status = ?',
+      @user, FlickrController::PHOTO_PROCESSED)
+      
+    split_sets_setid =  split_sets.map {|set| set.photoset}.compact
+    split_sets_id    =  split_sets.map {|set| set.id}.compact
+    
+    set_uploaded_count = Photo.select('count(status) as uploaded_count, photoset_id').where('photoset_id IN (?)', split_sets_id).where('status',FlickrController::PHOTO_PROCESSED).group('photoset_id')
+    set_total_count    = Photo.select('count(photoset_id) as total_count, photoset_id').where('photoset_id IN (?)', split_sets_id).group('photoset_id')
+    fb_albums          = Photo.select('distinct(facebook_album) as fb_album, photoset_id').where('photoset_id in (?)', split_sets_id).group('photoset_id')
+    
+    
+    #no need for 
+    set_uploaded_count_map = {}
+    for photoset in set_uploaded_count
+      set_uploaded_count_map[photoset.photoset_id] = photoset.uploaded_count
+    end
+    
+    fb_albums_map_id = {}
+    for photoset in fb_albums
+      photoset_id = Photoset.find(photoset.photoset_id).photoset
+      if fb_albums_map_id.has_key?(photoset_id)
+        fb_albums_map_id[photoset_id].push(photoset.fb_album)
+      else
+        fb_albums_map_id[photoset_id] = [photoset.fb_album]
+      end
+    end
+  
+    #This is the foreign key and not flickr photoset id.
+    all_uploaded_sets_id = set_total_count.map { |set| set.photoset_id if set.total_count == set_uploaded_count_map[set.photoset_id]}.compact
+    
+    #This is the flickr set id.
+    all_uploaded_sets = Photoset.select('id, photoset').where('id IN (?)', all_uploaded_sets_id).map {|set| set.photoset}.compact
+    
+      
+    ret_sets = []
+    for set in @sets
+      if all_uploaded_sets.include? set.id
         ret_sets.push(set)
       end
     end
 
-    response = { :sets => ret_sets}                       
+    response = { :sets => ret_sets, :fb_albums => fb_albums_map_id}  
     render :json => response
   end
   
