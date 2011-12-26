@@ -38,14 +38,14 @@ flickr_user = "<%= @flickr_user %>";
 
 <script id="inqueue_sets_list_template" type="text/x-jquery-tmpl">
 <div>
-    <h4> Sets currently in Migration Queue </h4>
+    <h4> In migration queue </h4>
         <div class="sets">
             {{each(index, set) sets}}
                 <div class="set">
                     <label>
                         <div class="cover">
                             <img class="thumb" id="${set.primary}" src="http://farm${set.farm}.staticflickr.com/${set.server}/${set.primary}_${set.secret}_s.jpg" style="margin: 0 auto; display: block">
-                            
+                            <div class="progressbar" data="${set.progress.percent}">${set.progress.done}/${set.progress.total}</div>
                         </div>
                     </label>
                     <div class="thumb-title">
@@ -62,7 +62,7 @@ flickr_user = "<%= @flickr_user %>";
 
 <script id="uploaded_sets_list_template" type="text/x-jquery-tmpl">
 <div>
-    <h4> Sets that have been already uploaded </h4>
+    <h4> Uploaded sets </h4>
         <div class="sets">
             {{each(index, set) sets}}
                 <div class="set">
@@ -71,13 +71,14 @@ flickr_user = "<%= @flickr_user %>";
                             <img class="thumb" id="${set.primary}" src="http://farm${set.farm}.staticflickr.com/${set.server}/${set.primary}_${set.secret}_s.jpg" style="margin: 0 auto; display: block">
                         </div>
                     </label>
-                    <div style="font-size: 0.8em; font-weight: bold">                        
+                    <div style="thumb-title">                        
                         ${set.title}<br/>
                     <a target="_blank" href="http://flickr.com/photos/<%= @user.flickr_user_nsid %>/sets/${set.id}">
                         <img style="vertical-align: middle" src="/assets/flickrico.png">
-                    </a><a target="_blank" href="http://facebook.com/alagu">
-                            <img style="vertical-align: middle" src="/assets/fbico.png">
-                        </a>
+                    </a>
+                        {{each(idx, album) set.fb_albums}}
+                            <a href="http://facebook.com/${album}"><img style="vertical-align: middle" src="/assets/fbico.png"></a>
+                        {{/each}}
                     </div>
                 </div>
             {{/each}}
