@@ -52,7 +52,7 @@ class FlickrController < ApplicationController
     @sets, @user   = self.get_all_sets
     
     inqueuesets = Photoset.select('id,photoset').where('user_id = ? and status IN (?, ?)',
-      @user, FlickrController::PHOTO_NOTPROCESSED, FlickrController::PHOTO_PROCESSING);
+      @user, FlickrController::PHOTO_NOTPROCESSED, FlickrController::PHOTO_PROCESSING, FlickrController::PHOTO_PROCESSED);
 
     inqueuesets_setid  = inqueuesets.map {|set| set.photoset}.compact 
     inqueuesets_id     = inqueuesets.map {|set| set.id}.compact
