@@ -49,14 +49,14 @@ flickr_user = "<%= @flickr_user %>";
                             <div style="clear:both;"></div>
                         </div>
                         <div style="clear:both;"></div>
-                        <div class="thumb-title">
+                    </label>    
+                    <div class="thumb-title">
                         <input type="checkbox" onclick="_gaq.push(['_trackEvent', 'Select_Sets', '#{set.id}']);" name="set[]" value="${set.id}" id="${set.id}">
                         ${set.title} 
                         <a target="_blank" href="http://flickr.com/photos/<%= @user.flickr_user_nsid %>/sets/${set.id}">
-                            <img style="padding: 2px 5px; vertical-align: top" src="/assets/external-link.png">
+                            <img style="vertical-align: middle" src="/assets/flickrico.png">
                         </a>
-                        </div>
-                    </label>
+                    </div>
                 </div>
             {{/each}}
         </div>

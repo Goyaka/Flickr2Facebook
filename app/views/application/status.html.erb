@@ -44,16 +44,16 @@ flickr_user = "<%= @flickr_user %>";
                 <div class="set">
                     <label>
                         <div class="cover">
-                            <img id="${set.primary}" src="http://farm${set.farm}.staticflickr.com/${set.server}/${set.primary}_${set.secret}_s.jpg" style="margin: 0 auto; display: block">
+                            <img class="thumb" id="${set.primary}" src="http://farm${set.farm}.staticflickr.com/${set.server}/${set.primary}_${set.secret}_s.jpg" style="margin: 0 auto; display: block">
                             
                         </div>
-                        <div style="font-size: 0.8em; font-weight: bold">
-                            ${set.title} 
-                        <a target="_blank" href="http://flickr.com/photos/<%= @user.flickr_user_nsid %>/sets/${set.id}">
-                            <img style="padding: 2px 5px; vertical-align: top" src="/assets/external-link.png">
-                        </a>
-                        </div>
                     </label>
+                    <div class="thumb-title">
+                        ${set.title}<br/>
+                        <a target="_blank" href="http://flickr.com/photos/<%= @user.flickr_user_nsid %>/sets/${set.id}">
+                            <img style="vertical-align: middle" src="/assets/flickrico.png">
+                        </a>
+                    </div>
                 </div>
             {{/each}}
         </div>
@@ -68,15 +68,17 @@ flickr_user = "<%= @flickr_user %>";
                 <div class="set">
                     <label>
                         <div class="cover">
-                            <img id="${set.primary}" src="http://farm${set.farm}.staticflickr.com/${set.server}/${set.primary}_${set.secret}_s.jpg" style="margin: 0 auto; display: block">
-                        </div>
-                        <div style="font-size: 0.8em; font-weight: bold">
-                            ${set.title} 
-                        <a target="_blank" href="http://flickr.com/photos/<%= @user.flickr_user_nsid %>/sets/${set.id}">
-                            <img style="padding: 2px 5px; vertical-align: top" src="/assets/external-link.png">
-                        </a>
+                            <img class="thumb" id="${set.primary}" src="http://farm${set.farm}.staticflickr.com/${set.server}/${set.primary}_${set.secret}_s.jpg" style="margin: 0 auto; display: block">
                         </div>
                     </label>
+                    <div style="font-size: 0.8em; font-weight: bold">                        
+                        ${set.title}<br/>
+                    <a target="_blank" href="http://flickr.com/photos/<%= @user.flickr_user_nsid %>/sets/${set.id}">
+                        <img style="vertical-align: middle" src="/assets/flickrico.png">
+                    </a><a target="_blank" href="http://facebook.com/alagu">
+                            <img style="vertical-align: middle" src="/assets/fbico.png">
+                        </a>
+                    </div>
                 </div>
             {{/each}}
         </div>
