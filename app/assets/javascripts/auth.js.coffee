@@ -2,7 +2,7 @@ addCheckHandlers =->
     $('.set label').click ->
         check = ($(this).find('.check'))
         image = ($(this).find('.thumb'))
-        if ($(this).find('input').attr('checked') == 'checked')
+        if ($(this).parent().find('input').attr('checked') != 'checked')
             check.addClass('selected')
             image.addClass('selected')
         else
@@ -40,8 +40,12 @@ $(document).ready ->
                         $('#select_all').click ->
                             if ($('#select_all').attr('checked'))
                                 $('.sets input').attr('checked',true)
+                                $('.sets .check').addClass('selected')
+                                $('.sets .thumb').addClass('selected')
                             else
                                 $('.sets input').attr('checked',false)
+                                $('.sets .check').removeClass('selected')
+                                $('.sets .thumb').removeClass('selected')
             
         if $("#sets_list_template").length != 0
             loadsets('/flickr/sets','#sets_list_template', '#sets', 'Loading your flickr sets')

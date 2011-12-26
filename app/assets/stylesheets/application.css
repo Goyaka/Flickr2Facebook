@@ -26,6 +26,11 @@
     border-radius: 5px;
     vertical-align: top;
 }
+
+#sets .set.fixedheight label {
+    height:95px;
+}
+
 #sets .set label {
     padding: 0px;
     width: 100%;
@@ -119,8 +124,4 @@
 #sets .set .thumb-title {
     font-size: 0.8em;
     font-weight: bold;
-}
-
-#sets .set .thumb-title-offset {
-    margin-top:-20px;
 }

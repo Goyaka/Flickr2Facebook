@@ -40,8 +40,8 @@ flickr_user = "<%= @flickr_user %>";
     <%= form_tag("flickr/import-sets", :method => "post", :id=>'upload-photos-form') do %>
         <div class="sets">
             {{each(index, set) sets}}
-                <div class="set">
-                    <label>
+                <div class="set fixedheight">
+                    <label for="${set.id}">
                         <div class="cover">
                             <img class="thumb" id="${set.primary}" src="http://farm${set.farm}.staticflickr.com/${set.server}/${set.primary}_${set.secret}_s.jpg" style="margin: 0 auto; display: block"\     > 
                             <img class="check" src="/assets/check.png">
