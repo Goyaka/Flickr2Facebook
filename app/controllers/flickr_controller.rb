@@ -51,7 +51,7 @@ class FlickrController < ApplicationController
   def get_sets_inqueue
     @sets, @user   = self.get_all_sets
     
-    inqueuesets = Photoset.select('id,photoset').where('user_id = ? and status IN (?, ?)',
+    inqueuesets = Photoset.select('id,photoset').where('user_id = ? and status IN (?, ?, ?)',
       @user, FlickrController::PHOTO_NOTPROCESSED, FlickrController::PHOTO_PROCESSING, FlickrController::PHOTO_PROCESSED);
 
     inqueuesets_setid  = inqueuesets.map {|set| set.photoset}.compact 
@@ -100,7 +100,7 @@ class FlickrController < ApplicationController
     puts upload_progress_map
     ret_sets = []
     for set in @sets
-      if inqueuesets_setid.include? set.id
+      if inqueuesets_setid.include? set.id and set.photos.to_i > upload_progress_map[set.id]["2"].to_i
         ret_sets.push(set)
       end
     end
