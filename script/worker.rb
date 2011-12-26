@@ -4,7 +4,7 @@ class Worker < ActiveRecord::Base
   
   def self.upload_loop
     while true
-      photo = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).first(:order => "RANDOM()")
+      photo = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).first(:order => "RAND()")
       if photo
         photoset = Photoset.find(photo.photoset_id)
         user = User.find(photoset.user_id)
