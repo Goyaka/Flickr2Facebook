@@ -159,6 +159,11 @@ class FlickrController < ApplicationController
   end
   
   def select_sets
+    if params["set"].nil?
+      redirect_to :controller => 'application', :action => 'main'
+      return
+    end
+      
     # TODO: Make the config loading part separated
     config = YAML.load_file(Rails.root.join("config/flickr.yml"))[Rails.env]
     FlickRaw.api_key = config['app_id']
