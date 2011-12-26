@@ -65,9 +65,6 @@ class Job
     photo[:message]           = info.title + "\n" + info.description + "\n" 
     t                         = Time.at(info.dateuploaded.to_i).utc
     photo[:date]              = info.dateuploaded.to_i
-    if photo[:lat]
-      photo[:message]	+= "\n\n{'lat':#{photo[:lat]},'lon':#{photo[:lon]}}}"
-    end
     return photo
     
   end
