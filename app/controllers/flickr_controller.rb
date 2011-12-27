@@ -115,59 +115,15 @@ class FlickrController < ApplicationController
       end
     end
     
+    ret_sets.sort{|x,y|
+      upload_progress_map[x.id]['percent'] <=> upload_progress_map[y.id]['percent'] 
+    }
     
     response = { :sets => ret_sets, :progress => upload_progress_map, :fb_albums => fb_albums_map_id}
     render :json => response
   end
 
-  
-  def get_sets_uploaded
-    @sets, @user   = self.get_all_sets
-    split_sets = Photoset.select('photoset, id').where('user_id = ? and status = ?',
-      @user, FlickrController::PHOTO_PROCESSED)
-      
-    split_sets_setid =  split_sets.map {|set| set.photoset}.compact
-    split_sets_id    =  split_sets.map {|set| set.id}.compact
     
-    set_uploaded_count = Photo.select('count(status) as uploaded_count, photoset_id').where('photoset_id IN (?)', split_sets_id).where('status',FlickrController::PHOTO_PROCESSED).group('photoset_id')
-    set_total_count    = Photo.select('count(photoset_id) as total_count, photoset_id').where('photoset_id IN (?)', split_sets_id).group('photoset_id')
-    fb_albums          = Photo.select('distinct(facebook_album) as fb_album, photoset_id').where('photoset_id in (?)', split_sets_id).group('photoset_id')
-    
-    
-    #no need for 
-    set_uploaded_count_map = {}
-    for photoset in set_uploaded_count
-      set_uploaded_count_map[photoset.photoset_id] = photoset.uploaded_count
-    end
-    
-    fb_albums_map_id = {}
-    for photoset in fb_albums
-      photoset_id = Photoset.find(photoset.photoset_id).photoset
-      if fb_albums_map_id.has_key?(photoset_id)
-        fb_albums_map_id[photoset_id].push(photoset.fb_album)
-      else
-        fb_albums_map_id[photoset_id] = [photoset.fb_album]
-      end
-    end
-  
-    #This is the foreign key and not flickr photoset id.
-    all_uploaded_sets_id = set_total_count.map { |set| set.photoset_id if set.total_count == set_uploaded_count_map[set.photoset_id]}.compact
-    
-    #This is the flickr set id.
-    all_uploaded_sets = Photoset.select('id, photoset').where('id IN (?)', all_uploaded_sets_id).map {|set| set.photoset}.compact
-    
-      
-    ret_sets = []
-    for set in @sets
-      if all_uploaded_sets.include? set.id
-        ret_sets.push(set)
-      end
-    end
-
-    response = { :sets => ret_sets, :fb_albums => fb_albums_map_id}  
-    render :json => response
-  end
-  
   def select_sets
     if params["set"].nil?
       redirect_to :controller => 'application', :action => 'main'
