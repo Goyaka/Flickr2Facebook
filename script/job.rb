@@ -14,15 +14,17 @@ class Job
   
   MAX_FACEBOOK_PHOTO_COUNT = 200
   
-  def initialize(fb_access_token, flickr_access_token, flickr_access_secret)
-    config = YAML.load_file(Rails.root.join("config/flickr.yml"))[Rails.env]
-    FlickRaw.api_key = config['app_id']
-    FlickRaw.shared_secret = config['shared_secret']
+  def initialize(fb_access_token, flickr_access_token, flickr_access_secret, initialize_flickr = false)
+    @fb_access_token = fb_access_token
     
-    @fb_access_token      = fb_access_token
-    flickr.access_token   = flickr_access_token
-    flickr.access_secret  = flickr_access_secret
-        
+    if initialize_flickr
+      config = YAML.load_file(Rails.root.join("config/flickr.yml"))[Rails.env]
+      FlickRaw.api_key = config['app_id']
+      FlickRaw.shared_secret = config['shared_secret']
+    
+      flickr.access_token = flickr_access_token
+      flickr.access_secret  = flickr_access_secret
+    end        
   end
   
   def download(source, destination)

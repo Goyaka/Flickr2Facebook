@@ -58,7 +58,7 @@ class Worker < ActiveRecord::Base
         if set
           puts "Splitting set " + set.photoset + " to photos"
           user = User.find(set.user_id)
-          job = Job.new(user.fb_session, user.flickr_access_token, user.flickr_access_secret)              
+          job = Job.new(user.fb_session, user.flickr_access_token, user.flickr_access_secret, true)              
           job.upload_set(set.photoset)
         else
           # "No photosets. waiting."
