@@ -53,9 +53,10 @@ class Worker < ActiveRecord::Base
   def self.split_sets_loop
     while true
       begin
+        logger.info("Getting unprocessed photosets")
         set = Photoset.where("status = ?", FlickrController::PHOTOSET_NOTPROCESSED).first
         if set
-          puts "Splitting set " + set.photoset + " to photos"
+          logger.info("Splitting set " + set.photoset + " to photos")
           user = User.find(set.user_id)
           job = Job.new(user.fb_session, user.flickr_access_token, user.flickr_access_secret, true)              
           job.upload_set(set.photoset)
@@ -64,18 +65,7 @@ class Worker < ActiveRecord::Base
           sleep 1
         end
       rescue Exception => msg
-        puts "Exception raised " + msg
-      end
-    end
-  end
-  
-  def self.upload_smaller_photosets
-    while true
-      begin
-        photos = Photoset.where("status = ?  ", FlickrController::PHOTOSET_NOTPROCESSED).order("photos_count ASC").first.photos
-        put photos
-      rescue Exception => msg
-        puts "Exception raised " + msg
+        logger.error("Exception raised" + msg)
       end
     end
   end

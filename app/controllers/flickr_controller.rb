@@ -114,11 +114,11 @@ class FlickrController < ApplicationController
         ret_sets.push(set)
       end
     end
-    
-    ret_sets.sort{|x,y|
-      upload_progress_map[x.id]['percent'] <=> upload_progress_map[y.id]['percent'] 
-    }
-    
+    puts ret_sets
+    sorted_ret_sets = []
+    sorted_ret_sets.concat(sorted_ret_sets.select{|s| upload_progress_map[s.id]['percent']<100})
+    sorted_ret_sets.concat(sorted_ret_sets.select{|s| upload_progress_map[s.id]['percent']=100})
+    puts ret_sets
     response = { :sets => ret_sets, :progress => upload_progress_map, :fb_albums => fb_albums_map_id}
     render :json => response
   end
