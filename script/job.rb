@@ -97,6 +97,7 @@ class Job
       photo.save
     end
     
+    files = []
     jobs.each_with_index do |job, index|
       photo_id = job[:photo].photo
       photo = getphoto_info(photo_id) 
@@ -107,6 +108,7 @@ class Job
       filename     = photo_id  #(Time.now.to_f*1000).to_i.to_s + '.jpg'  
       filepath     = '/tmp/' + filename
       download(photo[:photo_source], filepath)
+      files.push(filepath)
       job[:filename] = filename
       
       payload[filename] = File.open(filepath)
@@ -148,6 +150,11 @@ class Job
       
     rescue Exception => msg
       puts msg.inspect
+    end
+    
+    files.each do |filepath|
+      puts "Deleting " + filepath
+      File.delete(filepath)
     end
     
   end
