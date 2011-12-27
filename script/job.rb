@@ -184,7 +184,7 @@ class Job
   def populate_photos(set_id)
     photoset = Photoset.where('photoset = ?', set_id).first
      if photoset
-       photos = self.getphotos_from_set(set_id)
+       photos  = self.getphotos_from_set(set_id)
        piclist = []
        
        index = 0
