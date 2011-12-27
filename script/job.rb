@@ -84,12 +84,12 @@ class Job
     if verify_photo 
       verify_photo.status = FlickrController::PHOTO_PROCESSING
       verify_photo.save
-      photo_id     = photo.photo
-      album_id     = photo.facebook_album
+      photo_id = photo.photo
+      album_id = photo.facebook_album
 
       puts "Downloading photo " + photo_id.to_s
-      photo        = getphoto_info(photo_id) 
-      filename     = '/tmp/' + (Time.now.to_f*1000).to_i.to_s
+      photo = getphoto_info(photo_id) 
+      filename = '/tmp/' + (Time.now.to_f*1000).to_i.to_s
  
       download(photo[:photo_source], filename)
       puts "Downloaded photo. Uploading to facebook " + photo_id
@@ -127,8 +127,8 @@ class Job
   end
   
   def create_album(albumname, description)
-     response = RestClient.post("https://graph.facebook.com/me/albums?access_token=#{@fb_access_token}", 
-                                {:name => albumname, :message => description, :privacy => '{"value":"SELF"}' })
+     response = RestClient.post("https://graph.facebook.com/me/albums?access_token=#{@fb_access_token}", {
+       :name => albumname, :message => description, :privacy => '{"value":"SELF"}' })
      return (JSON.parse response.to_s)['id']
   end
   
@@ -162,7 +162,6 @@ class Job
       photos          = self.getphotos_from_set(set_id)
       piclist         = []
 
-    
       albumcount = (photos.length + Job::MAX_FACEBOOK_PHOTO_COUNT) / Job::MAX_FACEBOOK_PHOTO_COUNT
       albumids   = self.create_fb_albums(albumname, description, albumcount)
 
@@ -179,16 +178,14 @@ class Job
       
       photoset.status = FlickrController::PHOTOSET_PROCESSED
       photoset.save
-
     end
   end
   
-  
   def populate_photos(set_id)
-    photoset    = Photoset.where('photoset = ?', set_id).first
+    photoset = Photoset.where('photoset = ?', set_id).first
      if photoset
-       photos          = self.getphotos_from_set(set_id)
-       piclist         = []
+       photos = self.getphotos_from_set(set_id)
+       piclist = []
        
        index = 0
        photoset_photos = photos
@@ -198,5 +195,4 @@ class Job
        end
      end
   end
-  
 end
