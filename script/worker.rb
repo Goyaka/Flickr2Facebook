@@ -46,7 +46,7 @@ class Worker < ActiveRecord::Base
           sleep 1
         end
       rescue Exception => msg
-        puts "Exception raised" + msg
+        puts "Exception raised " + msg
       end
     end
   end
@@ -65,7 +65,18 @@ class Worker < ActiveRecord::Base
           sleep 1
         end
       rescue Exception => msg
-        puts "Exception raised" + msg
+        puts "Exception raised " + msg
+      end
+    end
+  end
+  
+  def self.upload_smaller_photosets
+    while true
+      begin
+        photos = Photoset.where("status = ?  ", FlickrController::PHOTOSET_NOTPROCESSED).order("photos_count ASC").first.photos
+        put photos
+      rescue Exception => msg
+        puts "Exception raised " + msg
       end
     end
   end
