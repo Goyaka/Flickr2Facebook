@@ -1,4 +1,5 @@
 require 'flickraw-cached'
+require 'delayed_jobs'
 
 class FlickrController < ApplicationController
   
@@ -125,6 +126,8 @@ class FlickrController < ApplicationController
 
     
   def select_sets
+    mailer_content = get_queued_mailer_content(@user)
+    mailjob = AsyncMailerJob.new(mailer_content)
     if params["set"].nil?
       redirect_to :controller => 'application', :action => 'main'
       return
@@ -159,6 +162,19 @@ class FlickrController < ApplicationController
     
     redirect_to :controller => 'application', :action => 'status'
     
+  end
+
+  def get_queued_mailer_content(user)
+    usermeta = UserMeta.where(:user => user.id).first
+    name = usermeta.first_name
+    if(name==nil || name.strip == "")
+      name = "User"
+    end
+    
+    config = YAML.load_file(Rails.root.join("config/goyaka.yml"))[:mailer]
+    sender_emails = config[:sender]
+    sender_names = config[:sendername]
+    sender_designations = config[:sender]
   end
 
 end
