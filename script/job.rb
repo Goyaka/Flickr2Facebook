@@ -56,22 +56,46 @@ class Job
   end
 
   def getphoto_info(photo_id)
-    info = flickr.photos.getInfo(:photo_id => photo_id)
+    info = PhotoMeta.where(:photo => photo_id).first
     photo = {}
-    photo[:photo_source] = getphoto_url(photo_id)
-    if info.respond_to?('location')
-      photo[:lat], photo[:lon]  = info.location.latitude, info.location.longitude
+    
+    if info['originalsecret'].nil?
+      
+      photo[:photo_source] = info['url_m']
+    else
+      photo[:photo_source] = "http://farm#{info['farm']}.staticflickr.com/#{info['server']}/#{info['photo']}_#{info['originalsecret']}_o.jpg"
     end
-    photo[:message]           = info.title + "\n" + info.description + "\n" 
-    t                         = Time.at(info.dateuploaded.to_i).utc
-    photo[:date]              = info.dateuploaded.to_i
+    
+    photo[:message]           = info['title'] + "\n" + info['description'] + "\n"
+    photo[:date]              = info['dateupload'].to_i
     return photo
     
   end
 
   def getphotos_from_set(set_id)
-     info = flickr.photosets.getPhotos(:photoset_id => set_id)
-     return info
+     photos = []
+     
+     info = flickr.photosets.getPhotos(:photoset_id => set_id,:extras => " date_upload,geo, date_taken, icon_server, original_format, url_sq,url_o,url_m,url_b,description")
+     photos = photos + info.photo
+     
+     if info.pages > 1 
+       for page in 2..info.pages
+         info = flickr.photosets.getPhotos(:photoset_id => set_id,:page => page, :extras => " date_upload,geo, date_taken, icon_server, original_format,url_m, url_b, url_sq,url_o,description")
+         photos = photos + info.photo
+       end
+     end
+     
+     newphotos = []
+     
+     photos.each do |photo|
+       photo_h = photo.to_hash
+       photo_h['photo'] = photo.id
+       photo_h.delete('id')
+       newphotos.push(photo_h)
+     end
+
+     puts photos.length
+     return newphotos
   end
 
   def upload(photo)
@@ -88,7 +112,7 @@ class Job
       filename     = '/tmp/' + (Time.now.to_f*1000).to_i.to_s
  
       download(photo[:photo_source], filename)
-      puts "Downloaded photo. Uploading to facebook. " + photo_id
+      puts "Downloaded photo. Uploading to facebook " + photo_id
   
       #Upload photo to facebook.
       begin
@@ -158,25 +182,24 @@ class Job
       photos          = self.getphotos_from_set(set_id)
       piclist         = []
 
-      for pic in photos.photo
-         piclist.push pic.id
-      end
     
-      albumcount = (piclist.length + Job::MAX_FACEBOOK_PHOTO_COUNT) / Job::MAX_FACEBOOK_PHOTO_COUNT
+      albumcount = (photos.length + Job::MAX_FACEBOOK_PHOTO_COUNT) / Job::MAX_FACEBOOK_PHOTO_COUNT
       albumids   = self.create_fb_albums(albumname, description, albumcount)
 
       index = 0
-      photoset_photos = photos.photo
+      photoset_photos = photos
       for pic in photoset_photos
         facebook_album = albumids[(index + 1)/Job::MAX_FACEBOOK_PHOTO_COUNT]
-        puts "Adding photo " + pic.id.to_s + " to facebook album http://facebook.com/" + facebook_album
-        photo = Photo.new(:photo => pic.id, :photoset_id => photoset, :facebook_photo => '', :facebook_album => facebook_album, :status => FlickrController::PHOTO_NOTPROCESSED)
+        puts "Adding photo " + pic['photo'].to_s + " to facebook album http://facebook.com/" + facebook_album
+        photo = Photo.new(:photo => pic['photo'], :photoset_id => photoset, :facebook_photo => '', :facebook_album => facebook_album, :status => FlickrController::PHOTO_NOTPROCESSED)
         photo.save()
+        photometa = PhotoMeta.create(pic)
         index = index + 1
       end
       
       photoset.status = FlickrController::PHOTOSET_PROCESSED
       photoset.save
+
     end
   end
 
