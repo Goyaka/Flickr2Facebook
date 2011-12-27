@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
   def index
+     @photo_count = Rails.cache.read('photo_count').to_s
   end
   
   def login

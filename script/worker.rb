@@ -79,4 +79,9 @@ class Worker < ActiveRecord::Base
       job.populate_photos(set.photoset)
     end
   end
+  
+  def self.photo_count_cron
+    photo_count = Photo.where("status = ?", FlickrController::PHOTO_PROCESSED).length
+    Rails.cache.write('photo_count', photo_count)
+  end
 end
