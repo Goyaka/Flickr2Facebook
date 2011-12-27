@@ -6,9 +6,9 @@ class Worker < ActiveRecord::Base
   def self.upload_loop_batch
     while true
       if Rails.env == 'production'
-        photos = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).order("RAND()").limit(2)
+        photos = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).order("RAND()").limit(5)
       else
-        photos = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).order("RANDOM()").limit(2)
+        photos = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).order("RANDOM()").limit(5)
       end
       
       jobs = []
