@@ -14,6 +14,9 @@ gem "flickraw-cached"
 gem "execjs"
 gem "therubyracer"
 gem "rest-client"
+gem 'mongoid'
+gem 'bson'
+gem 'bson_ext'
 
 group :production do
   gem "mysql2"
