@@ -70,6 +70,17 @@ class Worker < ActiveRecord::Base
     end
   end
   
+  def self.upload_smaller_photosets
+    while true
+      begin
+        photos = Photoset.where("status = ?  ", FlickrController::PHOTOSET_NOTPROCESSED).order("photos_count ASC").first.photos
+        put photos
+      rescue Exception => msg
+        puts "Exception raised " + msg
+      end
+    end
+  end
+  
   def self.populate_photos
     sets = Photoset.all()
     for set in sets
