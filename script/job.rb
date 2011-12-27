@@ -77,6 +77,46 @@ class Job
      puts photos.length
      return newphotos
   end
+  
+  def batch_upload(jobs)
+    payload = {}
+    batch   = []
+    
+    access_token = ''
+    jobs.each_with_index do |job, index|
+      photo_id = job[:photo].photo
+      photo = getphoto_info(photo_id) 
+      album_id     = job[:photo].facebook_album
+      access_token = job[:user].fb_session
+      
+      puts "Downloading photo " + photo_id.to_s
+      filename     = photo_id  #(Time.now.to_f*1000).to_i.to_s + '.jpg'  
+      filepath     = '/tmp/' + filename
+      download(photo[:photo_source], filepath)
+      job[:filename] = filename
+      
+      payload[filename] = File.open(filepath)
+      batch_data = {"method" => "POST",
+                   "relative_url" => "#{album_id}/photos",
+                   "access_token" => job[:user].fb_session,
+                   "body" => "message=#{photo[:message]}&backdated_time=#{photo[:date]}",
+                   "attached_files" => filename
+                  }
+      batch.push(batch_data)            
+    end
+
+    
+    begin
+      payload[:batch] = batch.to_json
+      payload[:access_token] = access_token
+      puts payload.inspect   
+      response = RestClient.post("https://graph.facebook.com/", payload)
+      puts response.inspect     
+    rescue Exception => msg
+      puts msg.inspect
+    end
+    
+  end
 
   def upload(photo)
     verify_photo = Photo.where('id = ? AND status = ?', photo.id, FlickrController::PHOTO_NOTPROCESSED).first
