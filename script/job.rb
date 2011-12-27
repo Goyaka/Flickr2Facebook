@@ -153,8 +153,12 @@ class Job
     end
     
     files.each do |filepath|
-      puts "Deleting " + filepath
-      File.delete(filepath)
+      begin
+        puts "Deleting " + filepath
+        File.delete(filepath)
+      rescue
+        puts "Couldn't delete " + filepath
+      end
     end
     
   end
