@@ -204,6 +204,9 @@ class Job
       photos          = self.getphotos_from_set(set_id)
       piclist         = []
 
+      photoset.photos_count = photos.length
+      photoset.save
+
       albumcount = (photos.length + Job::MAX_FACEBOOK_PHOTO_COUNT) / Job::MAX_FACEBOOK_PHOTO_COUNT
       albumids   = self.create_fb_albums(albumname, description, albumcount)
 
