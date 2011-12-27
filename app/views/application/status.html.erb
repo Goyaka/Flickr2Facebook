@@ -16,8 +16,7 @@
           <li class="active"><a href="/status">Uploaded photos</a></li>
         </ul>
         <div id="sets" class="row">
-            <div id="queue" class="span8"></div>
-            <div id="done" class="span8"></div>
+            <div id="queue"></div>
         </div>
     <% else %>
     <% end %>
@@ -38,7 +37,6 @@ flickr_user = "<%= @flickr_user %>";
 
 <script id="inqueue_sets_list_template" type="text/x-jquery-tmpl">
 <div>
-    <h4> In migration queue </h4>
         <div class="sets">
             {{each(index, set) sets}}
                 <div class="set">
@@ -53,6 +51,9 @@ flickr_user = "<%= @flickr_user %>";
                         <a target="_blank" href="http://flickr.com/photos/<%= @user.flickr_user_nsid %>/sets/${set.id}">
                             <img style="vertical-align: middle" src="/assets/flickrico.png">
                         </a>
+                        {{each(idx, album) set.fb_albums}}
+                            <a href="http://facebook.com/${album}"><img style="vertical-align: middle" src="/assets/fbico.png"></a>
+                        {{/each}}
                     </div>
                 </div>
             {{/each}}

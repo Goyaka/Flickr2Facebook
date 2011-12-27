@@ -51,8 +51,7 @@ class FlickrController < ApplicationController
   def get_sets_inqueue
     @sets, @user   = self.get_all_sets
     
-    inqueuesets = Photoset.select('id,photoset').where('user_id = ? and status IN (?, ?, ?)',
-      @user, FlickrController::PHOTO_NOTPROCESSED, FlickrController::PHOTO_PROCESSING, FlickrController::PHOTO_PROCESSED);
+    inqueuesets = Photoset.select('id,photoset').where('user_id = ?', @user)
 
     inqueuesets_setid  = inqueuesets.map {|set| set.photoset}.compact 
     inqueuesets_id     = inqueuesets.map {|set| set.id}.compact
@@ -62,6 +61,7 @@ class FlickrController < ApplicationController
     end
     
     set_uploaded_count = Photo.select('count(status) as count, status, photoset_id').where('photoset_id IN (?)', inqueuesets_id).group('photoset_id, status')
+    fb_albums          = Photo.select('distinct(facebook_album) as fb_album, photoset_id').where('photoset_id in (?)', inqueuesets_id).group('photoset_id')
     
     set_upload_progress = {}
     for set in set_uploaded_count
@@ -76,6 +76,16 @@ class FlickrController < ApplicationController
     set_upload_progress.each { |key,value|
      upload_progress_map[inqueuesets_map[key.to_i]] = value 
     }
+    
+    fb_albums_map_id = {}
+    for photoset in fb_albums
+      photoset_id = Photoset.find(photoset.photoset_id).photoset
+      if fb_albums_map_id.has_key?(photoset_id)
+        fb_albums_map_id[photoset_id].push(photoset.fb_album)
+      else
+        fb_albums_map_id[photoset_id] = [photoset.fb_album]
+      end
+    end
     
     for set in @sets
       if not upload_progress_map.has_key? set.id
@@ -100,13 +110,13 @@ class FlickrController < ApplicationController
     puts upload_progress_map
     ret_sets = []
     for set in @sets
-      if inqueuesets_setid.include? set.id and set.photos.to_i > upload_progress_map[set.id]["2"].to_i
+      if inqueuesets_setid.include? set.id
         ret_sets.push(set)
       end
     end
     
     
-    response = { :sets => ret_sets, :progress => upload_progress_map}
+    response = { :sets => ret_sets, :progress => upload_progress_map, :fb_albums => fb_albums_map_id}
     render :json => response
   end
 
