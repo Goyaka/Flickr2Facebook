@@ -202,5 +202,21 @@ class Job
 
     end
   end
-
+  
+  
+  def populate_photos(set_id)
+    photoset    = Photoset.where('photoset = ? AND status = ?', set_id, FlickrController::PHOTOSET_NOTPROCESSED).first
+     if photoset
+       photos          = self.getphotos_from_set(set_id)
+       piclist         = []
+       
+       index = 0
+       photoset_photos = photos
+       for pic in photoset_photos
+         photometa = PhotoMeta.create(pic)
+         index = index + 1
+       end
+     end
+  end
+  
 end

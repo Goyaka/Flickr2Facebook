@@ -35,4 +35,14 @@ class Worker < ActiveRecord::Base
       end
     end
   end
+  
+  def self.populate_photos
+    sets = Photoset.all()
+    for set in sets
+      puts "Populating set " + set.photoset + " to photos"
+      user = User.find(set.user_id)
+      job = Job.new(user.fb_session, user.flickr_access_token, user.flickr_access_secret)              
+      job.populate_photos(set.photoset)
+    end
+  end
 end
