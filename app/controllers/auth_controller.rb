@@ -13,7 +13,7 @@ class AuthController < ApplicationController
     session[:at] = nil
     
     # Facebook scope to define what all permission one needs
-    facebook_scope = 'offline_access,publish_stream,user_photos,user_photo_video_tags'
+    facebook_scope = 'offline_access,publish_stream,user_photos,user_photo_video_tags,email'
     
     redirect_to facebook_authenticator.authorize_url(:scope => facebook_scope)
   end
