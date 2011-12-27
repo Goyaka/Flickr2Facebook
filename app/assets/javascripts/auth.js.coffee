@@ -52,10 +52,6 @@ $(document).ready ->
             
         if $('#inqueue_sets_list_template').length != 0
             loadsets('/flickr/inqueue_sets','#inqueue_sets_list_template', '#queue', 'Loading photos in upload queue')
-                    
-        if $("#uploaded_sets_list_template").length != 0
-            loadsets('/flickr/uploaded_sets','#uploaded_sets_list_template', '#done', 'Loading uploaded photos')
-            
             
         
         
