@@ -6,7 +6,7 @@ class Worker < ActiveRecord::Base
   def self.upload_loop_batch
     while true
       if Rails.env == 'production'
-        photos = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).order("RAND()").limit(5)
+        photos = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).order("id DESC").limit(5)
       else
         photos = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).order("RANDOM()").limit(5)
       end
@@ -22,7 +22,6 @@ class Worker < ActiveRecord::Base
       
       job = Job.new("","","",false)
       job.batch_upload(jobs)
-      break
     end
   end
   
