@@ -85,6 +85,18 @@ class Job
     batch   = []
     
     access_token = ''
+    photo_ids = []
+    jobs.each do |job|
+      photo_ids.push(job[:photo].photo)
+    end
+    
+    photos = Photo.where('photo in (?)', photo_ids)
+    #Set status as processing.
+    photos.each do |photo|
+      photo.status = FlickrController::PHOTO_PROCESSING
+      photo.save
+    end
+    
     jobs.each_with_index do |job, index|
       photo_id = job[:photo].photo
       photo = getphoto_info(photo_id) 
@@ -106,14 +118,34 @@ class Job
                   }
       batch.push(batch_data)            
     end
-
     
+    fb_photo_ids = []
     begin
       payload[:batch] = batch.to_json
       payload[:access_token] = access_token
-      puts payload.inspect   
       response = RestClient.post("https://graph.facebook.com/", payload)
-      puts response.inspect     
+      response_obj = JSON.parse response
+      response_obj.each do |response_item| 
+        body =  JSON.parse response_item['body']
+        if body.has_key?('id')
+          fb_photo_ids.push(body['id'])
+        else
+          fb_photo_ids.push('')
+        end
+      end
+      
+      fb_photo_ids.each do |id|
+        puts "Uploaded http://facebook.com/" + id.to_s
+      end
+      
+      photos = Photo.where('photo in (?)', photo_ids)
+      #Set status as processing.
+      photos.each_with_index do |photo, index|
+        photo.status = FlickrController::PHOTO_PROCESSED
+        photo.facebook_photo = "http://www.facebook.com/#{fb_photo_ids[index]}"
+        photo.save
+      end
+      
     rescue Exception => msg
       puts msg.inspect
     end
