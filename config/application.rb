@@ -53,5 +53,6 @@ module Flickr2facebook
     config.generators do |g| 
       g.orm :active_record 
     end
+    config.cache_store = :mem_cache_store, "localhost"
   end
 end

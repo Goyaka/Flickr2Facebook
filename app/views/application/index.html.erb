@@ -3,6 +3,9 @@
 <div class="main">
     <h1> UnifyPhotos </h1>
     <h2> Easily migrate your photos to Facebook </h2>
+    <% if @photo_count %>
+    <span id="photo-count"><%= @photo_count %> photos moved so far</span>
+    <% end %>
     <div class="row">
         <div class="span4"> &nbsp; </div>
         <div class="span3">
