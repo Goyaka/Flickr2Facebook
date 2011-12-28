@@ -4,38 +4,41 @@
     <table class="pgStyle1 circle3" cellspacing="0">
     <tbody><tr>
         <td class="c <%= @step1 %>"><var>1</var></td><td class="t"><b id="pagecircle1">Sign in into Facebook</b></td>
-        <td class="c <%= @step2 %>"><var>2</var></td><td class="t"><b id="pagecircle2">Sign in to Flickr</b></td>
+        <td class="c <%= @step2 %>"><var>2</var></td><td class="t"><b id="pagecircle2">Sign in to Flickr/Picasa</b></td>
         <td class="c <%= @step3 %>"><var>3</var></td><td class="t"><b id="pagecircle3">Migrate photos</b></td>
     </tr></tbody>
     </table>
+    
+    <div class="row">&nbsp;</div>
     <div class="row">
-        <div class="span4"> &nbsp; </div>
-        <div class="span3">
-            <img src = "/assets/<%= @flickr_user ? "flickr.png":"flickr-not-authenticated.png" %>">
-            <% if not @fb_user %>
-                &nbsp;
-            <% elsif @fb_user and not @flickr_user %>
-                <a href="/flickr-auth" class="btn large" onclick="_gaq.push(['_trackEvent', 'Auth', 'Flickr', 'start']);" style="color: #FE63BB; font-size: 22px"> 
-                    Authenticate
-                </a> <br>                
-            <% else %>
-                Logged in as <a href="http://www.flickr.com" style="color: #FE63BB; font-weight: bold;"><%= @flickr_user %> </a>
-            <% end %>
-            &nbsp;
-        </div>
-        <div class="span2">
-            <img src="/assets/arrow.png" style="padding-top: 50px;"> 
-            &nbsp;
-        </div>
-        <div class="span3">
-            <img src = "/assets/<%= @fb_user ? "facebook.png":"facebook-not-authenticated.png" %>">
-            <% if not @fb_user %>
-                <a href="facebook-auth" onclick="_gaq.push(['_trackEvent', 'Auth', 'Facebook', 'start']);"> <img src="/assets/facebook-login-button.png" /> </a> <br>                
-            <% else %>
-                Logged in as <br><a href="http://www.facebook.com/<%= @fb_user %>" style="font-weight:bold"><%= @fb_user.fb_first_name %> <%= @fb_user.fb_last_name %></a>
-            <% end%>
+        
+        <% if @step == 1 %>
+           <div class="span6"> &nbsp; </div>
+            <div class="span3">
+                <img src = "/assets/<%= @fb_user ? "facebook.png":"facebook-not-authenticated.png" %>">
+                <% if not @fb_user %>
+                    <a href="facebook-auth" onclick="_gaq.push(['_trackEvent', 'Auth', 'Facebook', 'start']);"> <img src="/assets/facebook-login-button.png" /> </a> <br>                
+                <% else %>
+                    Logged in as <br><a href="http://www.facebook.com/<%= @fb_user %>" style="font-weight:bold"><%= @fb_user.fb_first_name %> <%= @fb_user.fb_last_name %></a>
+                <% end%>
 
-        </div>
+            </div>
+        <% elsif @step == 2 %>
+           <div class="span6"> &nbsp; </div>
+           <div class="span3">
+                <img src = "/assets/<%= @flickr_user ? "flickr.png":"flickr-not-authenticated.png" %>">
+                <% if not @fb_user %>
+                    &nbsp;
+                <% elsif @fb_user and not @flickr_user %>
+                    <a href="/flickr-auth" class="btn large" onclick="_gaq.push(['_trackEvent', 'Auth', 'Flickr', 'start']);" style="color: #FE63BB; font-size: 22px"> 
+                        Authenticate
+                    </a> <br>                
+                <% else %>
+                    Logged in as <a href="http://www.flickr.com" style="color: #FE63BB; font-weight: bold;"><%= @flickr_user %> </a>
+                <% end %>
+                &nbsp;
+            </div>
+        <% end %>
         <div class="clear"></div>
     </div>
     <div id="sets"> </div>

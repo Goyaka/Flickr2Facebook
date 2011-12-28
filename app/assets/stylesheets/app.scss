@@ -100,12 +100,8 @@ img {
 
 footer {
     border: 0 none;
+    border-top:1px solid #1e611e;
     h1.logo {
-     opacity:0.45;
-     float:right;
-     position:fixed;
-     bottom:35px;
-     right:50px;
      background: transparent url("/assets/goyaka-logo.png") no-repeat 0 2px;
      font-family: 'Salsa', cursive;
      font-size : 21px;

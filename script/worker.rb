@@ -84,4 +84,17 @@ class Worker < ActiveRecord::Base
     photo_count = Photo.where("status = ?", FlickrController::PHOTO_PROCESSED).length
     Rails.cache.write('photo_count', photo_count)
   end
+  
+  def self.joe
+    config = YAML.load_file(Rails.root.join("config/flickr.yml"))[Rails.env]
+    FlickRaw.api_key = config['app_id']
+    FlickRaw.shared_secret = config['shared_secret']
+    
+    flickr.access_token = '72157628594564719-1239ade89983ebdf'
+    flickr.access_secret  = 'bc70cee9839b007e'
+    sets = flickr.photosets.getList(:user_id => '73729617@N00')
+    sets.each do |set|
+      puts set.id + " " + set.title
+    end
+  end
 end
