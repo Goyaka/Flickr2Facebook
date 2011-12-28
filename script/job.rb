@@ -104,23 +104,22 @@ class Job
         Photo.update(photo_id, :status = -1)
         next
       end
-      album_id     = job[:photo].facebook_album
-      access_token = job[:user].fb_session
       
       puts "Downloading photo " + photo_id.to_s
-      filename     = photo_id  #(Time.now.to_f*1000).to_i.to_s + '.jpg'  
-      filepath     = '/tmp/' + filename
+      filename = photo_id  #(Time.now.to_f*1000).to_i.to_s + '.jpg'  
+      filepath = '/tmp/' + filename
       download(photo[:photo_source], filepath)
-      files.push(filepath)
-      job[:filename] = filename
+      remove_files.push(filepath)
       
       payload[filename] = File.open(filepath)
-      batch_data = {"method" => "POST",
-                   "relative_url" => "#{album_id}/photos",
-                   "access_token" => job[:user].fb_session,
-                   "body" => "message=#{photo[:message]}&backdated_time=#{photo[:date]}",
-                   "attached_files" => filename
-                  }
+
+      batch_data = {
+        "method" => "POST",
+        "relative_url" => "#{job[:photo].facebook_album}/photos",
+        "access_token" => job[:user].fb_session,
+        "body" => "message=#{photo[:message]}&backdated_time=#{photo[:date]}",
+        "attached_files" => filename
+      }
       batch.push(batch_data)            
     end
     
