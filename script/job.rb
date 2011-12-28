@@ -152,7 +152,10 @@ class Job
         photo.save
       end
       
-      files.each do |filepath|
+    rescue Exception => msg
+      puts msg.inspect
+    ensure
+      remove_files.each do |filepath|
         begin
           puts "Deleting " + filepath
           File.delete(filepath)
