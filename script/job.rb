@@ -168,58 +168,7 @@ class Job
           puts "Couldn't delete " + filepath
         end
       end
-        
-    rescue Exception => msg
-      puts msg.inspect
     end
-  end
-
-  def upload(photo)
-    verify_photo = Photo.where('id = ? AND status = ?', photo.id, FlickrController::PHOTO_NOTPROCESSED).first
-    
-    if verify_photo 
-      verify_photo.status = FlickrController::PHOTO_PROCESSING
-      verify_photo.save
-      photo_id = photo.photo
-      album_id = photo.facebook_album
-
-      puts "Downloading photo " + photo_id.to_s
-      photo = getphoto_info(photo_id) 
-      filename = '/tmp/' + (Time.now.to_f*1000).to_i.to_s
- 
-      download(photo[:photo_source], filename)
-      puts "Downloaded photo. Uploading to facebook " + photo_id
-  
-      #Upload photo to facebook.
-      begin
-        response = RestClient.post("https://graph.facebook.com/#{album_id}/photos?access_token=#{@fb_access_token}",
-                                  {:source => File.new(filename),
-                                   :message => photo[:message],
-                                   :backdated_time => photo[:date]})
-        fb_photo_id = (JSON.parse response.to_s)['id']  
-        puts "Uploaded to http://facebook.com/#{fb_photo_id}"
-      rescue Exception => error
-        puts "Erroring + " + error.to_s 
-      end
-
-      File.delete(filename)
-      verify_photo.status = FlickrController::PHOTO_PROCESSED
-      verify_photo.facebook_photo = "http://facebook.com/#{fb_photo_id}"
-      verify_photo.save
-    end
-=begin
-    search_location = "https://graph.facebook.com/search?q=''&type=place&center=#{photo[:lat]},#{photo[:lon]}&distance=1000&access_token=#{access_token}"
-    puts search_location
-    response      = RestClient.get search_location
-    location_data = JSON.parse response.to_s
-    place_id      = location_data['data'][0]['id']
-    place_name    = location_data['data'][0]['name']
-  
-    response      = RestClient.post "https://graph.facebook.com/me/feed?access_token=#{access_token}", {:message => 'test3'}#, :created_time => '2011-01-09T07:16:18Z', :updated_time => '2011-01-09T07:16:18Z'}# , :place => "{'id':147397208613378}"} #, :type=>'photo', :link => "http://facebook.com/#{fb_photo_id}", :created_time => photo[:date], :updated_time => photo[:date], :place => "{' id':#{place_id}}"}
-  #  puts "Geotagged " +  place_name+ " (" + place_id + ")"
-  #  puts "Date uploaded " + photo[:date]
-    puts response
-=end
   end
   
   def create_album(albumname, description)
@@ -275,20 +224,5 @@ class Job
       photoset.status = FlickrController::PHOTOSET_PROCESSED
       photoset.save
     end
-  end
-  
-  def populate_photos(set_id)
-    photoset = Photoset.where('photoset = ?', set_id).first
-     if photoset
-       photos  = self.getphotos_from_set(set_id)
-       piclist = []
-       
-       index = 0
-       photoset_photos = photos
-       for pic in photoset_photos
-         photometa = PhotoMeta.create(pic)
-         index = index + 1
-       end
-     end
   end
 end
