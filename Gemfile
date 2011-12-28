@@ -11,12 +11,14 @@ gem "httparty"
 gem "thin"
 gem "flickraw"
 gem "flickraw-cached"
+gem "delayed_job"
 gem "execjs"
 gem "therubyracer"
 gem "rest-client"
 gem 'mongoid'
 gem 'bson'
 gem 'bson_ext'
+gem 'amazon-ses-mailer'
 
 group :production do
   gem "mysql2"

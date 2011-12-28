@@ -1,5 +1,4 @@
 require 'flickraw-cached'
-require 'delayed_jobs'
 
 class FlickrController < ApplicationController
   
@@ -126,8 +125,6 @@ class FlickrController < ApplicationController
 
     
   def select_sets
-    mailer_content = get_queued_mailer_content(@user)
-    mailjob = AsyncMailerJob.new(mailer_content)
     if params["set"].nil?
       redirect_to :controller => 'application', :action => 'main'
       return
@@ -141,6 +138,7 @@ class FlickrController < ApplicationController
     flickr = FlickRaw::Flickr.new
     facebook_user = Mogli::User.find("me",Mogli::Client.new(session[:at]))
     response = {}
+    @user = nil
     if facebook_user
       @user = User.where(:user => facebook_user.id)[0]
       if @user
@@ -159,22 +157,26 @@ class FlickrController < ApplicationController
         end
       end
     end
+    puts @user
+    mailer_content = get_queued_mailer_content(@user)
+    mailjob = AsyncMailerJob.new(mailer_content)
+    Delayed::Job.enqueue mailjob
     
     redirect_to :controller => 'application', :action => 'status'
     
   end
 
   def get_queued_mailer_content(user)
-    usermeta = UserMeta.where(:user => user.id).first
-    recipient_name = usermeta.first_name
+    usermeta = UserMeta.where(:user => user.user).first
+    recipient_name = usermeta.user_first_name
     if(recipient_name==nil || recipient_name.strip == "")
       recipient_name = "User"
     end
     
-    recipient_email = UserMeta.email
+    recipient_email = usermeta.user_email
     
-    senders = YAML.load_file(Rails.root.join("config/goyaka.yml"))[:mailer][:senders]
-    current_sender = senders[Time.now%senders.size]
+    senders = YAML.load_file(Rails.root.join("config/goyaka.yml"))['mailer']['senders']
+    current_sender = senders[Time.now.to_i%senders.size]
     sender_name = current_sender['name']
     sender_email = current_sender['email']
     sender_nick = current_sender['nick']

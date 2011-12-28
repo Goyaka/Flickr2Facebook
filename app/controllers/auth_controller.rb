@@ -67,14 +67,25 @@ class AuthController < ApplicationController
     if not user
     # create a new user now
       user = User.new(:user => fb_user.id, :fb_first_name => fb_user.first_name, :fb_last_name => fb_user.last_name, :fb_code => params[:code], :fb_session => session[:at])
-      usermeta = UserMeta.create(:first_name => fb_user.first_name, :last_name => fb_user.last_name, :email => fb_user.email)
       user.save
       
     elsif not user.fb_last_name or not user.fb_first_name
       # if the user's name is not updated then just update that
       user.fb_first_name = fb_user.first_name
       user.fb_last_name = fb_user.last_name
+      usermeta = UserMeta.create(:user_first_name => fb_user.first_name, :user_last_name => fb_user.last_name, :user_email => fb_user.email)
       user.save
+    end
+    puts "usermeta not found"
+    usermeta = UserMeta.where(:user => user.user).first
+    if not usermeta
+      puts "creating usermeta"
+      usermeta = UserMeta.create(:user => user.user, :user_first_name => fb_user.first_name, :user_last_name => fb_user.last_name, :user_email => fb_user.email)
+    else
+      puts "updating usermeta"
+      usermeta.user_first_name = fb_user.first_name
+      usermeta.user_last_name = fb_user.last_name
+      usermeta.user_email = fb_user.email
     end
     
     # update the session and fb_access_code

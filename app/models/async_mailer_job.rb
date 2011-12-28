@@ -6,10 +6,10 @@ class AsyncMailerJob
   end
 
   def perform
-    mailer.deliver to:      @content[:recipient],
-               from:    @content[:sender],
-               subject: @content[:subject],
-               body:    @content[:body]
+    @mailer.deliver :to=>      @content[:recipient],
+               :from=>    @content[:sender],
+               :subject=> @content[:subject],
+               :body=>    @content[:body]
   end
   
 end
