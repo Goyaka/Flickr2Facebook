@@ -13,14 +13,14 @@ class Worker < ActiveRecord::Base
           puts "Stop upload file is present. Exiting..."
           break
         end
-        #if Rails.env == 'production'
+        if Rails.env == 'production'
         puts "#{sort_criteria} #{FlickrController::PHOTO_NOTPROCESSED}"
           if sort_criteria == 'ASC' || sort_criteria == 'DESC'
             photos = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).order("id #{sort_criteria}").limit(5)
           elsif sort_criteria == 'SMALLFIRST'
             photos = Photo.joins(:photoset).where("photos.status = 0").order("photosets.photos_count ASC").limit(5) 
           end
-        #end
+        end
         
         if photos.nil? or photos.empty?
           sleep 3
