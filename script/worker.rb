@@ -2,7 +2,7 @@ require 'job'
 
 class Worker < ActiveRecord::Base
  
-  def self.upload_loop_batch
+  def self.upload_loop_batch(sort_criteria = 'ASC')
     begin
       while true
         if File.exists?('/tmp/PAUSE_UPLOAD')
@@ -14,7 +14,10 @@ class Worker < ActiveRecord::Base
           break
         end
         if Rails.env == 'production'
-          photos = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).order("id DESC").limit(5)
+        puts "#{sort_criteria} #{FlickrController::PHOTO_NOTPROCESSED}"
+          if sort_criteria == 'ASC' || sort_criteria == 'DESC'
+            photos = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).order("id #{sort_criteria}").limit(5)
+          end
         end
         
         if photos.nil? or photos.empty?
