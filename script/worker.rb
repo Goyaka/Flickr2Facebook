@@ -1,17 +1,16 @@
 require 'job' 
-require 'File'
 
 class Worker < ActiveRecord::Base
  
   def self.upload_loop_batch
     begin
       while true
-        if File.exists('/tmp/PAUSE_UPLOAD')?
-          puts "PAUSE_UPLOAD file is present. Pausing..."
+        if File.exists?('/tmp/PAUSE_UPLOAD')
+          puts "Pause upload file is present. Pausing..."
           sleep 30
           next
-        elsif File.exists('/tmp/STOP_UPLOAD')?
-          puts "STOP_UPLOAD file is present. Exiting..."
+        elsif File.exists?('/tmp/STOP_UPLOAD')
+          puts "Stop upload file is present. Exiting..."
           break
         end
         if Rails.env == 'production'
@@ -20,6 +19,7 @@ class Worker < ActiveRecord::Base
         
         if photos.nil? or photos.empty?
           sleep 3
+          puts "No photos to upload"
           next
         end
         
