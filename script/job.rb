@@ -101,6 +101,12 @@ class Job
     jobs.each_with_index do |job, index|
       photo_id = job[:photo].photo
       photo = getphoto_info(photo_id) 
+      if not photo[:photo_source]
+        this_photo = Photo.find(photo_id)
+        this_photo.status = -1
+        this_photo.save
+        next
+      end
       album_id     = job[:photo].facebook_album
       access_token = job[:user].fb_session
       
