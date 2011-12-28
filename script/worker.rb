@@ -1,27 +1,42 @@
 require 'job' 
+require 'File'
 
 class Worker < ActiveRecord::Base
-  
-  
+ 
   def self.upload_loop_batch
-    while true
-      if Rails.env == 'production'
-        photos = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).order("id DESC").limit(5)
-      else
-        photos = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).order("RANDOM()").limit(5)
+    begin
+      while true
+        if File.exists('/tmp/PAUSE_UPLOAD')?
+          puts "PAUSE_UPLOAD file is present. Pausing..."
+          sleep 30
+          next
+        elsif File.exists('/tmp/STOP_UPLOAD')?
+          puts "STOP_UPLOAD file is present. Exiting..."
+          break
+        end
+        if Rails.env == 'production'
+          photos = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).order("id DESC").limit(5)
+        end
+        
+        if photos.nil? or photos.empty?
+          sleep 3
+          next
+        end
+        
+        jobs = []
+
+        photos.each do |photo|
+          photoset = Photoset.find(photo.photoset_id)
+          user     = User.find(photoset.user_id)
+          job      = { :photo => photo, :user => user} 
+          jobs.push(job)
+        end
+
+        job = Job.new("","","",false)
+        job.batch_upload(jobs)
       end
-      
-      jobs = []
-      
-      photos.each do |photo|
-        photoset = Photoset.find(photo.photoset_id)
-        user     = User.find(photoset.user_id)
-        job      = { :photo => photo, :user => user} 
-        jobs.push(job)
-      end
-      
-      job = Job.new("","","",false)
-      job.batch_upload(jobs)
+    rescue Exception => msg
+      puts "Exception reached => " + msg
     end
   end
     
@@ -82,10 +97,5 @@ class Worker < ActiveRecord::Base
     photo_count = Photo.where("status = ?", FlickrController::PHOTO_PROCESSED).length
     Rails.cache.write('photo_count', photo_count)
   end
-  
-  def self.upload_for_user
-    photos = User.find(181).photosets.collect { |set|
-      set.photos
-    }
-  end
+ 
 end
