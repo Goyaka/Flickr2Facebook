@@ -38,15 +38,18 @@ class Job
     end
   end
 
-  def getphoto_info(photo_id)
+  def get_photo_info(photo_id)
     info = PhotoMeta.where(:photo => photo_id).first
-    photo = {}
+    return nil unless info.empty? or info.nil?
     
-    if info['originalsecret'].nil?  
+    photo = {}
+    if info['originalsecret'].nil?
       photo[:photo_source] = info['url_m']
     else
       photo[:photo_source] = "http://farm#{info['farm']}.staticflickr.com/#{info['server']}/#{info['photo']}_#{info['originalsecret']}_o.jpg"
     end
+    
+    return nil unless photo[:photo_source].nil?
     
     photo[:message] = info['title'] + "\n" + info['description'] + "\n"
     photo[:date] = info['dateupload'].to_i
