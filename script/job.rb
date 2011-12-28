@@ -86,21 +86,14 @@ class Job
   def batch_upload(jobs)
     payload = {}
     batch   = []
-    
     access_token = ''
-    photo_ids = []
-    jobs.each do |job|
-      photo_ids.push(job[:photo].photo)
-    end
-    
-    photos = Photo.where('photo in (?)', photo_ids)
-    #Set status as processing.
-    photos.each do |photo|
-      photo.status = FlickrController::PHOTO_PROCESSING
-      photo.save
-    end
-    
-    files = []
+    remove_files = []
+
+    # set status of all photos to PHOTO_PROCESSING
+    photo_ids = jobs.collect { |job| job[:photo].photo }.compact
+    Photo.where('photo in (?)', photo_ids).update_all FlickrController::PHOTO_PROCESSING
+
+
     jobs.each_with_index do |job, index|
       photo_id = job[:photo].photo
       photo = getphoto_info(photo_id) 
