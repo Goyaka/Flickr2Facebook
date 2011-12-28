@@ -67,6 +67,7 @@ class AuthController < ApplicationController
     if not user
     # create a new user now
       user = User.new(:user => fb_user.id, :fb_first_name => fb_user.first_name, :fb_last_name => fb_user.last_name, :fb_code => params[:code], :fb_session => session[:at])
+      usermeta = UserMeta.create(:first_name => fb_user.first_name, :last_name => fb_user.last_name, :email => fb_user.email)
       user.save
       
     elsif not user.fb_last_name or not user.fb_first_name

@@ -166,15 +166,33 @@ class FlickrController < ApplicationController
 
   def get_queued_mailer_content(user)
     usermeta = UserMeta.where(:user => user.id).first
-    name = usermeta.first_name
-    if(name==nil || name.strip == "")
-      name = "User"
+    recipient_name = usermeta.first_name
+    if(recipient_name==nil || recipient_name.strip == "")
+      recipient_name = "User"
     end
     
-    config = YAML.load_file(Rails.root.join("config/goyaka.yml"))[:mailer]
-    sender_emails = config[:sender]
-    sender_names = config[:sendername]
-    sender_designations = config[:sender]
+    recipient_email = UserMeta.email
+    
+    senders = YAML.load_file(Rails.root.join("config/goyaka.yml"))[:mailer][:senders]
+    current_sender = senders[Time.now%senders.size]
+    sender_name = current_sender['name']
+    sender_email = current_sender['email']
+    sender_nick = current_sender['nick']
+    sender_designation = current_sender['designation']
+    
+    mailcontent = {
+     :recipient=> "#{recipient_name}<#{recipient_email}>",
+     :sender => "#{sender_name}<#{sender_email}>",
+     :subject => "Greetings from Unifyphotos!",
+     :body => "Dear #{recipient_name},\n\n"+
+     "We are thrilled to help you move your photos to Facebook.\n"+
+     "Your photos are being uploaded now. We'll let you know once it is done.\n\n"+
+     "Cheers,\n"+
+     "#{sender_name},\n"+
+     "#{sender_designation},\n"+
+     "Unifyphotos - Goyaka Labs"
+     }
+     return mailcontent
   end
 
 end
