@@ -95,12 +95,13 @@ class Job
 
 
     jobs.each_with_index do |job, index|
+      # get flickr photo id
       photo_id = job[:photo].photo
-      photo = getphoto_info(photo_id) 
-      if not photo[:photo_source]
-        this_photo = Photo.find(photo_id)
-        this_photo.status = -1
-        this_photo.save
+
+      # If photo information is nil, set status as -1
+      photo = get_photo_info(photo_id) 
+      if photo.nil?
+        Photo.update(photo_id, :status = -1)
         next
       end
       album_id     = job[:photo].facebook_album
