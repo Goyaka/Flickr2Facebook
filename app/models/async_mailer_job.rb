@@ -1,7 +1,8 @@
 class AsyncMailerJob
   def initialize(mailcontent)
     @content = mailcontent
-    @mailer = AmazonSes::Mailer.new(:access_key => "AKIAICVVEBIXIX3FBQFQ", :secret_key => "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")
+    awsconfig = YAML.load_file(Rails.root.join("config/aws.yml"))[Rails.env]
+    @mailer = AmazonSes::Mailer.new(:access_key => awsconfig['key'], :secret_key => awsconfig['secret'])
   end
 
   def perform
