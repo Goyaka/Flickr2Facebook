@@ -45,29 +45,6 @@ class Worker < ActiveRecord::Base
     end
   end
     
-  def self.upload_loop
-    while true
-      begin
-        if Rails.env == 'production'
-          photo = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).first(:order => "RAND()")
-        else
-          photo = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).first(:order => "RANDOM()")
-        end
-        if photo
-          photoset = Photoset.find(photo.photoset_id)
-          user = User.find(photoset.user_id)
-          job = Job.new(user.fb_session, user.flickr_access_token, user.flickr_access_secret)              
-          job.upload(photo)
-        else
-          # "No photo. waiting."
-          sleep 1
-        end
-      rescue Exception => msg
-        puts "Exception raised" + msg
-      end
-    end
-  end
-  
   def self.split_sets_loop
     while true
       begin
@@ -85,16 +62,6 @@ class Worker < ActiveRecord::Base
       rescue Exception => msg
         logger.error("Exception raised" + msg)
       end
-    end
-  end
-  
-  def self.populate_photos
-    sets = Photoset.all()
-    for set in sets
-      puts "Populating set " + set.photoset + " to photos"
-      user = User.find(set.user_id)
-      job = Job.new(user.fb_session, user.flickr_access_token, user.flickr_access_secret)              
-      job.populate_photos(set.photoset)
     end
   end
   
