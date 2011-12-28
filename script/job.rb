@@ -261,9 +261,9 @@ class Job
       for pic in photoset_photos
         facebook_album = albumids[(index + 1)/Job::MAX_FACEBOOK_PHOTO_COUNT]
         puts "Adding photo " + pic['photo'].to_s + " to facebook album http://facebook.com/" + facebook_album
+        photometa = PhotoMeta.create(pic)
         photo = Photo.new(:photo => pic['photo'], :photoset_id => photoset, :facebook_photo => '', :facebook_album => facebook_album, :status => FlickrController::PHOTO_NOTPROCESSED)
         photo.save()
-        photometa = PhotoMeta.create(pic)
         index = index + 1
       end
       
