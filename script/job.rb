@@ -126,21 +126,18 @@ class Job
     fb_photo_ids = []
     begin
       payload[:batch] = batch.to_json
+
       response = RestClient.post("https://graph.facebook.com/", payload)
+
       response_obj = JSON.parse response
       response_obj.each do |response_item| 
         body =  JSON.parse response_item['body']
         if body.has_key?('id')
           fb_photo_ids.push(body['id'])
+          puts "Uploaded http://facebook.com/" + id.to_s
         else
           puts body
-          fb_photo_ids.push('')
-        end
-      end
-      
-      fb_photo_ids.each do |id|
-        if id
-          puts "Uploaded http://facebook.com/" + id.to_s
+          fb_photo_ids.push(nil)
         end
       end
       
