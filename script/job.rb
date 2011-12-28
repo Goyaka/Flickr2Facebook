@@ -138,12 +138,15 @@ class Job
         if body.has_key?('id')
           fb_photo_ids.push(body['id'])
         else
+          puts body
           fb_photo_ids.push('')
         end
       end
       
       fb_photo_ids.each do |id|
-        puts "Uploaded http://facebook.com/" + id.to_s
+        if id
+          puts "Uploaded http://facebook.com/" + id.to_s
+        end
       end
       
       photos = Photo.where('photo in (?)', photo_ids)
@@ -151,22 +154,24 @@ class Job
       photos.each_with_index do |photo, index|
         photo.status = FlickrController::PHOTO_PROCESSED
         photo.facebook_photo = "http://www.facebook.com/#{fb_photo_ids[index]}"
+        if not fb_photo_ids[index]
+          photo.status = FlickrController::PHOTO_FAILED
+        end
         photo.save
       end
       
+      files.each do |filepath|
+        begin
+          puts "Deleting " + filepath
+          File.delete(filepath)
+        rescue
+          puts "Couldn't delete " + filepath
+        end
+      end
+        
     rescue Exception => msg
       puts msg.inspect
     end
-    
-    files.each do |filepath|
-      begin
-        puts "Deleting " + filepath
-        File.delete(filepath)
-      rescue
-        puts "Couldn't delete " + filepath
-      end
-    end
-    
   end
 
   def upload(photo)

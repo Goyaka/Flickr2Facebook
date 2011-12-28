@@ -9,6 +9,7 @@ class FlickrController < ApplicationController
   PHOTO_NOTPROCESSED = 0
   PHOTO_PROCESSING   = 1
   PHOTO_PROCESSED    = 2
+  PHOTO_FAILED       = 42
   
   def get_all_sets
     # TODO: Make the config loading part separated
