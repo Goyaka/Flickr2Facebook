@@ -24,9 +24,7 @@ class Worker < ActiveRecord::Base
       job.batch_upload(jobs)
     end
   end
-  
-  
-  
+    
   def self.upload_loop
     while true
       begin
@@ -83,5 +81,11 @@ class Worker < ActiveRecord::Base
   def self.photo_count_cron
     photo_count = Photo.where("status = ?", FlickrController::PHOTO_PROCESSED).length
     Rails.cache.write('photo_count', photo_count)
+  end
+  
+  def self.upload_for_user
+    photos = User.find(181).photosets.collect { |set|
+      set.photos
+    }
   end
 end
