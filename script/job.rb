@@ -126,7 +126,6 @@ class Job
     fb_photo_ids = []
     begin
       payload[:batch] = batch.to_json
-      payload[:access_token] = access_token
       response = RestClient.post("https://graph.facebook.com/", payload)
       response_obj = JSON.parse response
       response_obj.each do |response_item| 
