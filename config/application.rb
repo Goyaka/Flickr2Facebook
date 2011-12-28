@@ -51,5 +51,9 @@ module Flickr2facebook
     config.assets.version = '1.0'
     
     config.cache_store = :mem_cache_store, "localhost"
+    
+    config.generators do |g| 
+      g.orm :active_record 
+    end
   end
 end
