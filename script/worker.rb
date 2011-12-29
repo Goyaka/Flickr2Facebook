@@ -77,7 +77,9 @@ class Worker < ActiveRecord::Base
   end
   
   def self.beanstalk_pusher
-    beanstalk = Beanstalk::Pool.new(['localhost:11300'])
+    config = YAML.load_file(Rails.root.join("config/beanstalk.yml"))[Rails.env]
+    
+    beanstalk = Beanstalk::Pool.new([config['host']])
     
     while true
       jobs_count = beanstalk.stats['current-jobs-ready']
