@@ -40,7 +40,7 @@ class Job
 
   def get_photo_info(photo_id)
     info = PhotoMeta.where(:photo => photo_id).first
-    return nil unless info.empty? or info.nil?
+    return nil unless info.nil? or info.empty?
     
     photo = {}
     if info['originalsecret'].nil?
