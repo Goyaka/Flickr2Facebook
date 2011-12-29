@@ -18,7 +18,7 @@ class Worker < ActiveRecord::Base
           puts "#{sort_criteria} #{FlickrController::PHOTO_NOTPROCESSED}"
           if sort_criteria == 'ASC' || sort_criteria == 'DESC'
             Photo.transaction do
-              _photos = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).order("id #{sort_criteria}").limit(5)
+              _photos = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).lock(true).order("id #{sort_criteria}").limit(5)
               _photos.each do |photo|
                 photo.status = FlickrController::PHOTO_PROCESSING
                 photo.save
