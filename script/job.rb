@@ -92,8 +92,6 @@ class Job
 
     # set status of all photos to PHOTO_PROCESSING
     photo_ids = jobs.collect { |job| job[:photo].photo }.compact
-    Photo.where('photo in (?)', photo_ids).update_all :status => FlickrController::PHOTO_PROCESSING
-
 
     jobs.each_with_index do |job, index|
       # get flickr photo id
