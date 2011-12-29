@@ -13,19 +13,20 @@ class Worker < ActiveRecord::Base
           puts "Stop upload file is present. Exiting..."
           break
         end
+        photos = nil
         if Rails.env == 'production'
           puts "#{sort_criteria} #{FlickrController::PHOTO_NOTPROCESSED}"
           if sort_criteria == 'ASC' || sort_criteria == 'DESC'
             Photo.transaction do
-              photos = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).order("id #{sort_criteria}").limit(5)
-              photos.each do |photo|
+              _photos = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).order("id #{sort_criteria}").limit(5)
+              _photos.each do |photo|
                 photo.status = FlickrController::PHOTO_PROCESSING
                 photo.save
               end
+              photos = _photos
             end
           end
         end
-
         
         if photos.nil? or photos.empty?
           sleep 3
