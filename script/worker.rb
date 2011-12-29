@@ -43,8 +43,9 @@ class Worker < ActiveRecord::Base
         # experimental
         break
       end
-    rescue Exception => msg
-      puts "Exception reached => " + msg
+    rescue Exception => e
+      puts "Exception reached => " + e
+      puts e.backtrace
     end
   end
     
