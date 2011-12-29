@@ -49,3 +49,4 @@ gem 'jquery-rails'
 # To use debugger
 # gem 'ruby-debug'
 gem 'memcache-client'
+gem 'beanstalk-client'

@@ -30,6 +30,7 @@ GEM
     activesupport (3.1.2)
       multi_json (~> 1.0)
     arel (2.2.1)
+    beanstalk-client (1.1.1)
     bson (1.5.1)
     bson_ext (1.5.1)
     builder (3.0.0)
@@ -144,6 +145,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  beanstalk-client
   bson
   bson_ext
   coffee-rails (~> 3.1.1)
