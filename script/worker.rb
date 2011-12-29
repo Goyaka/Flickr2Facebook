@@ -23,6 +23,7 @@ class Worker < ActiveRecord::Base
                 photo.save
               end
             end
+          end
         end
 
         
