@@ -52,6 +52,10 @@ class Worker < ActiveRecord::Base
   def self.split_sets_loop
     while true
       begin
+        if File.exists?('/tmp/STOP_SPLIT')
+          puts "Stop upload file is present. Exiting..."
+          break
+        end
         logger.info("Getting unprocessed photosets")
         set = Photoset.where("status = ?", FlickrController::PHOTOSET_NOTPROCESSED).first
         if set
