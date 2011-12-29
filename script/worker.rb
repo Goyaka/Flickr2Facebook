@@ -41,7 +41,7 @@ class Worker < ActiveRecord::Base
         job.batch_upload(jobs)
         
         # experimental
-        break
+        # break
       end
     rescue Exception => e
       puts "Exception reached => " + e
