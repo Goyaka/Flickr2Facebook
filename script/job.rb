@@ -40,7 +40,9 @@ class Job
 
   def get_photo_info(photo_id)
     info = PhotoMeta.where(:photo => photo_id).first
-    puts info
+    if info.nil? 
+      puts "Empty metadata for photos " + photo_id.to_s
+    end
     return nil if info.nil? 
     
     photo = {}
@@ -133,12 +135,11 @@ class Job
       response_obj = JSON.parse response
       response_obj.each do |response_item| 
         body =  JSON.parse response_item['body']
-	puts body
         if body.has_key?('id')
           fb_photo_ids.push(body['id'])
           puts "Uploaded http://facebook.com/" + body['id'].to_s
         else
-          puts body
+          puts response_item['body']
           fb_photo_ids.push(nil)
         end
       end
