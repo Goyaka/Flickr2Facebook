@@ -114,6 +114,13 @@ class Worker < ActiveRecord::Base
     end
   end
   
+  def self.beanstalk_queue_count
+    config = YAML.load_file(Rails.root.join("config/flickr.yml"))[Rails.env]
+    config = YAML.load_file(Rails.root.join("config/beanstalk.yml"))[Rails.env]
+    beanstalk = Beanstalk::Pool.new([config['host']])
+    puts "Current jobs in queue : " + beanstalk.stats['current-jobs-ready'].to_s
+  end
+  
   def self.photo_count_cron
     photo_count = Photo.where("status = ?", FlickrController::PHOTO_PROCESSED).length
     Rails.cache.write('photo_count', photo_count)
