@@ -14,13 +14,20 @@ class Worker < ActiveRecord::Base
           break
         end
         if Rails.env == 'production'
-        puts "#{sort_criteria} #{FlickrController::PHOTO_NOTPROCESSED}"
-          if sort_criteria == 'ASC' || sort_criteria == 'DESC'
-            photos = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).order("id #{sort_criteria}").limit(5)
-          elsif sort_criteria == 'SMALLFIRST'
-            photos = Photo.joins(:photoset).where("photos.status = 0").order("photosets.photos_count ASC").limit(5) 
+          Photo.transaction do
+            puts "#{sort_criteria} #{FlickrController::PHOTO_NOTPROCESSED}"
+            if sort_criteria == 'ASC' || sort_criteria == 'DESC'
+              photos = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).order("id #{sort_criteria}").limit(5)
+            elsif sort_criteria == 'SMALLFIRST'
+              photos = Photo.joins(:photoset).where("photos.status = 0").order("photosets.photos_count ASC").limit(5) 
+            end
+            photos.each do |photo|
+              photo.status = FlickrController::PHOTO_PROCESSING
+              photo.save
+            end
           end
         end
+
         
         if photos.nil? or photos.empty?
           sleep 3
@@ -31,8 +38,6 @@ class Worker < ActiveRecord::Base
         jobs = []
 
         photos.each do |photo|
-          photo.status = FlickrController::PHOTO_PROCESSING
-          photo.save
           photoset = Photoset.find(photo.photoset_id)
           user     = User.find(photoset.user_id)
           job      = { :photo => photo, :user => user} 
