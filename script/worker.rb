@@ -3,7 +3,7 @@ require 'beanstalk-client'
 
 class Worker < ActiveRecord::Base
   
-  MAX_JOB_LIMIT = 100
+  MAX_JOB_LIMIT = 500
  
   def self.upload_loop_batch(sort_criteria = 'ASC')
     beanstalk = Beanstalk::Pool.new(['localhost:11300'])
@@ -86,11 +86,19 @@ class Worker < ActiveRecord::Base
       
       #Do not push to beanstalk if there are more than 500 entries.
       if jobs_count.to_i > Worker::MAX_JOB_LIMIT
-        puts "More than 100 jobs (#{jobs_count.to_s}), waiting."
+        puts "More than #{Worker::MAX_JOB_LIMIT} jobs (#{jobs_count.to_s}), waiting."
         sleep 5
         next  
       else
-        photos = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).limit(12)
+
+        #Pick 100 photos from db and push to beanstalk
+        photos = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).limit(100)
+	
+        if photos.empty?
+          puts "No photos in db, waiting"
+          sleep 10
+        end
+
         photo_ids = photos.map {|photo| photo.id }
 
         #Split into batches of 5.
@@ -102,6 +110,7 @@ class Worker < ActiveRecord::Base
         #Push them into beanstalk
         photo_id_batches.each do |photo_batch|
           #Change status of each photo to processing.
+	  puts "Pushing #{photo_batch.inspect} to beanstalk"
           photo_batch.each do |photo|
             photo_object = Photo.find(photo)
             photo_object.status = FlickrController::PHOTO_PROCESSING
@@ -109,7 +118,6 @@ class Worker < ActiveRecord::Base
           end
           beanstalk.put(photo_batch.to_json)
         end
-        break
       end
     end
   end
