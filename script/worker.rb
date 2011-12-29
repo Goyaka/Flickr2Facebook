@@ -14,18 +14,15 @@ class Worker < ActiveRecord::Base
           break
         end
         if Rails.env == 'production'
-          Photo.transaction do
-            puts "#{sort_criteria} #{FlickrController::PHOTO_NOTPROCESSED}"
-            if sort_criteria == 'ASC' || sort_criteria == 'DESC'
+          puts "#{sort_criteria} #{FlickrController::PHOTO_NOTPROCESSED}"
+          if sort_criteria == 'ASC' || sort_criteria == 'DESC'
+            Photo.transaction do
               photos = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).order("id #{sort_criteria}").limit(5)
-            elsif sort_criteria == 'SMALLFIRST'
-              photos = Photo.joins(:photoset).where("photos.status = 0").order("photosets.photos_count ASC").limit(5) 
+              photos.each do |photo|
+                photo.status = FlickrController::PHOTO_PROCESSING
+                photo.save
+              end
             end
-            photos.each do |photo|
-              photo.status = FlickrController::PHOTO_PROCESSING
-              photo.save
-            end
-          end
         end
 
         
