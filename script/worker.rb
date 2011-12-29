@@ -6,7 +6,8 @@ class Worker < ActiveRecord::Base
   MAX_JOB_LIMIT = 500
  
   def self.upload_loop_batch(sort_criteria = 'ASC')
-    beanstalk = Beanstalk::Pool.new(['localhost:11300'])
+    config = YAML.load_file(Rails.root.join("config/beanstalk.yml"))[Rails.env]
+    beanstalk = Beanstalk::Pool.new([config['host']])
     begin
       while true
         if File.exists?('/tmp/PAUSE_UPLOAD')
@@ -123,7 +124,6 @@ class Worker < ActiveRecord::Base
   end
   
   def self.beanstalk_queue_count
-    config = YAML.load_file(Rails.root.join("config/flickr.yml"))[Rails.env]
     config = YAML.load_file(Rails.root.join("config/beanstalk.yml"))[Rails.env]
     beanstalk = Beanstalk::Pool.new([config['host']])
     puts "Current jobs in queue : " + beanstalk.stats['current-jobs-ready'].to_s
