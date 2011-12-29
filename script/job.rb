@@ -40,7 +40,8 @@ class Job
 
   def get_photo_info(photo_id)
     info = PhotoMeta.where(:photo => photo_id).first
-    return nil unless info.nil? or info.empty?
+    puts info
+    return nil if info.nil? 
     
     photo = {}
     if info['originalsecret'].nil?
@@ -49,7 +50,7 @@ class Job
       photo[:photo_source] = "http://farm#{info['farm']}.staticflickr.com/#{info['server']}/#{info['photo']}_#{info['originalsecret']}_o.jpg"
     end
     
-    return nil unless photo[:photo_source].nil?
+    return nil if photo[:photo_source].nil?
     
     photo[:message] = info['title'] + "\n" + info['description'] + "\n"
     photo[:date] = info['dateupload'].to_i
@@ -112,6 +113,7 @@ class Job
       remove_files.push(filepath)
       
       payload[filename] = File.open(filepath)
+      access_token = job[:user].fb_session
 
       batch_data = {
         "method" => "POST",
@@ -126,15 +128,17 @@ class Job
     fb_photo_ids = []
     begin
       payload[:batch] = batch.to_json
+      payload[:access_token] = access_token
 
       response = RestClient.post("https://graph.facebook.com/", payload)
 
       response_obj = JSON.parse response
       response_obj.each do |response_item| 
         body =  JSON.parse response_item['body']
+	puts body
         if body.has_key?('id')
           fb_photo_ids.push(body['id'])
-          puts "Uploaded http://facebook.com/" + id.to_s
+          puts "Uploaded http://facebook.com/" + body['id'].to_s
         else
           puts body
           fb_photo_ids.push(nil)
