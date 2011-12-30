@@ -81,6 +81,10 @@ img {
 .main  {
     h2 {
      color:#040;
+     font-size:105%;
+     text-align: left;
+     margin-left: 110px;
+     padding-top: 20px;
     }
 }
 
@@ -114,21 +118,27 @@ img {
 } 
 
 footer {
+    
     border: 0 none;
     h1.logo {
-     opacity:0.45;
-     float:right;
-     position:fixed;
-     bottom:35px;
-     right:50px;
      background: transparent url("/assets/goyaka-logo.png") no-repeat 0 2px;
      font-family: 'Salsa', cursive;
-     font-size : 21px;
+     font-size : 15px;
      padding-left : 36px;
      padding-top : 13px;
      margin-top: 10px;
      color:#040;
      margin-bottom:-2px;
+    }
+    
+    text-align: center;
+    
+    .footer-logo {
+        display:inline-block;
+    }
+    
+    .fb-like {
+        display:block;
     }
     
     h1.logo:hover {

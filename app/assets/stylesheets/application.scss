@@ -15,120 +15,134 @@
     font-size: 15px;
     background-color:#fff;
     border-radius:5px;
-}
-
-#sets .refresh {
-    width:40%;
-    margin:5px auto 10px auto;
-    font-size:80%;
-}
-
-#sets .refresh a {
-    padding:5px;
-    padding-right:8px;
-}
-
-
-#sets .set {
-    display: inline-block;
-    width: 150px;
-    padding: 2px 0px;
-    margin: 0px 5px;
-    overflow: hidden;
-    cursor: pointer;
-    border-radius: 5px;
-    vertical-align: top;
-}
-
-#sets .set.fixedheight label {
-    height:95px;
-}
-
-#sets .set label {
-    padding: 0px;
-    width: 100%;
-    text-align: center;
-    cursor: pointer;
-}
-
-#sets .set .cover {
-    border: 2px solid transparent;
-    background: transparent;
-    min-height: 75px;
-}
-
-#sets .set .cover img.thumb {
-    border: 1px solid #ccc;
-    padding : 5px;
-    background-color:#fff;
-    border-radius: 5px;
-}
-
-#sets .set .cover .progressbar {
-    border: 1px solid black;
-    width: 90px;
-    margin: 0 auto;
-    border-radius: 2px;
-    font-size: 11px;
-    font-weight: bold;
-    background-color: white;
-    height : 15px;
-}
-
-#sets .set .cover .progressbar .fill {
-    background-color:orange;
-    position:relative;
-    height:100%;
-    top:0;
-    left:0;
-}
-
-#sets .set .cover .progressbar .data {
-    position:relative;
-    top:-17px;
-    left:0;
-}
-
-
-#sets .set:hover .cover img.thumb,
-#sets .set:hover .cover img.selected {
-    background-color: #FAE65C;
-}
-
-#sets .set .cover img.check {
-    position: relative;
-    top: -18px;
-    right: 100px;
-    float: right;
-    display:none;
-}
-
-#sets .set:hover .cover img.check,
-#sets .set .cover img.selected {
-    display:none;
-    background-color:transparent;
-}
-
-
-#sets .set .cover .count {
-    float: left;
-    position: relative;
-    display: block;
-    background-color: white;
-    border: 1px solid #444;
-    border-radius: 20px;
-    font-size: 9px;
-    font-weight: bold;
-    width: 18px;
-    height: 18px;
-    color: #111;
-    text-align: center;
-    left: 105px;
-    top: -91px;
-    z-index: 10000;
-}
-
-#sets .set .thumb-title {
-    font-size: 0.8em;
-    font-weight: bold;
+    padding-bottom:10px;
+    
+    .import-spacer {
+        width : 960px;
+        height : 80px;
+    }
+    
+    .import-sets-button {
+        padding:20px 0;
+        bottom:0;
+        width:960px;
+        height:40px;
+        background-color:#fff;
+        
+        button {
+            font-weight:bold;
+        }
+    }
+    
+    .refresh {
+        width:40%;
+        margin:5px auto 10px auto;
+        font-size:80%;
+        
+        a {
+            padding:5px;
+            padding-right:8px;
+        }
+    }
+    
+    .set {
+        display: inline-block;
+        width: 150px;
+        padding: 2px 0px;
+        margin: 0px 5px;
+        overflow: hidden;
+        cursor: pointer;
+        border-radius: 5px;
+        vertical-align: top;
+        
+        .thumb-title {
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        
+        
+        .cover {
+            img.thumb, img.selected {
+                background-color: #FAE65C;
+            }
+            
+            border: 2px solid transparent;
+            background: transparent;
+            min-height: 75px;
+            
+            .count {
+                float: left;
+                position: relative;
+                display: block;
+                background-color: white;
+                border: 1px solid #444;
+                border-radius: 20px;
+                font-size: 9px;
+                font-weight: bold;
+                width: 18px;
+                height: 18px;
+                color: #111;
+                text-align: center;
+                left: 105px;
+                top: -91px;
+                z-index: 10000;
+            }
+            
+            img.thumb {
+                border: 1px solid #ccc;
+                padding : 5px;
+                background-color:#fff;
+                border-radius: 5px;
+            }
+            
+            img.check {
+                position: relative;
+                top: -18px;
+                right: 100px;
+                float: right;
+                display:none;
+            }
+            
+            img.check, img.selected {
+                display:none;
+                background-color:transparent;
+            }
+            
+            .progressbar {
+                border: 1px solid black;
+                width: 90px;
+                margin: 0 auto;
+                border-radius: 2px;
+                font-size: 11px;
+                font-weight: bold;
+                background-color: white;
+                height : 15px;
+                
+                .fill {
+                    background-color:orange;
+                    position:relative;
+                    height:100%;
+                    top:0;
+                    left:0;
+                }
+                
+                .data {
+                    position:relative;
+                    top:-17px;
+                    left:0;
+                }
+            }
+        }
+        
+        label {
+            padding: 0px;
+            width: 100%;
+            text-align: center;
+            cursor: pointer;
+        }
+    }
+    
+    .set.fixedheight label {
+        height:95px;
+    }
 }
