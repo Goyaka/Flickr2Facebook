@@ -12,9 +12,22 @@
 #sets {
     text-align: center;
     margin: 0 auto;
-    padding-top: 20px;
     font-size: 15px;
+    background-color:#fff;
+    border-radius:5px;
 }
+
+#sets .refresh {
+    width:40%;
+    margin:5px auto 10px auto;
+    font-size:80%;
+}
+
+#sets .refresh a {
+    padding:5px;
+    padding-right:8px;
+}
+
 
 #sets .set {
     display: inline-block;

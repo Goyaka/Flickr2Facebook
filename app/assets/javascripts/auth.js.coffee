@@ -53,5 +53,8 @@ $(document).ready ->
         if $('#inqueue_sets_list_template').length != 0
             loadsets('/flickr/inqueue_sets','#inqueue_sets_list_template', '#queue', 'Loading photos in upload queue')
             
+    $('#dialog-close').click ->
+        $('#modal-share-friends').modal('hide')
+            
         
         

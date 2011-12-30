@@ -17,11 +17,25 @@ small {
     .navtab 
     {
         margin-bottom:0px;
-        li.first
+        
+        li
         {
-            margin-left:40%;
+            font-size:150%;
+            
+            a {
+                padding: 5px 15px
+            }
         }
     }
+    
+    li.active a {
+        color:#000;
+    }
+    
+    li.first {
+       margin-left:35%;
+    }
+    
     .startnow {
         text-shadow: #040 1px 1px;
         font-weight: bold;
@@ -233,4 +247,10 @@ background: #CCC;
 #photo-count {
  margin-top:5px;
  font-size : 110%;
+}
+
+.share-photos-image
+{
+    margin-left:20px;
+    display: inline-block;
 }
