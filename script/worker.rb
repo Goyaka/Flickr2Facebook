@@ -94,7 +94,6 @@ class Worker < ActiveRecord::Base
 
         #Pick 100 photos from db and push to beanstalk
         photos = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).limit(100)
-	
         if photos.empty?
           puts "No photos in db, waiting"
           sleep 10
@@ -111,13 +110,13 @@ class Worker < ActiveRecord::Base
         #Push them into beanstalk
         photo_id_batches.each do |photo_batch|
           #Change status of each photo to processing.
-	  puts "Pushing #{photo_batch.inspect} to beanstalk"
-          photo_batch.each do |photo|
-            photo_object = Photo.find(photo)
-            photo_object.status = FlickrController::PHOTO_PROCESSING
-            photo_object.save
-          end
-          beanstalk.put(photo_batch.to_json)
+        puts "Pushing #{photo_batch.inspect} to beanstalk"
+        photo_batch.each do |photo|
+          photo_object = Photo.find(photo)
+          photo_object.status = FlickrController::PHOTO_PROCESSING
+          photo_object.save
+        end
+        beanstalk.put(photo_batch.to_json)
         end
       end
     end
