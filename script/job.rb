@@ -85,6 +85,21 @@ class Job
      puts photos.length
      return newphotos
   end
+
+  def create_album_on_fb()
+    puts "Creating facebook album"
+    setinfo         = flickr.photosets.getInfo(:photoset_id => photo[:photoset_id])
+    albumname       = setinfo.title
+    description     = setinfo.description
+    albumcount = (photos.length + Job::MAX_FACEBOOK_PHOTO_COUNT) / Job::MAX_FACEBOOK_PHOTO_COUNT
+    albumids   = self.create_fb_albums(albumname, description, albumcount)
+    photos.each do |photo|
+      album_name = albumids[(index + 1)/Job::MAX_FACEBOOK_PHOTO_COUNT]
+      photo.facebook_album = album_name
+      photo.save()
+    end
+    return photos.first.facebook_album
+  end
   
   def batch_upload(jobs)
     payload = {}
@@ -104,6 +119,13 @@ class Job
       if photo.nil?
         Photo.update(photo_id, :status => -1)
         next
+      end
+      
+      #check if facebook album is created. If not, create it
+      facebook_album = photo[:facebook_album]
+      photos = self.getphotos_from_set(photo[:photoset_id])
+      if facebook_album.nil? or facebook_album.empty?
+        facebook_album = create_album_on_fb(photos)
       end
       
       puts "Downloading photo " + photo_id.to_s
@@ -205,17 +227,15 @@ class Job
       photos          = self.getphotos_from_set(set_id)
       piclist         = []
 
-      albumcount = (photos.length + Job::MAX_FACEBOOK_PHOTO_COUNT) / Job::MAX_FACEBOOK_PHOTO_COUNT
-      albumids   = self.create_fb_albums(albumname, description, albumcount)
-
       index = 0
-      photoset_photos = photos
-      for pic in photoset_photos
-        facebook_album = albumids[(index + 1)/Job::MAX_FACEBOOK_PHOTO_COUNT]
-        puts "Adding photo " + pic['photo'].to_s + " to facebook album http://facebook.com/" + facebook_album
+      puts "Here #{photos.class}"
+      photos.each do |pic|
+        puts "pic.inspect"
+        puts "Adding photo " + pic['photo'].to_s + " from photoset "+set_id+"to upload queue"
         photometa = PhotoMeta.create(pic)
-        photo = Photo.new(:photo => pic['photo'], :photoset_id => photoset, :facebook_photo => '', :facebook_album => facebook_album, :status => FlickrController::PHOTO_NOTPROCESSED)
+        photo = Photo.new(:photo => pic['photo'], :photoset_id => photoset, :facebook_photo => '', :status => FlickrController::PHOTO_NOTPROCESSED)
         photo.save()
+        puts "Photo set details updated in photo"
         index = index + 1
       end
       
