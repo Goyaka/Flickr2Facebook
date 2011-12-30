@@ -119,7 +119,7 @@ class Job
         "method" => "POST",
         "relative_url" => "#{job[:photo].facebook_album}/photos",
         "access_token" => job[:user].fb_session,
-        "body" => "message=#{photo[:message]}&backdated_time=#{photo[:date]}",
+        "body" => "message=#{photo[:message]}",
         "attached_files" => filename
       }
       batch.push(batch_data)            
