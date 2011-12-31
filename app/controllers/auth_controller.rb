@@ -112,7 +112,10 @@ class AuthController < ApplicationController
   end
   
   def google_auth
-    @consumer = OAuth::Consumer.new( "USER","SECRET", {
+    # Load picasa app config
+    config = YAML.load_file(Rails.root.join("config/picasa.yml"))[Rails.env]
+    
+    @consumer = OAuth::Consumer.new( config['client_id'], config['client_secret'], {
       :site => "https://www.google.com", 
       :request_token_path => "/accounts/OAuthGetRequestToken", 
       :access_token_path => "/accounts/OAuthGetAccessToken", 
