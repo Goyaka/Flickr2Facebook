@@ -13,7 +13,7 @@
     <div class="row">
         
         <% if @step == 1 %>
-           <div class="span6"> &nbsp; </div>
+           <div class="span7"> &nbsp; </div>
             <div class="span3">
                 <img src = "/assets/facebook.png">
                 <% if not @fb_user %>
@@ -25,9 +25,9 @@
            <% if @fb_user and not @flickr_user %>
            <div class="span4"> &nbsp; </div>
            
-           <div class="span3">
+           <div class="span3 flickr-login">
                 <img src = "/assets/flickr.png">
-                    <a href="/flickr-auth" class="btn large" onclick="_gaq.push(['_trackEvent', 'Auth', 'Flickr', 'start']);" style="color: #FE63BB; font-size: 22px"> 
+                    <a href="/flickr-auth" class="btn" onclick="_gaq.push(['_trackEvent', 'Auth', 'Flickr', 'start']);"> 
                       Authenticate 
                     </a> 
                 &nbsp;
@@ -39,10 +39,14 @@
                 <div class="separator-top"></div>
             </div>
             
-            <div class="span3">
+            <div class="span3 picasa-login">
                     <img src = "/assets/picasa.png">
-                        <a href="/flickr-auth" class="btn large" onclick="_gaq.push(['_trackEvent', 'Auth', 'Picasa', 'start']);" style="color: #FE63BB; font-size: 22px"> 
-                          Authenticate 
+                        <a href="/flickr-auth" onclick="_gaq.push(['_trackEvent', 'Auth', 'Picasa', 'start']);" style="color: #FE63BB; font-size: 22px"> 
+                          <table>
+                              <tr>
+                          <td class="bbl"></td><td class="bbm">Authenticate</td><td class="bbr"></td>
+                              </tr>
+                          </table> 
                         </a> 
                     &nbsp;
             </div>

@@ -135,6 +135,8 @@ footer {
     
     .fb-like {
         display:block;
+        width: 200px;
+        margin: 0 auto;
     }
     
     h1.logo:hover {
@@ -287,4 +289,47 @@ background: #CCC;
         background-image:none;
     }
  }
+ .picasa-login {
+ 
+     table {
+        margin-top:5px;
+     }
+ 
+     tr, td, tbody {
+        padding:0;
+        margin:0;
+     }
+     td.bbl {
+         background:url("/assets/bbl.gif");
+         width:10px;
+     }
+     
+     td.bbm {
+         background:url("/assets/bbm.gif");
+         color:#fff;
+         vertical-align:top;
+         font-weight:bold;
+         text-align:center;
+         padding:6px 3px;
+     }
+     
+     a {
+        text-decoration:none;
+     }
+     
+     td.bbr {
+         background:url("/assets/bbr.gif");
+         width:10px;
+     }
+ }
+ 
+ .flickr-login {
+    a {
+        font-weight:bold;
+        color: #FE63BB;
+        margin-top:10px;
+        padding:8px 34px;
+    }
+ }
+ 
 }
