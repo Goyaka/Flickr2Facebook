@@ -33,9 +33,12 @@ class ApplicationController < ActionController::Base
     
     if not @fb_user
       @step1, @step2, @step3 = "selected", "", ""
+      @step = 1
     elsif @fb_user and not @flickr_user
       @step1, @step2, @step3 = "done", "selected", ""
+      @step = 2
     else
+      @step = 3 
       @step1, @step2, @step3 = "done", "done", ""
     end
     
