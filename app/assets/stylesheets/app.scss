@@ -260,3 +260,31 @@ background: #CCC;
     margin-left:20px;
     display: inline-block;
 }
+
+
+.login-flow {
+ .flickr-or-picasa {
+    font-size:130%;
+    font-weight:bold;
+    color:#000;
+    
+    .separator-top, .separator-bottom {
+        background:url("/assets/separator.png") repeat-y scroll 50% 0 transparent;
+        width:100%;
+    }
+    
+    .separator-top {
+        height:70px;
+    }
+    
+    .separator-bottom {
+        height:90px;
+    }
+    
+    .or-text {
+        display:inline-block;
+        padding:5px 0;
+        background-image:none;
+    }
+ }
+}

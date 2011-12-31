@@ -1,5 +1,5 @@
 <% content_for :content do %>
-<div class="main">
+<div class="main login-flow">
     
     <table class="pgStyle1 circle3" cellspacing="0">
     <tbody><tr>
@@ -17,27 +17,37 @@
             <div class="span3">
                 <img src = "/assets/facebook.png">
                 <% if not @fb_user %>
-                    <a href="facebook-auth" onclick="_gaq.push(['_trackEvent', 'Auth', 'Facebook', 'start']);"> <img src="/assets/facebook-login-button.png" /> </a> <br>                
-                <% else %>
-                    Logged in as <br><a href="http://www.facebook.com/<%= @fb_user %>" style="font-weight:bold"><%= @fb_user.fb_first_name %> <%= @fb_user.fb_last_name %></a>
+                    <a href="facebook-auth" onclick="_gaq.push(['_trackEvent', 'Auth', 'Facebook', 'start']);"> <img src="/assets/facebook-login-button.png" /> </a> <br>
                 <% end%>
 
             </div>
         <% elsif @step == 2 %>
-           <div class="span6"> &nbsp; </div>
+           <% if @fb_user and not @flickr_user %>
+           <div class="span4"> &nbsp; </div>
+           
            <div class="span3">
                 <img src = "/assets/flickr.png">
-                <% if not @fb_user %>
-                    &nbsp;
-                <% elsif @fb_user and not @flickr_user %>
                     <a href="/flickr-auth" class="btn large" onclick="_gaq.push(['_trackEvent', 'Auth', 'Flickr', 'start']);" style="color: #FE63BB; font-size: 22px"> 
-                        Authenticate
-                    </a> <br>                
-                <% else %>
-                    Logged in as <a href="http://www.flickr.com" style="color: #FE63BB; font-weight: bold;"><%= @flickr_user %> </a>
-                <% end %>
+                      Authenticate 
+                    </a> 
                 &nbsp;
             </div>
+            
+            <div class="span3 flickr-or-picasa">
+                <div class="separator-top"></div>
+                <div class="or-text">OR</div>
+                <div class="separator-top"></div>
+            </div>
+            
+            <div class="span3">
+                    <img src = "/assets/picasa.png">
+                        <a href="/flickr-auth" class="btn large" onclick="_gaq.push(['_trackEvent', 'Auth', 'Picasa', 'start']);" style="color: #FE63BB; font-size: 22px"> 
+                          Authenticate 
+                        </a> 
+                    &nbsp;
+            </div>
+                        
+           <% end %>
         <% end %>
         <div class="clear"></div>
     </div>
