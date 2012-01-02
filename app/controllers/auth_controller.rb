@@ -1,4 +1,5 @@
 require 'uri'
+require 'xmlsimple'
 
 class AuthController < ApplicationController
   def facebook_authenticator
@@ -134,13 +135,34 @@ class AuthController < ApplicationController
   end
   
   def google_callback
+    
+    fb_access_token = session[:at] if session[:at]
+    user = User.find_by_fb_session(fb_access_token)
+    
+    if user.nil?
+      session[:at] = nil
+      redirect_to :facebook_auth
+    end
+    
+    #Sample tutorial - http://runerb.com/2010/01/12/ruby-oauth-youtube/
     @request_token = session[:request_token]
     @access_token = @request_token.get_access_token(:oauth_verifier => params[:oauth_verifier])
-    render :json => @access_token
+    
+    album_data = @access_token.get('https://picasaweb.google.com/data/feed/api/user/default')
+    
+    album_data = @access_token.get('https://picasaweb.google.com/data/feed/api/user/default')
+    album_parsed =  XmlSimple.xml_in album_data.body
+    user_id = album_parsed['user'].to_s
+    user.google_access_token = @access_token.token
+    user.google_access_secret = @access_token.secret
+    user.google_name  = album_parsed['nickname'].to_s
+    user.google_userid = album_parsed['user'].to_s 
+    user.save
+    
+    redirect_to :controller => 'application', :action => 'main'
   end
   
   #Logout from the app
-  
   def logout
     session[:at] = nil
     redirect_to root_url
