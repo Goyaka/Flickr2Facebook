@@ -148,10 +148,10 @@ class Job
       photos = Photo.where('photo in (?)', photo_ids)
       #Set status as processing.
       photos.each_with_index do |photo, index|
-        photo.status = FlickrController::PHOTO_PROCESSED
+        photo.status = Constants::PHOTO_PROCESSED
         photo.facebook_photo = "http://www.facebook.com/#{fb_photo_ids[index]}"
         if not fb_photo_ids[index]
-          photo.status = FlickrController::PHOTO_FAILED
+          photo.status = Constants::PHOTO_FAILED
         end
         photo.save
       end
@@ -196,9 +196,9 @@ class Job
   end
 
   def upload_set(set_id) 
-    photoset    = Photoset.where('photoset = ? AND status = ?', set_id, FlickrController::PHOTOSET_NOTPROCESSED).first
+    photoset    = Photoset.where('photoset = ? AND status = ?', set_id, Constants::PHOTOSET_NOTPROCESSED).first
     if photoset
-      photoset.status = FlickrController::PHOTOSET_PROCESSING
+      photoset.status = Constants::PHOTOSET_PROCESSING
       photoset.save
       setinfo         = flickr.photosets.getInfo(:photoset_id => set_id)
       albumname       = setinfo.title
@@ -215,12 +215,12 @@ class Job
         facebook_album = albumids[(index + 1)/Job::MAX_FACEBOOK_PHOTO_COUNT]
         puts "Adding photo " + pic['photo'].to_s + " to facebook album http://facebook.com/" + facebook_album
         photometa = PhotoMeta.create(pic)
-        photo = Photo.new(:photo => pic['photo'], :photoset_id => photoset, :facebook_photo => '', :facebook_album => facebook_album, :status => FlickrController::PHOTO_NOTPROCESSED)
+        photo = Photo.new(:photo => pic['photo'], :photoset_id => photoset, :facebook_photo => '', :facebook_album => facebook_album, :status => Constants::PHOTO_NOTPROCESSED)
         photo.save()
         index = index + 1
       end
       
-      photoset.status = FlickrController::PHOTOSET_PROCESSED
+      photoset.status = Constants::PHOTOSET_PROCESSED
       photoset.save
     end
   end

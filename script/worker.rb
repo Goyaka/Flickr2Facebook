@@ -61,7 +61,7 @@ class Worker < ActiveRecord::Base
           break
         end
         logger.info("Getting unprocessed photosets")
-        set = Photoset.where("status = ?", FlickrController::PHOTOSET_NOTPROCESSED).first
+        set = Photoset.where("status = ?", Constants::PHOTOSET_NOTPROCESSED).first
         if set
           logger.info("Splitting set " + set.photoset + " to photos")
           user = User.find(set.user_id)
@@ -93,7 +93,7 @@ class Worker < ActiveRecord::Base
       else
 
         #Pick 100 photos from db and push to beanstalk
-        photos = Photo.where("status = ?", FlickrController::PHOTO_NOTPROCESSED).limit(100)
+        photos = Photo.where("status = ?", Constants::PHOTO_NOTPROCESSED).limit(100)
         if photos.empty?
           puts "No photos in db, waiting"
           sleep 10
@@ -113,7 +113,7 @@ class Worker < ActiveRecord::Base
         puts "Pushing #{photo_batch.inspect} to beanstalk"
         photo_batch.each do |photo|
           photo_object = Photo.find(photo)
-          photo_object.status = FlickrController::PHOTO_PROCESSING
+          photo_object.status = Constants::PHOTO_PROCESSING
           photo_object.save
         end
         beanstalk.put(photo_batch.to_json)
@@ -129,7 +129,7 @@ class Worker < ActiveRecord::Base
   end
   
   def self.photo_count_cron
-    photo_count = Photo.where("status = ?", FlickrController::PHOTO_PROCESSED).length
+    photo_count = Photo.where("status = ?", Constants::PHOTO_PROCESSED).length
     Rails.cache.write('photo_count', photo_count)
   end
  

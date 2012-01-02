@@ -2,15 +2,6 @@ require 'flickraw-cached'
 
 class FlickrController < ApplicationController
   
-  PHOTOSET_NOTPROCESSED = 0
-  PHOTOSET_PROCESSING   = 1
-  PHOTOSET_PROCESSED    = 2
-  
-  PHOTO_NOTPROCESSED = 0
-  PHOTO_PROCESSING   = 1
-  PHOTO_PROCESSED    = 2
-  PHOTO_FAILED       = 42
-  
   def get_all_sets
     # TODO: Make the config loading part separated
     config = YAML.load_file(Rails.root.join("config/flickr.yml"))[Rails.env]
@@ -25,7 +16,7 @@ class FlickrController < ApplicationController
       flickr.access_token = @user.flickr_access_token
       flickr.access_secret = @user.flickr_access_secret
       @sets = flickr.photosets.getList(:user_id => @user.flickr_user_nsid)
-    end
+    end 
     
     return @sets, @user
   end
@@ -34,8 +25,8 @@ class FlickrController < ApplicationController
   def get_sets_notuploaded
     @sets, @user   = self.get_all_sets
 
-    existing_sets = Photoset.select('photoset').where('user_id = ? and status IN (?, ?, ?)',
-      @user, FlickrController::PHOTO_NOTPROCESSED, FlickrController::PHOTO_PROCESSING, FlickrController::PHOTO_PROCESSED).map {|set| set.photoset}.compact
+    existing_sets = Photoset.select('photoset').where('user_id = ? and status IN (?, ?, ?) and source = ?',
+      @user, Constants::PHOTO_NOTPROCESSED, Constants::PHOTO_PROCESSING, Constants::PHOTO_PROCESSED, Constants::SOURCE_FLICKR).map {|set| set.photoset}.compact
 
     ret_sets = []
     for set in @sets
@@ -145,7 +136,7 @@ class FlickrController < ApplicationController
         params["set"].each do |set| 
           photoset = Photoset.where(:user_id => @user.id, :photoset => set)
           if photoset.empty?
-            photoset = Photoset.new(:user_id => @user.id, :photoset => set, :status => FlickrController::PHOTOSET_NOTPROCESSED)
+            photoset = Photoset.new(:user_id => @user.id, :photoset => set, :status => Constants::PHOTOSET_NOTPROCESSED)
             photoset.save!
             response[:success] = true
             response[:message] = "Set has been added to be exported." 
