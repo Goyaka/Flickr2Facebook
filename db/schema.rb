@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111228224739) do
+ActiveRecord::Schema.define(:version => 20120102100718) do
 
   create_table "photos", :force => true do |t|
     t.string   "photo"
@@ -52,6 +52,9 @@ ActiveRecord::Schema.define(:version => 20111228224739) do
     t.string   "flickr_user_nsid"
     t.string   "fb_first_name"
     t.string   "fb_last_name"
+    t.string   "google_access_token"
+    t.string   "google_access_secret"
+    t.string   "google_name"
   end
 
   add_index "users", ["user"], :name => "index_users_on_user"
