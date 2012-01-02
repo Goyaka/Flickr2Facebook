@@ -139,4 +139,11 @@ class AuthController < ApplicationController
     render :json => @access_token
   end
   
+  #Logout from the app
+  
+  def logout
+    session[:at] = nil
+    redirect_to root_url
+  end
+  
 end

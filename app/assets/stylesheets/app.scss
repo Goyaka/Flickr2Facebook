@@ -1,18 +1,103 @@
 body {
-    width: 960px;
     margin: 0 auto;
     font-size: 16px;
     line-height: 16px;
     background : #E5E2D4 url("background.png") repeat-x scroll 0 0;
     font : 13px/1.231 sans-serif;
 }
+
+header {
+    background-color:#040;
+    color:#fff;
+    width:100%;
+    
+    .header-wrap {
+        width:960px;
+        margin:0 auto;
+        
+        .dropdown-menu {
+            background-color:#040;
+        }
+        
+        a {
+            text-decoration:none;
+            color:#fff;
+        }
+
+        a:hover {
+            text-decoration:none;
+            color:#fff;
+        }
+
+        a:visited {
+            color:#fff;
+        }
+
+        h1 {
+            color:#fff;
+            font-size:120%;
+            margin-left:10px;
+            margin-bottom:0px;
+            display:inline-block;
+            font-family:'Salsa', cursive;
+        }
+
+        .menu-buttons {
+            padding-top:0;
+            display: inline-block;
+            float:right;
+            
+            
+            #lilo-dropdown {
+                background-color:#205C20;
+                
+                .info {
+                    margin: 4px 5px;
+                    padding: 2px;
+                    font-size:85%;
+                    color:#000;
+                    background-color:#AFDBB2;
+                    
+                    a:hover {
+                        background:inherit;
+                    }
+                    
+                    a {
+                      color:#000;
+                      padding-left:25px;
+                      text-shadow:none;
+                      img {
+                        vertical-align:middle;
+                      }
+                    }
+                    
+                    a.flickr-account {
+                        background:transparent url("/assets/flickrico.png") no-repeat 5px 3px;
+                    }
+                }
+
+                .divider {
+                    background-color:#2F4F2F;
+                    border-color:#274F27;
+                }
+            }
+            
+            .lilo-name {
+                display:inline-block;
+            }
+        }
+
+    }
+}
 small {
     font-size: 0.8em;
 }
 
 .main {
+    width: 960px;
+    margin: 0 auto;
     text-align: center;
-    padding-top: 50px;
+    padding-top: 20px;
     
     .navtab 
     {

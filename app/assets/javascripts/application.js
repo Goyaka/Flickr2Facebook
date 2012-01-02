@@ -3,5 +3,6 @@
 //= require jquery.tmpl.min
 //= require jquery.form.js
 //= require bootstrap-modal
+//= require bootstrap-dropdown
 //= require application
 //= require auth

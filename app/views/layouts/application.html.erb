@@ -6,7 +6,7 @@
     <%= stylesheet_link_tag    "application" %>
 
     <%= csrf_meta_tags %>
-    <meta property="og:title" content="Goyaka Export - Move photos to facebook"/>
+    <meta property="og:title" content="UnifyPhotos - Move photos to facebook"/>
     <meta property="og:type" content="product"/>
     <meta property="og:url" content="http://export.goyaka.com/"/>
     <meta property="og:image:url" content="http://export.goyaka.com/assets/goyaka-logo.png"/>
@@ -27,6 +27,27 @@
     </script>
 </head>
 <body>
+    <header>
+        <div class="header-wrap">            
+            <% if @user and @fb_user%>
+            <ul class="nav secondary-nav menu-buttons">
+                <li class="dropdown" data-dropdown="dropdown">
+                    Logged in as <a style="display:inline-block" href="#" class="dropdown-toggle"><%= @fb_user.fb_first_name %> <%= @fb_user.fb_last_name %></a>
+                    <ul class="dropdown-menu" id="lilo-dropdown">
+                        <% if @flickr_user  %>
+                        <li> <div class="info">Linked accounts:<br>
+                            <a class="flickr-account" href="http://flickr.com/<%= @user.flickr_user_nsid %>" target="_blank"> <%= @flickr_user %></a>  </div></li>
+                        <% end %>
+                        <li><a href="/logout">Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <% end %>
+            <h1><a href="/"> UnifyPhotos </a></h1>
+            <div style="clear:both"></div>
+        </div>
+    </header>
+    
     <%= yield :content %>
     <footer>
         <a class="footer-logo" href="http://www.goyaka.com/" target="new"><h1 class="logo">Goyaka Labs</h1></a>

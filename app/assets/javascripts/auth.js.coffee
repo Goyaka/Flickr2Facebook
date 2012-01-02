@@ -81,5 +81,6 @@ $(document).ready ->
     $('#dialog-close').click ->
         $('#modal-share-friends').modal('hide')
             
-        
+    $().dropdown()
+    
         

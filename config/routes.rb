@@ -15,6 +15,7 @@ Flickr2facebook::Application.routes.draw do
   match "flickr/cover-photo" => 'flickr#get_cover_images'
   match "migrate" => "application#migrate"
   match "status" => "application#status"
+  match "logout" => "auth#logout"
 
   root :to => 'application#index'
 end
