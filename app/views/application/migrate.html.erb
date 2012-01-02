@@ -1,6 +1,6 @@
 <% content_for :content do %>
 <div class="main">
-    <% if @fb_user and @flickr_user %>
+    <% if @fb_user and (@flickr_user or @google_user) %>
         <ul class="tabs navtab">
           <li class="active first"><a href="/migrate">Move photos</a></li>
           <li><a href="/status">Uploaded photos</a></li>
@@ -21,6 +21,10 @@ fb_user = "<%= @fb_user %>";
 <% if @flickr_user %>
 flickr_user = "<%= @flickr_user %>";
 <% end %>
+
+<% if @google_user %>
+google_user = "<%= @google_user %>"
+<% end %> 
 </script>
 
 <% if @fb_user and @flickr_user %>

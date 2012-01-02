@@ -25,7 +25,9 @@ class ApplicationController < ActionController::Base
       @fb_user = @user
       
       @flickr_user = @user.flickr_username
-      if @fb_user and @flickr_user 
+      @google_user = @user.google_name
+      
+      if @fb_user and (@flickr_user or @google_user) 
         redirect_to :action => 'migrate' and return
       end
     end
@@ -34,7 +36,7 @@ class ApplicationController < ActionController::Base
     if not @fb_user
       @step1, @step2, @step3 = "selected", "", ""
       @step = 1
-    elsif @fb_user and not @flickr_user
+    elsif @fb_user and not (@flickr_user or @google_user)
       @step1, @step2, @step3 = "done", "selected", ""
       @step = 2
     else
@@ -56,6 +58,7 @@ class ApplicationController < ActionController::Base
       @user = User.where(:user => facebook_user.id)[0]
       @fb_user = @user
       @flickr_user = @user.flickr_username
+      @google_user = @user.google_name
       @client = Mogli::Client.new(session[:at])
     end
     
@@ -80,6 +83,7 @@ class ApplicationController < ActionController::Base
         redirect_to :controller => 'auth', :action => 'facebook_auth' and return
       end
       @fb_user = @user
+      @google_user = @user.google_name
       @flickr_user = @user.flickr_username
       @client = Mogli::Client.new(session[:at])
     end
