@@ -28,8 +28,9 @@ class Job
   end
   
   def download(source, destination)
-    host = source.split('/')[2]
-    path = "/" + source.split('/')[3..source.length].join('/')
+    uri  = URI.parse(source)
+    host = uri.host
+    path = uri.path
     Net::HTTP.start(host) do |http|
         resp = http.get(path)
         open(destination, "wb") do |file|
