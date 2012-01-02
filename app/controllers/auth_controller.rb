@@ -149,8 +149,6 @@ class AuthController < ApplicationController
     @access_token = @request_token.get_access_token(:oauth_verifier => params[:oauth_verifier])
     
     album_data = @access_token.get('https://picasaweb.google.com/data/feed/api/user/default')
-    
-    album_data = @access_token.get('https://picasaweb.google.com/data/feed/api/user/default')
     album_parsed =  XmlSimple.xml_in album_data.body
     user_id = album_parsed['user'].to_s
     user.google_access_token = @access_token.token
