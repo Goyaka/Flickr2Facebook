@@ -6,11 +6,76 @@
           <li><a href="/status">Uploaded photos</a></li>
         </ul>
         <div id="sets">
+            <div class="sets-wrapper">
+                <div id="select_all_wrapper" class="pull-right span2"> <label for="select_all">Select all</label><input type="checkbox" id="select_all"></div>
+                <h2 class="migrate-header"> Choose sets that you want to migrate to Facebook. </h2>
+                <%= form_tag("flickr/import-sets", :method => "post", :id=>'upload-photos-form') do %>
+                <div class="sets">
+                </div>
+                <center class="import-sets-button" class="push-down">
+                     <button class="btn large success"> Import Sets Now! </button>
+                 </center>
+                 <div class="import-sets-placemark"></div>
+                 </form>
+            </div>
         </div>
-    <% else %>
     <% end %>
 </div>
 
+
+<% if @fb_user and @flickr_user %>
+<script id="flickr_set_template" type="text/x-jquery-tmpl">
+{{each(index, set) sets}}
+    <div class="set fixedheight">
+        <label for="${set.id}">
+            <div class="cover">
+                <img class="thumb" id="${set.primary}" src="http://farm${set.farm}.staticflickr.com/${set.server}/${set.primary}_${set.secret}_s.jpg" style="margin: 0 auto; display: block"\     > 
+                <img class="check" src="/assets/check.png">
+                <span class="count">${set.photos}</span>
+                <div style="clear:both;"></div>
+            </div>
+            <div style="clear:both;"></div>
+        </label>    
+        <div class="thumb-title">
+            <input type="checkbox" onclick="_gaq.push(['_trackEvent', 'Select_Sets', '#{set.id}']);" name="set[]" value="${set.id}" id="${set.id}">
+            ${set.title} 
+            <a target="_blank" href="http://flickr.com/photos/<%= @user.flickr_user_nsid %>/sets/${set.id}">
+                <img style="vertical-align: middle" src="/assets/flickrico.png">
+            </a>
+        </div>
+    </div>
+{{/each}}
+</script>
+<% end %>
+
+<% if @fb_user and @flickr_user %>
+<script id="picasa_album_template" type="text/x-jquery-tmpl">
+{{each(index,album) albums}}
+    <div class="set fixedheight">
+        <label for="${album['id'][0]}">
+            <div class="cover">
+                <img class="thumb" width="75" height="75" id="${album['id'][0]}" src="${album['group'][0]['thumbnail'][0]['url']}" style="margin: 0 auto; display:block">
+                <span class="count">${album['numphotos']}</span>
+                <div style="clear:both;"></div>
+            </div>
+        </label>
+        <div class="thumb-title">
+            <input type="checkbox" onclick="_gaq.push(['_trackEvent', 'Select Picasa Album']);" name="album[]" value="${album['id'][0]}" id="${album['id'][0]}">
+            ${album['title'][0]['content']} 
+            <a target="_blank" href="${album['link'][1]['href']}">
+                <img style="vertical-align: middle" src="/assets/picasaico.png">
+            </a>
+        </div>
+    </div>
+{{/each}}
+</script>
+<% end %>
+
+<% end %>
+
+<% end %>
+
+<% content_for :javascript do %>
 
 <script type="text/javascript">
 var fb_user;
@@ -25,48 +90,13 @@ flickr_user = "<%= @flickr_user %>";
 <% if @google_user %>
 google_user = "<%= @google_user %>"
 <% end %> 
+
+$(document).ready(function() {
+    loadsets('/flickr/sets','#flickr_set_template', '.sets', 'Loading your flickr sets')
+    loadsets('/picasa/albums','#picasa_album_template', '.sets', '')
+    
+});
+
 </script>
-
-<% if @fb_user and @flickr_user %>
-<script id="sets_list_template" type="text/x-jquery-tmpl">
-<div>
-
-    <div id="select_all_wrapper" class="pull-right span2"> <label for="select_all">Select all</label><input type="checkbox" id="select_all"></div>
-
-    <h2 class="migrate-header"> Choose sets that you want to migrate to Facebook. </h2>
-    <%= form_tag("flickr/import-sets", :method => "post", :id=>'upload-photos-form') do %>
-        <div class="sets">
-            {{each(index, set) sets}}
-                <div class="set fixedheight">
-                    <label for="${set.id}">
-                        <div class="cover">
-                            <img class="thumb" id="${set.primary}" src="http://farm${set.farm}.staticflickr.com/${set.server}/${set.primary}_${set.secret}_s.jpg" style="margin: 0 auto; display: block"\     > 
-                            <img class="check" src="/assets/check.png">
-                            <span class="count">${set.photos}</span>
-                            <div style="clear:both;"></div>
-                        </div>
-                        <div style="clear:both;"></div>
-                    </label>    
-                    <div class="thumb-title">
-                        <input type="checkbox" onclick="_gaq.push(['_trackEvent', 'Select_Sets', '#{set.id}']);" name="set[]" value="${set.id}" id="${set.id}">
-                        ${set.title} 
-                        <a target="_blank" href="http://flickr.com/photos/<%= @user.flickr_user_nsid %>/sets/${set.id}">
-                            <img style="vertical-align: middle" src="/assets/flickrico.png">
-                        </a>
-                    </div>
-                </div>
-            {{/each}}
-        </div>
-        
-        <center class="import-sets-button" class="push-down">
-            <button class="btn large success"> Import Sets Now! </button>
-        </center>
-        <div class="import-sets-placemark"></div>
-        
-        
-    <% end %>
-</div>
-</script>
-<% end %>
 
 <% end %>
