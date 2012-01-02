@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120102100718) do
+ActiveRecord::Schema.define(:version => 20120102113810) do
 
   create_table "photos", :force => true do |t|
     t.string   "photo"
@@ -20,6 +20,7 @@ ActiveRecord::Schema.define(:version => 20120102100718) do
     t.string   "status"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "source",         :default => "F"
   end
 
   add_index "photos", ["photoset_id"], :name => "index_photos_on_photoset_id"
@@ -32,6 +33,7 @@ ActiveRecord::Schema.define(:version => 20120102100718) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "photos_count"
+    t.string   "source",       :default => "F"
   end
 
   add_index "photosets", ["status"], :name => "index_photosets_on_status"
@@ -55,6 +57,7 @@ ActiveRecord::Schema.define(:version => 20120102100718) do
     t.string   "google_access_token"
     t.string   "google_access_secret"
     t.string   "google_name"
+    t.string   "google_userid"
   end
 
   add_index "users", ["user"], :name => "index_users_on_user"
