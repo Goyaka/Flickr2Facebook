@@ -1,3 +1,23 @@
+isScrolledIntoView = (elem)->
+    docViewTop = $(window).scrollTop();
+    docViewBottom = docViewTop + $(window).height();
+
+    elemTop = $(elem).offset().top;
+    elemBottom = elemTop + $(elem).height();
+
+    ((elemBottom >= docViewTop) && (elemTop <= docViewBottom));
+    
+scrollImportButton =->
+    if('.import-sets-placemark')
+        if(isScrolledIntoView('.import-sets-placemark'))
+            $('.import-sets-button').css('position','relative')
+            $('.import-sets-button').css('border','0 none')
+        else
+            $('.import-sets-button').css('position','fixed')
+            $('.import-sets-button').css('bottom','0')
+            $('.import-sets-button').css('border-top','1px #ccc solid')
+        
+
 addCheckHandlers =->
     $('.set label').click ->
         check = ($(this).find('.check'))
@@ -34,6 +54,11 @@ $(document).ready ->
                     
                     $(picker).tmpl(data).appendTo(target);
                     addCheckHandlers()
+                    
+                    if($('.import-sets-button'))
+                        $(window).scroll(scrollImportButton)
+                    
+                    scrollImportButton()
                     
                     #add select all handler
                     if $('#select_all')
