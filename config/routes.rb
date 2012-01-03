@@ -10,11 +10,13 @@ Flickr2facebook::Application.routes.draw do
   match "flickr/sets" => 'flickr#get_sets_notuploaded'
   match "picasa/albums" => 'picasa#get_sets_notuploaded'
   
-  match "flickr/uploaded_sets" => 'flickr#get_sets_uploaded'
-  match "flickr/uploading_sets" => 'flickr#get_sets_uploading'  
-  match "flickr/inqueue_sets" => 'flickr#get_sets_inqueue'
-  match "flickr/import-sets" => 'flickr#select_sets', :via => :post
-  match "flickr/cover-photo" => 'flickr#get_cover_images'
+  match "flickr/inqueue-sets" => 'flickr#get_sets_inqueue'
+  
+  #Generic photo routes, defaulted to flickr controller
+  match "photos/import-sets" => 'application#select_sets', :via => :post
+  match "photos/upload-status" => 'application#upload_status'
+  
+  
   match "migrate" => "application#migrate"
   match "status" => "application#status"
   match "logout" => "auth#logout"
