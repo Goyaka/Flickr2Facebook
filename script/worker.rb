@@ -74,8 +74,7 @@ class Worker < ActiveRecord::Base
             job.split_picasa_sets(user, set.photoset) 
           end
         else
-          puts "No photosets. waiting."
-          sleep 1
+          sleep 4
         end
       rescue Exception => msg
         logger.error("Exception raised" + msg)
