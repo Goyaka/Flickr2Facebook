@@ -1,45 +1,23 @@
 require 'flickraw-cached'
 
-class FlickrController < ApplicationController
-  
-  def get_all_sets
-    # TODO: Make the config loading part separated
-    config = YAML.load_file(Rails.root.join("config/flickr.yml"))[Rails.env]
-    FlickRaw.api_key = config['app_id']
-    FlickRaw.shared_secret = config['shared_secret']
-
-    flickr = FlickRaw::Flickr.new
-
-    facebook_user = Mogli::User.find("me",Mogli::Client.new(session[:at]))
-    if facebook_user
-      @user = User.where(:user => facebook_user.id)[0]
-      flickr.access_token = @user.flickr_access_token
-      flickr.access_secret = @user.flickr_access_secret
-      @sets = flickr.photosets.getList(:user_id => @user.flickr_user_nsid)
-    end 
-    
-    return @sets, @user
-  end
-    
-    
+class FlickrController < ApplicationController  
   def get_sets_notuploaded
-    @sets, @user   = self.get_all_sets
+    user = User.find_by_fb_session(session[:at])
+    sets = user.get_all_flickr_sets
 
-    existing_sets = Photoset.select('photoset').where('user_id = ? and status IN (?, ?, ?) and source = ?',
-      @user, Constants::PHOTO_NOTPROCESSED, Constants::PHOTO_PROCESSING, Constants::PHOTO_PROCESSED, Constants::SOURCE_FLICKR).map {|set| set.photoset}.compact
+    existing_sets = Photoset.select('photoset').where('user_id = ? and source = ?', user, Constants::SOURCE_FLICKR).map {|set| set.photoset}.compact
 
     ret_sets = []
-    for set in @sets
+    for set in sets
       if not existing_sets.include? set.id
         ret_sets.push(set)
       end
     end
     
-    response = {:sets => ret_sets}
-    render :json => response
+    render :json => {:sets => ret_sets}
   end
   
-    
+
   def get_sets_inqueue
     @sets, @user   = self.get_all_sets
     
