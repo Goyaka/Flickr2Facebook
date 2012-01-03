@@ -5,11 +5,15 @@
           <li class="active first"><a href="/migrate">Move photos</a></li>
           <li><a href="/status">Uploaded photos</a></li>
         </ul>
-        <div id="sets">
+        <div class="loading-box hide">
+            <center><img src= "assets/loading.gif"><div class="loading-message"></div></center>
+        </div>
+        <div id="sets" class="hide">
             <div class="sets-wrapper">
                 <div id="select_all_wrapper" class="pull-right span2"> <label for="select_all">Select all</label><input type="checkbox" id="select_all"></div>
                 <h2 class="migrate-header"> Choose sets that you want to migrate to Facebook. </h2>
-                <%= form_tag("flickr/import-sets", :method => "post", :id=>'upload-photos-form') do %>
+                <%= form_tag("/photos/import-sets", :method => "post", :id=>'upload-photos-form') do %>
+                                
                 <div class="sets">
                 </div>
                 <center class="import-sets-button" class="push-down">
@@ -37,7 +41,7 @@
             <div style="clear:both;"></div>
         </label>    
         <div class="thumb-title">
-            <input type="checkbox" onclick="_gaq.push(['_trackEvent', 'Select_Sets', '#{set.id}']);" name="set[]" value="${set.id}" id="${set.id}">
+            <input type="checkbox" onclick="_gaq.push(['_trackEvent', 'Select_Sets', '#{set.id}']);" name="flickr_set[]" value="${set.id}" id="${set.id}">
             ${set.title} 
             <a target="_blank" href="http://flickr.com/photos/<%= @user.flickr_user_nsid %>/sets/${set.id}">
                 <img style="vertical-align: middle" src="/assets/flickrico.png">
@@ -48,25 +52,25 @@
 </script>
 <% end %>
 
-<% if @fb_user and @flickr_user %>
+<% if @fb_user and @google_user %>
 <script id="picasa_album_template" type="text/x-jquery-tmpl">
 {{each(index,album) albums}}
     <div class="set fixedheight">
-        <label for="${album['id'][0]}">
+        <label for="${album['id'][1]}">
             <div class="cover">
-                <img class="thumb" width="75" height="75" id="${album['id'][0]}" src="${album['group'][0]['thumbnail'][0]['url']}" style="margin: 0 auto; display:block">
+                <img class="thumb" width="75" height="75" src="${album['group'][0]['thumbnail'][0]['url']}" style="margin: 0 auto; display:block">
                 <span class="count">${album['numphotos']}</span>
                 <div style="clear:both;"></div>
             </div>
         </label>
         <div class="thumb-title">
-            <input type="checkbox" onclick="_gaq.push(['_trackEvent', 'Select Picasa Album']);" name="album[]" value="${album['id'][0]}" id="${album['id'][0]}">
+            <input type="checkbox" onclick="_gaq.push(['_trackEvent', 'Select Picasa Album']);" name="picasa_album[]" value="${album['id'][1]}" id="${album['id'][1]}">
             ${album['title'][0]['content']} 
             <a target="_blank" href="${album['link'][1]['href']}">
                 <img style="vertical-align: middle" src="/assets/picasaico.png">
             </a>
         </div>
-    </div>
+    </div>  
 {{/each}}
 </script>
 <% end %>
@@ -92,9 +96,15 @@ google_user = "<%= @google_user %>"
 <% end %> 
 
 $(document).ready(function() {
-    loadsets('/flickr/sets','#flickr_set_template', '.sets', 'Loading your flickr sets')
-    loadsets('/picasa/albums','#picasa_album_template', '.sets', '')
+    if(flickr_user) {
+        loadSetsToMigrate('/flickr/sets','#flickr_set_template', 'Flickr')
+    }
     
+    if(google_user) {
+        loadSetsToMigrate('/picasa/albums','#picasa_album_template', 'Picasa')   
+    }
+    
+    $(window).scroll(scrollImportButton)
 });
 
 </script>
