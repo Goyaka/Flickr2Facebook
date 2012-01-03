@@ -1,5 +1,33 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
+  
+  protected 
+  def get_user_details
+    puts session[:at]
+    begin 
+      facebook_user = Mogli::User.find("me",Mogli::Client.new(session[:at])) if session[:at]
+    rescue Mogli::Client::HTTPException
+      session[:at] = nil
+      redirect_to :controller => 'auth', :action => 'facebook_auth' and return
+    end
+
+    puts facebook_user.inspect
+    
+    if facebook_user
+      @fb_user = User.find_by_user(facebook_user.id)
+      if not @fb_user or not @fb_user.fb_session
+        session[:at] = nil
+        redirect_to :controller => 'auth', :action => 'facebook_auth' and return
+      end
+
+      @flickr_user = @fb_user.flickr_username
+      @google_user = @fb_user.google_name
+      
+      return @fb_user, @flickr_user, @google_user
+    end
+  end
+    
+  public
   def index
      @photo_count = Rails.cache.read('photo_count').to_s
   end
@@ -8,28 +36,9 @@ class ApplicationController < ActionController::Base
   end
   
   def main
-    # try to get the FB user handle
-    begin 
-      facebook_user = Mogli::User.find("me",Mogli::Client.new(session[:at])) if session[:at]
-    rescue Mogli::Client::HTTPException
-      session[:at] = nil
-      redirect_to :controller => 'auth', :action => 'facebook_auth' and return
-    end
-
-    if facebook_user
-      @user = User.where(:user => facebook_user.id)[0]
-      if not @user or not @user.fb_session
-        session[:at] = nil
-        redirect_to :controller => 'auth', :action => 'facebook_auth' and return
-      end
-      @fb_user = @user
-      
-      @flickr_user = @user.flickr_username
-      @google_user = @user.google_name  
-      
-      if @fb_user and (@flickr_user or @google_user) 
-        redirect_to :action => 'migrate' and return
-      end
+    @fb_user, @flickr_user, @google_user = get_user_details
+    if @fb_user and (@flickr_user or @google_user) 
+      redirect_to :action => 'migrate' and return
     end
     
     if not @fb_user
@@ -42,35 +51,19 @@ class ApplicationController < ActionController::Base
       @step = 3 
       @step1, @step2, @step3 = "done", "done", ""
     end
-    
   end
   
   def migrate
-    begin 
-      facebook_user = Mogli::User.find("me",Mogli::Client.new(session[:at])) if session[:at]
-    rescue Mogli::Client::HTTPException
-      session[:at] = nil
-      redirect_to :controller => 'auth', :action => 'facebook_auth' and return
-    end
-
-    if facebook_user
-      @user = User.where(:user => facebook_user.id)[0]
-      @fb_user = @user
-      @flickr_user = @user.flickr_username
-      @google_user = @user.google_name
-      @client = Mogli::Client.new(session[:at])
-    end
+    @fb_user, @flickr_user, @google_user = get_user_details
+    @client = Mogli::Client.new(session[:at])
     
     if not @flickr_user and not @fb_user
       redirect_to :action => 'main' and return
     end
   end
-  
+
   def status
-    facebook_user = Mogli::User.find("me", Mogli::Client.new(session[:at])) if session[:at]
-    @fb_user = User.find_by_user(facebook_user.id)
-    @google_user = @user.google_name
-    @flickr_user = @user.flickr_username
+    @fb_user, @flickr_user, @google_user = get_user_details
   end
   
   def upload_status
@@ -181,41 +174,38 @@ class ApplicationController < ActionController::Base
   
   #Should be in a parent container (for flickr, picasa)
   def select_sets
+    @fb_user, @flickr_user, @google_user = get_user_details
+    @user = @fb_user
     
     if params["flickr_set"].nil? and params["picasa_album"].nil?
       redirect_to :controller => 'application', :action => 'main'
       return
     end
-      
-    facebook_user = Mogli::User.find("me",Mogli::Client.new(session[:at]))
+    
     response = {}
-    if facebook_user
-      @user = User.where(:user => facebook_user.id)[0]
-      if @user
-        if not params["flickr_set"].nil?
-          params["flickr_set"].each do |set| 
-            photoset = Photoset.where(:user_id => @user.id, :photoset => set)
-            if photoset.empty?
-              photoset = Photoset.new(:user_id => @user.id, :photoset => set, :status => Constants::PHOTOSET_NOTPROCESSED, :source => Constants::SOURCE_FLICKR)
-              photoset.save!
-            end
-            puts photoset
+
+    if @user
+      if not params["flickr_set"].nil?
+        params["flickr_set"].each do |set| 
+          photoset = Photoset.where(:user_id => @user.id, :photoset => set)
+          if photoset.empty?
+            photoset = Photoset.new(:user_id => @user.id, :photoset => set, :status => Constants::PHOTOSET_NOTPROCESSED, :source => Constants::SOURCE_FLICKR)
+            photoset.save!
           end
         end
-        
-        if not params['picasa_album'].nil?  
-          params["picasa_album"].each do |album|
-            photoset = Photoset.where(:user_id => @user.id, :photoset => album)
-            if photoset.empty?
-              photoset = Photoset.new(:user_id => @user.id, :photoset => album, :status => Constants::PHOTOSET_NOTPROCESSED, :source => Constants::SOURCE_PICASA)
-              photoset.save!
-            end
+      end
+
+      if not params['picasa_album'].nil?  
+        params["picasa_album"].each do |album|
+          photoset = Photoset.where(:user_id => @user.id, :photoset => album)
+          if photoset.empty?
+            photoset = Photoset.new(:user_id => @user.id, :photoset => album, :status => Constants::PHOTOSET_NOTPROCESSED, :source => Constants::SOURCE_PICASA)
+            photoset.save!
           end
         end
       end
     end
-    
+
     redirect_to :controller => 'application', :action => 'status'  
   end
-  
 end
