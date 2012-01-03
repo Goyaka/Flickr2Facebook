@@ -196,7 +196,7 @@ class Job
   end
 
   def upload_set(set_id) 
-    photoset    = Photoset.where('photoset = ? AND status = ?', set_id, Constants::PHOTOSET_NOTPROCESSED).first
+    photoset    = Photoset.where('photoset = ? AND status = ? AND source=?', set_id, Constants::PHOTOSET_NOTPROCESSED, Constants::SOURCE_FLICKR).first
     if photoset
       photoset.status = Constants::PHOTOSET_PROCESSING
       photoset.save
