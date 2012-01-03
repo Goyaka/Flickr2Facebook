@@ -25,13 +25,12 @@ class ApplicationController < ActionController::Base
       @fb_user = @user
       
       @flickr_user = @user.flickr_username
-      @google_user = @user.google_name
+      @google_user = @user.google_name  
       
       if @fb_user and (@flickr_user or @google_user) 
         redirect_to :action => 'migrate' and return
       end
     end
-    
     
     if not @fb_user
       @step1, @step2, @step3 = "selected", "", ""
@@ -68,9 +67,8 @@ class ApplicationController < ActionController::Base
   end
   
   def status
-    @user = User.find_by_fb_session(session[:at])
-    
-    @fb_user = @user
+    facebook_user = Mogli::User.find("me", Mogli::Client.new(session[:at])) if session[:at]
+    @fb_user = User.find_by_user(facebook_user.id)
     @google_user = @user.google_name
     @flickr_user = @user.flickr_username
   end
