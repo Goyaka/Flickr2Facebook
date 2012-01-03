@@ -60,7 +60,7 @@ class Job
       photo[:message] = info['title'] + "\n" + info['description'] + "\n"
       photo[:date] = info['dateupload'].to_i  
     elsif source == Constants::SOURCE_PICASA
-      info = PicasaPhotoMeta.where(:photo => photo_id).first
+      info = PhotoMeta.where(:photo => photo_id).first
       if info.nil?
         puts "Empty metadata for photos " + photo_id.to_s
       end
@@ -229,7 +229,7 @@ class Job
         pic['photo'] = pic['id'][1]
 
         puts "Adding picasa photo " + pic['id'][1] + " to facebook album http://facebook.com/" + facebook_album
-        photometa = PicasaPhotoMeta.create(pic)
+        photometa = PhotoMeta.create(pic)
         photo = Photo.new(:photo => pic['id'][1],
                           :photoset_id => photoset,
                           :facebook_photo => '',
