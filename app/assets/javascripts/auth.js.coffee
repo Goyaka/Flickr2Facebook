@@ -1,3 +1,5 @@
+Array::remove = (e) -> @[t..t] = [] if (t = @indexOf(e)) > -1
+
 isScrolledIntoView = (elem)->
     docViewTop = $(window).scrollTop();
     docViewBottom = docViewTop + $(window).height();
@@ -7,7 +9,7 @@ isScrolledIntoView = (elem)->
 
     ((elemBottom >= docViewTop) && (elemTop <= docViewBottom));
     
-scrollImportButton =->
+@scrollImportButton = scrollImportButton =->
     if('.import-sets-placemark')
         if(isScrolledIntoView('.import-sets-placemark'))
             $('.import-sets-button').css('position','relative')
@@ -32,29 +34,43 @@ addCheckHandlers =->
                 check.css('visibility','hidden')
             $(this).blur ->
                 $(this).unbind('hover')
+                
+                
 
-@loadsets = loadsets = (api, picker, target, load_message)-> 
+@sourcesToLoad = sourcesToLoad = []
+@loadSetsToMigrate = loadSetsToMigrate = (api, template, source)->
+    
+    updateLoadingMessage =->
+        if sourcesToLoad.length == 0
+            $('.loading-box').hide()
+        else
+            loadingtext = 'Loading your '  + sourcesToLoad.join(' and ' ) + ' albums'
+            $('.loading-message').html(loadingtext)
+            $('.loading-box').show()
+    
     $.ajax
         url: api
         type: 'get'
         dataType: 'json'
         beforeSend: (xhr, settings) ->
-            $(target).html('<center><img src= "assets/loading.gif"><br>' + load_message + '</center>')
+            sourcesToLoad.push(source)
+            updateLoadingMessage()
+            
         success: (data) ->
             if data.hasOwnProperty 'fb_albums'
                 set['fb_albums'] = data['fb_albums'][set['id']] for set in data.sets
-
-            if data.hasOwnProperty 'progress'
-                set['progress'] = data['progress'][set['id']] for set in data.sets
-
-            $(picker).tmpl(data).appendTo(target);
+                
+            $(template).tmpl(data).appendTo('.sets');
+            
+            #Add checkbox handlers-
             addCheckHandlers()
-
-            if($('.import-sets-button'))
-                $(window).scroll(scrollImportButton)
-
+        
             scrollImportButton()
-
+            
+            sourcesToLoad.remove(source)
+            updateLoadingMessage()
+            $('#sets').show()
+            
             #add select all handler
             if $('#select_all')
                 $('#select_all').click ->
@@ -66,16 +82,28 @@ addCheckHandlers =->
                         $('.sets input').attr('checked',false)
                         $('.sets .check').removeClass('selected')
                         $('.sets .thumb').removeClass('selected')
+            
+
+
+@loadSetStatus = loadSetStatus =-> 
+#'/photos/inqueue_sets','#inqueue_sets_list_template', '#queue', 'Loading photos in upload queue')
+    $.ajax
+        url: '/photos/upload-status'
+        type: 'get'
+        dataType: 'json'
+        beforeSend: (xhr, settings) ->
+            $(target).html('<center><img src= "assets/loading.gif"><br> Loading photos in upload queue </center>')
+        success: (data) ->
+            target = '#queue'
+            $(target).html('')
+            
+            if data.hasOwnProperty 'progress'
+                set['progress'] = data['progress'][set['id']] for set in data.sets
+
+            $('#inqueue_sets_list_template').tmpl(data).appendTo(target);
                         
                                         
 $(document).ready -> 
-    if typeof fb_user != "undefined" and (typeof flickr_user != "undefined" or typeof google_user != undefined)
-        if $('#inqueue_sets_list_template').length != 0
-            loadsets('/flickr/inqueue_sets','#inqueue_sets_list_template', '#queue', 'Loading photos in upload queue')
-            
-    $('#dialog-close').click ->
-        $('#modal-share-friends').modal('hide')
-            
     $().dropdown()
     
         
