@@ -1,18 +1,7 @@
-<% content_for :content do %>
+@fb_user<% content_for :content do %>
 
 <div class="main">
     <% if @fb_user and @flickr_user %>
-        <div class="alert-message block-message success">
-            <div class="row">
-                <div class="share">
-                    If you liked this service, let your friends know!
-                    <a name="fb_share" share_url="http://export.goyaka.com">Share with Friends!</a> 
-                    <script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share" type="text/javascript">
-                    </script>
-                </div>
-            </div>
-        </div>
-        
         <ul class="tabs navtab">
           <li class="first"><a href="/migrate">Move photos</a></li>
           <li class="active"><a href="/status">Uploaded photos</a></li>
@@ -29,6 +18,14 @@
                         </div>
                 </div>
             </div>
+        </div>
+        <div class="alert-message">
+                <div class="share">
+                    If you liked this service, let your friends know!
+                    <a name="fb_share" share_url="http://export.goyaka.com">Share with Friends!</a> 
+                    <script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share" type="text/javascript">
+                    </script>
+                </div>
         </div>
     <% else %>
     <% end %>
@@ -66,7 +63,7 @@
         </label>
         <div class="thumb-title">
             ${set.flickr_data.title}<br/>
-            <a target="_blank" href="http://flickr.com/photos/<%= @user.flickr_user_nsid %>/sets/${set.flickr_data.id}">
+            <a target="_blank" href="http://flickr.com/photos/<%= @fb_user.flickr_user_nsid %>/sets/${set.flickr_data.id}">
                 <img style="vertical-align: middle" src="/assets/flickrico.png">
             </a>
         </div>
