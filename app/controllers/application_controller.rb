@@ -88,4 +88,106 @@ class ApplicationController < ActionController::Base
       @client = Mogli::Client.new(session[:at])
     end
   end
+  
+  def upload_status
+    
+    user = User.find_by_fb_session(session[:at])
+    
+    if user.nil?
+      render :json => {'STATUS' => 'ERROR'}
+    end
+    
+    #Fetch flickr albums in progress
+    puts FlickrHelper.inspect
+    if not user.flickr_user_nsid.nil? and false 
+      #Required for showing thumbnail
+      flickr_data  = FlickrHelper::get_all_sets
+    
+      #Remap sets by their flickr photo set id for easy lookups.
+      flickr_sets = {}
+      flickr_data.each do |flickr_set|
+        flickr_sets[flickr_set['id']] = flickr_set
+      end
+
+      #Fetch all the photosets in progress and processed.
+      sets_tracked_array = Photoset.where('user_id = ?', @user)
+    
+      #Remap them by our photoset primary key
+      sets_tracked = {}
+      sets_tracked_array.each do |set|
+        sets_tracked[set.id] = set
+      end
+    
+      sets_progress  = Photo.select('count(status) as count, status, photoset_id').where('photoset_id IN (?)', sets_tracked_array).group('photoset_id, status')
+    
+      #Put progress back into the original map
+      sets_progress.each do |set|
+        status = set.status.to_i == 2 ? 'done' : 'progress' 
+      
+        sets_tracked[set.photoset.id]['total'] ||= 0    
+        sets_tracked[set.photoset.id][status]  ||= 0 
+      
+        sets_tracked[set.photoset.id][status] += set.count
+        sets_tracked[set.photoset.id]['total'] += set.count      
+      end
+    
+      #Put flickr references inside the map
+      sets_tracked.each do |id,set|
+        sets_tracked[id]['flickr_data'] = flickr_sets[set.photoset]
+      end
+    end
+    
+    #Fetch picasa albums in progress
+    if not user.google_userid.nil?
+      picasa_data = 'hi'
+    end    
+    
+    
+    render :json => {:sets_tracked => sets_tracked}
+    
+    #Fetch count of photos in progress/processed.
+    #inqueuephotos = Photo.select('count(status) as count, status, photoset_id').where('photoset_id IN (?)', inqueuesets_id).group('photoset_id, status')
+    
+  end
+  
+  
+  #Should be in a parent container (for flickr, picasa)
+  def select_sets
+    
+    if params["flickr_set"].nil? and params["picasa_album"].nil?
+      redirect_to :controller => 'application', :action => 'main'
+      return
+    end
+      
+    facebook_user = Mogli::User.find("me",Mogli::Client.new(session[:at]))
+    response = {}
+    if facebook_user
+      @user = User.where(:user => facebook_user.id)[0]
+      if @user
+        if not params["flickr_set"].nil?
+          params["flickr_set"].each do |set| 
+            photoset = Photoset.where(:user_id => @user.id, :photoset => set)
+            if photoset.empty?
+              photoset = Photoset.new(:user_id => @user.id, :photoset => set, :status => Constants::PHOTOSET_NOTPROCESSED, :source => Constants::SOURCE_FLICKR)
+              photoset.save!
+            end
+            puts photoset
+          end
+        end
+        
+        if not params['picasa_album'].nil?  
+          params["picasa_album"].each do |album|
+            photoset = Photoset.where(:user_id => @user.id, :photoset => album)
+            if photoset.empty?
+              photoset = Photoset.new(:user_id => @user.id, :photoset => album, :status => Constants::PHOTOSET_NOTPROCESSED, :source => Constants::SOURCE_PICASA)
+              photoset.save!
+            end
+          end
+        end
+      end
+    end
+    
+    redirect_to :controller => 'application', :action => 'status'  
+  end
+  
 end
