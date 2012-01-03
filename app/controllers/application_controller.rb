@@ -98,10 +98,9 @@ class ApplicationController < ActionController::Base
     end
     
     #Fetch flickr albums in progress
-    puts FlickrHelper.inspect
-    if not user.flickr_user_nsid.nil? and false 
+    if not user.flickr_user_nsid.nil?
       #Required for showing thumbnail
-      flickr_data  = FlickrHelper::get_all_sets
+      flickr_data  = user.get_all_flickr_sets
     
       #Remap sets by their flickr photo set id for easy lookups.
       flickr_sets = {}
@@ -110,12 +109,13 @@ class ApplicationController < ActionController::Base
       end
 
       #Fetch all the photosets in progress and processed.
-      sets_tracked_array = Photoset.where('user_id = ?', @user)
+      sets_tracked_array = Photoset.where('user_id = ? and source = ?', user, Constants::SOURCE_FLICKR)
+    
     
       #Remap them by our photoset primary key
-      sets_tracked = {}
+      sets_tracked_flickr = {}
       sets_tracked_array.each do |set|
-        sets_tracked[set.id] = set
+        sets_tracked_flickr[set.id] = set
       end
     
       sets_progress  = Photo.select('count(status) as count, status, photoset_id').where('photoset_id IN (?)', sets_tracked_array).group('photoset_id, status')
@@ -124,26 +124,61 @@ class ApplicationController < ActionController::Base
       sets_progress.each do |set|
         status = set.status.to_i == 2 ? 'done' : 'progress' 
       
-        sets_tracked[set.photoset.id]['total'] ||= 0    
-        sets_tracked[set.photoset.id][status]  ||= 0 
-      
-        sets_tracked[set.photoset.id][status] += set.count
-        sets_tracked[set.photoset.id]['total'] += set.count      
+        sets_tracked_flickr[set.photoset.id]['total'] ||= 0    
+        sets_tracked_flickr[set.photoset.id][status]  ||= 0 
+
+        sets_tracked_flickr[set.photoset.id][status] += set.count
+        sets_tracked_flickr[set.photoset.id]['total'] += set.count      
       end
     
       #Put flickr references inside the map
-      sets_tracked.each do |id,set|
-        sets_tracked[id]['flickr_data'] = flickr_sets[set.photoset]
+      sets_tracked_flickr.each do |id,set|
+        sets_tracked_flickr[id]['flickr_data'] = flickr_sets[set.photoset]
       end
     end
     
     #Fetch picasa albums in progress
     if not user.google_userid.nil?
-      picasa_data = 'hi'
+      picasa_data = user.get_all_picasa_albums
+      
+      #Remap the same way as flickr.
+      picasa_albums = {}
+      picasa_data.each do |album|
+        picasa_albums[album['id'][1]] = album
+      end
+      
+      #Fetch all the photosets in progress and processed.
+      sets_tracked_array = Photoset.where('user_id = ? and source = ?', user, Constants::SOURCE_PICASA)
+      
+      #Remap them by photoset primary key.
+      sets_tracked_picasa = {}
+      sets_tracked_array.each do |set|
+        sets_tracked_picasa[set.id] = set
+      end
+      
+      #TODO Code repeat from above. Fix 
+      sets_progress  = Photo.select('count(status) as count, status, photoset_id').where('photoset_id IN (?)', sets_tracked_array).group('photoset_id, status')
+       
+      #Put progress back into the original map
+      sets_progress.each do |set|
+        status = set.status.to_i == 2 ? 'done' : 'progress' 
+      
+        sets_tracked_picasa[set.photoset.id]['total'] ||= 0    
+        sets_tracked_picasa[set.photoset.id][status]  ||= 0 
+
+        sets_tracked_picasa[set.photoset.id][status] += set.count
+        sets_tracked_picasa[set.photoset.id]['total'] += set.count      
+      end
+      
+      #Put flickr references inside the map
+      sets_tracked_picasa.each do |id,set|
+        sets_tracked_picasa[id]['picasa_data'] = picasa_albums[set.photoset]
+      end
+      
     end    
     
     
-    render :json => {:sets_tracked => sets_tracked}
+    render :json => {:sets_tracked_flickr => sets_tracked_flickr, :sets_tracked_picasa => sets_tracked_picasa}
     
     #Fetch count of photos in progress/processed.
     #inqueuephotos = Photo.select('count(status) as count, status, photoset_id').where('photoset_id IN (?)', inqueuesets_id).group('photoset_id, status')
