@@ -1,5 +1,3 @@
-require 'xmlsimple'
-
 class PicasaController < ApplicationController
   
   def get_sets_notuploaded

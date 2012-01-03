@@ -4,11 +4,6 @@
     <% if @fb_user and @flickr_user %>
         <div class="alert-message block-message success">
             <div class="row">
-                <div class="transfer-info">
-                Photos from <a href="http://flickr.com/<%= @user.flickr_user_nsid %>"> <%= @flickr_user %> </a> in Flickr to be moved to  <a href="http://facebook.com/<%= @fb_user.user %>"><%= @fb_user.fb_first_name %> </a> in Facebook.
-                </div>
-            </div>
-            <div class="row">
                 <div class="share">
                     If you liked this service, let your friends know!
                     <a name="fb_share" share_url="http://export.goyaka.com">Share with Friends!</a> 
@@ -28,75 +23,55 @@
             </div>
             <div class="refresh alert-message info block-message">Once photos are uploaded, share with your friends. 
                 <a data-controls-modal="modal-share-friends" data-backdrop="true" data-keyboard="true" class="btn small" href="#" id="share-with-friends">See how</a></div>
-            <div id="queue"></div>
+            <div id="queue">
+                <div>
+                        <div class="sets">
+                        </div>
+                </div>
+            </div>
         </div>
     <% else %>
     <% end %>
 </div>
 
-<script type="text/javascript">
-var fb_user;
-var flickr_user;
 <% if @fb_user %>
-fb_user = "<%= @fb_user %>";
-<% end %>
-<% if @flickr_user %>
-flickr_user = "<%= @flickr_user %>";
-<% end %>
+
+<script id="picasa_status_template" type="text/x-jquery-tmpl">
+{{each(index, set) sets_tracked_picasa}}
+    <div class="set">
+    <label>
+        <div class="cover">
+            <img class="thumb" src="${set.picasa_data['group'][0]['thumbnail'][0]['url']}" width="75" height="75" style="margin: 0 auto; display: block">
+            <div class="progressbar"><div class="fill" style="width:${set.percent}%">&nbsp;</div><div class="data">${set.done}/${set.total}</div></div>
+        </div>
+    </label>
+    <div class="thumb-title">
+        ${set.picasa_data['title'][0]['content']} <br/>
+        <a target="_blank" href="${set.picasa_data['link'][1]['href']}">
+            <img style="vertical-align: middle" src="/assets/picasaico.png">
+        </a>
+    </div>
+    </div>
+{{/each}}
 </script>
 
-<% if @fb_user and @flickr_user %>
-
-<script id="inqueue_sets_list_template" type="text/x-jquery-tmpl">
-<div>
-        <div class="sets">
-            {{each(index, set) sets}}
-                <div class="set">
-                    <label>
-                        <div class="cover">
-                            <img class="thumb" id="${set.primary}" src="http://farm${set.farm}.staticflickr.com/${set.server}/${set.primary}_${set.secret}_s.jpg" style="margin: 0 auto; display: block">
-                            <div class="progressbar" data="${set.progress.percent}"><div class="fill" style="width:${set.progress.percent}%">&nbsp;</div><div class="data">${set.progress.done}/${set.progress.total}</div></div>
-                        </div>
-                    </label>
-                    <div class="thumb-title">
-                        ${set.title}<br/>
-                        <a target="_blank" href="http://flickr.com/photos/<%= @user.flickr_user_nsid %>/sets/${set.id}">
-                            <img style="vertical-align: middle" src="/assets/flickrico.png">
-                        </a>
-                        {{each(idx, album) set.fb_albums}}
-                            <a href="http://facebook.com/${album}"><img style="vertical-align: middle" src="/assets/fbico.png"></a>
-                        {{/each}}
-                    </div>
-                </div>
-            {{/each}}
+<script id="flickr_status_template" type="text/x-jquery-tmpl">
+{{each(index, set) sets_tracked_flickr}}
+    <div class="set">
+        <label>
+            <div class="cover">
+                <img class="thumb" id="${set.flickr_data.primary}" src="http://farm${set.flickr_data.farm}.staticflickr.com/${set.flickr_data.server}/${set.flickr_data.primary}_${set.flickr_data.secret}_s.jpg" style="margin: 0 auto; display: block">
+                <div class="progressbar"><div class="fill" style="width:${set.percent}%">&nbsp;</div><div class="data">${set.done}/${set.total}</div></div>
+            </div>
+        </label>
+        <div class="thumb-title">
+            ${set.flickr_data.title}<br/>
+            <a target="_blank" href="http://flickr.com/photos/<%= @user.flickr_user_nsid %>/sets/${set.flickr_data.id}">
+                <img style="vertical-align: middle" src="/assets/flickrico.png">
+            </a>
         </div>
-</div>
-</script>
-
-<script id="uploaded_sets_list_template" type="text/x-jquery-tmpl">
-<div>
-    <h4> Uploaded sets </h4>
-        <div class="sets">
-            {{each(index, set) sets}}
-                <div class="set">
-                    <label>
-                        <div class="cover">
-                            <img class="thumb" id="${set.primary}" src="http://farm${set.farm}.staticflickr.com/${set.server}/${set.primary}_${set.secret}_s.jpg" style="margin: 0 auto; display: block">
-                        </div>
-                    </label>
-                    <div style="thumb-title">                        
-                        ${set.title}<br/>
-                    <a target="_blank" href="http://flickr.com/photos/<%= @user.flickr_user_nsid %>/sets/${set.id}">
-                        <img style="vertical-align: middle" src="/assets/flickrico.png">
-                    </a>
-                        {{each(idx, album) set.fb_albums}}
-                            <a href="http://facebook.com/${album}"><img style="vertical-align: middle" src="/assets/fbico.png"></a>
-                        {{/each}}
-                    </div>
-                </div>
-            {{/each}}
-        </div>
-</div>
+    </div>
+{{/each}}
 </script>
 
 
@@ -116,5 +91,29 @@ flickr_user = "<%= @flickr_user %>";
   </div>
 </div>
 <% end %>
+
+<% end %>
+
+<% content_for :javascript do %>
+
+
+<script type="text/javascript">
+var fb_user;
+var flickr_user;
+<% if @fb_user %>
+fb_user = "<%= @fb_user %>";
+<% end %>
+<% if @flickr_user %>
+flickr_user = "<%= @flickr_user %>";
+<% end %>
+
+$(document).ready(function(){
+    loadSetStatus()      
+    $('#dialog-close').click(function() {
+        $('#modal-share-friends').modal('hide')
+    })
+})
+</script>
+
 
 <% end %>

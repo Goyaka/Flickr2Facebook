@@ -86,21 +86,18 @@ addCheckHandlers =->
 
 
 @loadSetStatus = loadSetStatus =-> 
-#'/photos/inqueue_sets','#inqueue_sets_list_template', '#queue', 'Loading photos in upload queue')
     $.ajax
         url: '/photos/upload-status'
         type: 'get'
         dataType: 'json'
         beforeSend: (xhr, settings) ->
-            $(target).html('<center><img src= "assets/loading.gif"><br> Loading photos in upload queue </center>')
+            $('#queue').html('<center><img src= "assets/loading.gif"><br> Loading photos in upload queue </center>')
         success: (data) ->
             target = '#queue'
             $(target).html('')
             
-            if data.hasOwnProperty 'progress'
-                set['progress'] = data['progress'][set['id']] for set in data.sets
-
-            $('#inqueue_sets_list_template').tmpl(data).appendTo(target);
+            $('#flickr_status_template').tmpl(data).appendTo(target);
+            $('#picasa_status_template').tmpl(data).appendTo(target);
                         
                                         
 $(document).ready -> 

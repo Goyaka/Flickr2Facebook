@@ -68,25 +68,11 @@ class ApplicationController < ActionController::Base
   end
   
   def status
+    @user = User.find_by_fb_session(session[:at])
     
-    begin 
-      facebook_user = Mogli::User.find("me",Mogli::Client.new(session[:at])) if session[:at]
-    rescue Mogli::Client::HTTPException
-      session[:at] = nil
-      redirect_to :controller => 'auth', :action => 'facebook_auth' and return
-    end
-
-    if facebook_user
-      @user = User.where(:user => facebook_user.id)[0]
-      if @user.nil?
-        session[:at] = nil
-        redirect_to :controller => 'auth', :action => 'facebook_auth' and return
-      end
-      @fb_user = @user
-      @google_user = @user.google_name
-      @flickr_user = @user.flickr_username
-      @client = Mogli::Client.new(session[:at])
-    end
+    @fb_user = @user
+    @google_user = @user.google_name
+    @flickr_user = @user.flickr_username
   end
   
   def upload_status
@@ -120,19 +106,26 @@ class ApplicationController < ActionController::Base
     
       sets_progress  = Photo.select('count(status) as count, status, photoset_id').where('photoset_id IN (?)', sets_tracked_array).group('photoset_id, status')
     
+      puts sets_progress.inspect
       #Put progress back into the original map
       sets_progress.each do |set|
         status = set.status.to_i == 2 ? 'done' : 'progress' 
-      
-        sets_tracked_flickr[set.photoset.id]['total'] ||= 0    
-        sets_tracked_flickr[set.photoset.id][status]  ||= 0 
-
+        sets_tracked_flickr[set.photoset.id][status] ||= 0 
         sets_tracked_flickr[set.photoset.id][status] += set.count
-        sets_tracked_flickr[set.photoset.id]['total'] += set.count      
       end
     
       #Put flickr references inside the map
       sets_tracked_flickr.each do |id,set|
+        
+        sets_tracked_flickr[id]['done']  ||= 0
+        sets_tracked_flickr[id]['total'] ||= flickr_sets[set.photoset]['photos']
+        
+        if sets_tracked_flickr[id]['total'] == 0
+          sets_tracked_flickr[id]['percent'] = 0
+        else
+          sets_tracked_flickr[id]['percent'] = sets_tracked_flickr[id]['done'].to_f * 100 / sets_tracked_flickr[id]['total'].to_f 
+        end
+        
         sets_tracked_flickr[id]['flickr_data'] = flickr_sets[set.photoset]
       end
     end
@@ -163,15 +156,21 @@ class ApplicationController < ActionController::Base
       sets_progress.each do |set|
         status = set.status.to_i == 2 ? 'done' : 'progress' 
       
-        sets_tracked_picasa[set.photoset.id]['total'] ||= 0    
-        sets_tracked_picasa[set.photoset.id][status]  ||= 0 
-
+        sets_tracked_picasa[set.photoset.id][status] ||= 0 
         sets_tracked_picasa[set.photoset.id][status] += set.count
-        sets_tracked_picasa[set.photoset.id]['total'] += set.count      
       end
       
       #Put flickr references inside the map
       sets_tracked_picasa.each do |id,set|
+        sets_tracked_picasa[id]['done']  ||= 0
+        sets_tracked_picasa[id]['total'] ||= picasa_albums[set.photoset]['numphotos'].to_s.to_i
+        
+        if sets_tracked_picasa[id]['total'] == 0
+          sets_tracked_picasa[id]['percent'] = 0
+        else
+          sets_tracked_picasa[id]['percent'] = sets_tracked_picasa[id]['done'].to_f * 100 / sets_tracked_picasa[id]['total'].to_f 
+        end
+        
         sets_tracked_picasa[id]['picasa_data'] = picasa_albums[set.photoset]
       end
       
@@ -179,10 +178,6 @@ class ApplicationController < ActionController::Base
     
     
     render :json => {:sets_tracked_flickr => sets_tracked_flickr, :sets_tracked_picasa => sets_tracked_picasa}
-    
-    #Fetch count of photos in progress/processed.
-    #inqueuephotos = Photo.select('count(status) as count, status, photoset_id').where('photoset_id IN (?)', inqueuesets_id).group('photoset_id, status')
-    
   end
   
   
