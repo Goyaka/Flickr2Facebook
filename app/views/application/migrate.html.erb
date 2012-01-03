@@ -5,16 +5,16 @@
           <li class="active first"><a href="/migrate">Move photos</a></li>
           <li><a href="/status">Uploaded photos</a></li>
         </ul>
-        <div class="loading-box hide">
-            <center><img src= "assets/loading.gif"><div class="loading-message"></div></center>
-        </div>
-        <div id="sets" class="hide">
+        <div id="sets">
             <div class="sets-wrapper">
                 <div id="select_all_wrapper" class="pull-right span2"> <label for="select_all">Select all</label><input type="checkbox" id="select_all"></div>
                 <h2 class="migrate-header"> Choose sets that you want to migrate to Facebook. </h2>
                 <%= form_tag("/photos/import-sets", :method => "post", :id=>'upload-photos-form') do %>
                                 
                 <div class="sets">
+                    <div class="loading-box hide">
+                        <center><img src= "assets/loading.gif"><div class="loading-message"></div></center>
+                    </div>
                 </div>
                 <center class="import-sets-button" class="push-down">
                      <button class="btn large success"> Import Sets Now! </button>
@@ -43,7 +43,7 @@
         <div class="thumb-title">
             <input type="checkbox" onclick="_gaq.push(['_trackEvent', 'Select_Sets', '#{set.id}']);" name="flickr_set[]" value="${set.id}" id="${set.id}">
             ${set.title} 
-            <a target="_blank" href="http://flickr.com/photos/<%= @user.flickr_user_nsid %>/sets/${set.id}">
+            <a target="_blank" href="http://flickr.com/photos/<%= @fb_user.flickr_user_nsid %>/sets/${set.id}">
                 <img style="vertical-align: middle" src="/assets/flickrico.png">
             </a>
         </div>
