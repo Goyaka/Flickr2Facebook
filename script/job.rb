@@ -39,24 +39,38 @@ class Job
     end
   end
 
-  def get_photo_info(photo_id)
-    info = PhotoMeta.where(:photo => photo_id).first
-    if info.nil? 
-      puts "Empty metadata for photos " + photo_id.to_s
-    end
-    return nil if info.nil? 
-    
+  def get_photo_info(photo_id, source)
     photo = {}
-    if info['originalsecret'].nil?
-      photo[:photo_source] = info['url_m']
-    else
-      photo[:photo_source] = "http://farm#{info['farm']}.staticflickr.com/#{info['server']}/#{info['photo']}_#{info['originalsecret']}_o.jpg"
+    
+    if source == Constants::SOURCE_FLICKR
+      info = PhotoMeta.where(:photo => photo_id).first
+      if info.nil? 
+        puts "Empty metadata for photos " + photo_id.to_s
+      end
+      return nil if info.nil? 
+
+      if info['originalsecret'].nil?
+        photo[:photo_source] = info['url_m']
+      else
+        photo[:photo_source] = "http://farm#{info['farm']}.staticflickr.com/#{info['server']}/#{info['photo']}_#{info['originalsecret']}_o.jpg"
+      end
+
+      return nil if photo[:photo_source].nil?
+
+      photo[:message] = info['title'] + "\n" + info['description'] + "\n"
+      photo[:date] = info['dateupload'].to_i  
+    elsif source == Constants::SOURCE_PICASA
+      info = PicasaPhotoMeta.where(:photo => photo_id).first
+      if info.nil?
+        puts "Empty metadata for photos " + photo_id.to_s
+      end
+      
+      return nil if info.nil?
+      photo[:photo_source] = info['content']['src']
+      photo[:message] = info['summary'][0]['content']
+      photo[:date] = info['timestamp'][0].to_i/1000
     end
-    
-    return nil if photo[:photo_source].nil?
-    
-    photo[:message] = info['title'] + "\n" + info['description'] + "\n"
-    photo[:date] = info['dateupload'].to_i
+      
     return photo
     
   end
@@ -101,7 +115,7 @@ class Job
       photo_id = job[:photo].photo
 
       # If photo information is nil, set status as -1
-      photo = get_photo_info(photo_id) 
+      photo = get_photo_info(photo_id, job[:photo].source) 
       if photo.nil?
         Photo.update(photo_id, :status => -1)
         next
@@ -187,15 +201,52 @@ class Job
           puts "Creating album" + albumname_with_index
           albumids.push(self.create_album(albumname_with_index, description))
         rescue Exception => error
-          puts "Erroring + " + error.to_s 
+          puts "Erroring + " + error.to_s
         end
       end
     end
     
     return albumids
   end
+  
+  def split_picasa_sets(user, set_id)
+    photoset    = Photoset.where('photoset = ? AND status = ? AND source=?', set_id, Constants::PHOTOSET_NOTPROCESSED, Constants::SOURCE_PICASA).first
+    
+    
+    if photoset
+      puts "Splitting picasa set " + photoset[:photoset]
+      
+      photoset.status = Constants::PHOTOSET_PROCESSING
+      photoset.save
+      
+      albuminfo = user.get_picasa_album_info(set_id)
+      albumname = albuminfo['title'][0]['content']
+      albumcount = (albuminfo['entry'].length + Job::MAX_FACEBOOK_PHOTO_COUNT) / Job::MAX_FACEBOOK_PHOTO_COUNT
+      albumids = self.create_fb_albums(albumname, '', albumcount)
+      
+      albuminfo['entry'].each_with_index do |pic, index|
+        facebook_album = albumids[(index + 1)/Job::MAX_FACEBOOK_PHOTO_COUNT]
+        pic['photo'] = pic['id'][1]
 
-  def upload_set(set_id) 
+        puts "Adding picasa photo " + pic['id'][1] + " to facebook album http://facebook.com/" + facebook_album
+        photometa = PicasaPhotoMeta.create(pic)
+        photo = Photo.new(:photo => pic['id'][1],
+                          :photoset_id => photoset,
+                          :facebook_photo => '',
+                          :facebook_album => facebook_album,
+                          :source => Constants::SOURCE_PICASA,
+                          :status => Constants::PHOTO_NOTPROCESSED)
+                    
+        photo.save()
+      end
+      
+      photoset.status = Constants::PHOTOSET_PROCESSED
+      photoset.save
+    end
+    
+  end
+  
+  def split_flickr_sets(user, set_id) 
     photoset    = Photoset.where('photoset = ? AND status = ? AND source=?', set_id, Constants::PHOTOSET_NOTPROCESSED, Constants::SOURCE_FLICKR).first
     if photoset
       photoset.status = Constants::PHOTOSET_PROCESSING
@@ -213,9 +264,14 @@ class Job
       photoset_photos = photos
       for pic in photoset_photos
         facebook_album = albumids[(index + 1)/Job::MAX_FACEBOOK_PHOTO_COUNT]
-        puts "Adding photo " + pic['photo'].to_s + " to facebook album http://facebook.com/" + facebook_album
+        puts "Adding flickr photo " + pic['photo'].to_s + " to facebook album http://facebook.com/" + facebook_album
         photometa = PhotoMeta.create(pic)
-        photo = Photo.new(:photo => pic['photo'], :photoset_id => photoset, :facebook_photo => '', :facebook_album => facebook_album, :status => Constants::PHOTO_NOTPROCESSED)
+        photo = Photo.new(:photo => pic['photo'],
+                          :photoset_id => photoset,
+                          :facebook_photo => '',
+                          :facebook_album => facebook_album,
+                          :source => Constants::SOURCE_FLICKR,
+                          :status => Constants::PHOTO_NOTPROCESSED)
         photo.save()
         index = index + 1
       end

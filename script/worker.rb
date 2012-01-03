@@ -63,10 +63,16 @@ class Worker < ActiveRecord::Base
         logger.info("Getting unprocessed photosets")
         set = Photoset.where("status = ?", Constants::PHOTOSET_NOTPROCESSED).first
         if set
-          logger.info("Splitting set " + set.photoset + " to photos")
           user = User.find(set.user_id)
-          job = Job.new(user.fb_session, user.flickr_access_token, user.flickr_access_secret, true)
-          job.upload_set(set.photoset)
+          if set.source == Constants::SOURCE_FLICKR
+            logger.info("Splitting flickr set " + set.photoset + " to photos")
+            job = Job.new(user.fb_session, user.flickr_access_token, user.flickr_access_secret, true)
+            job.split_flickr_sets(user, set.photoset)
+          elsif set.source == Constants::SOURCE_PICASA
+            logger.info("Splitting picasa set " + set.photoset + " to photos")
+            job = Job.new(user.fb_session,"","", false)
+            job.split_picasa_sets(user, set.photoset) 
+          end
         else
           puts "No photosets. waiting."
           sleep 1
