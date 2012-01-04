@@ -3,6 +3,13 @@ require 'xmlsimple'
 class User < ActiveRecord::Base
   has_many :photosets
   
+  def get_display_name
+    display_name = ""
+    display_name += self.fb_first_name + " " if self.fb_first_name
+    display_name += self.fb_last_name if self.fb_last_name
+    return display_name
+  end
+  
   def get_all_flickr_sets
     config = YAML.load_file(Rails.root.join("config/flickr.yml"))[Rails.env]
     FlickRaw.api_key = config['app_id']
