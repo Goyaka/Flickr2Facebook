@@ -1,0 +1,25 @@
+<% content_for :content do %>
+<div class="main login-flow">
+    <%= render "steps" %>
+
+    <div class="row">        
+        <center>
+            <div><img src = "/assets/facebook.png"></div>
+            <% if not @fb_user %>
+                <a href="facebook-auth" onclick="_gaq.push(['_trackEvent', 'Auth', 'Facebook', 'start']);"> <img src="/assets/facebook-login-button.png" /> </a> <br>
+            <% else %>
+                Logged in as <br> <a href="http://www.facebook.com"> <%= @fb_user.get_display_name %></a>                
+            <% end %>
+        </center>
+    </div>
+    <% if @fb_user %>
+    <div class="row push-down">
+        <center class="push-down">
+            <a href="/main" class="startnow large btn success"> Sign into Picasa/Flickr ! </a> <br>
+        </center>
+    </div>
+    <% end %>
+    
+    <div class="clear"></div>
+</div>
+<% end %>

@@ -1,5 +1,7 @@
 Flickr2facebook::Application.routes.draw do
   match "main" => "application#main", :as => :main
+  match "facebook-login" => "application#facebook_login"
+  match "services-login" => "application#services_login"
   match "facebook-auth" => "auth#facebook_auth", :as => :facebook_auth
   match "facebook-callback" => "auth#facebook_callback", :as => :facbeook_callback
   match "flickr-auth" => "auth#flickr_auth", :as => :flickr_auth

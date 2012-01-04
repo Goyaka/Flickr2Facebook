@@ -1,0 +1,52 @@
+<% content_for :content do %>
+<div class="main login-flow">
+    <%= render "steps" %>
+
+    <div class="row">&nbsp;</div>
+    <div class="row">        
+        <div class="span4"> &nbsp; </div>
+        
+        <div class="span3 flickr-login">
+             <img src = "/assets/flickr.png">
+             <% if not @flickr_user %>
+             <a href="/flickr-auth" class="btn" onclick="_gaq.push(['_trackEvent', 'Auth', 'Flickr', 'start']);"> 
+                 Authenticate 
+             </a> 
+             <% else %>
+             Logged in as <br> <a href="http://www.flickr.com/"> <%= @flickr_user %> </a>
+             <% end %>
+             &nbsp;
+         </div>
+         
+         <div class="span2 flickr-or-picasa">
+             <div class="separator-top"></div>
+             <div class="or-text">OR</div>
+             <div class="separator-top"></div>
+         </div>
+         
+         <div class="span3 picasa-login">
+             <img src = "/assets/picasa.png">
+             <% if not @picasa_user %>
+             <a href="/google-auth" onclick="_gaq.push(['_trackEvent', 'Auth', 'Picasa', 'start']);" style="color: #FE63BB; font-size: 22px"> 
+                 <table>
+                     <tr>
+                         <td class="bbl"></td><td class="bbm">Authenticate</td><td class="bbr"></td>
+                     </tr>
+                 </table> 
+             </a> 
+             <% else %>
+                Logged in as <br> <a href="http://picasaweb.google.com/"> <%= @picasa_user %> </a>
+             <% end %>
+             &nbsp;
+         </div>
+    </div>
+    <% if @flickr_user or @picasa_user %>
+    <div class="row push-down">
+        <center class="push-down">
+            <a href="/main" class="startnow large btn success"> Start migrating your photos! </a> <br>
+        </center>
+    </div>
+    <% end %>
+    <div class="clear"></div>
+</div>
+<% end %>
