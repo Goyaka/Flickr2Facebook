@@ -7,7 +7,7 @@
         <div class="span4"> &nbsp; </div>
         
         <div class="span3 flickr-login">
-             <img src = "/assets/flickr.png">
+             <div> <img src = "/assets/flickr.png"> </div>
              <% if not @flickr_user %>
              <a href="/flickr-auth" class="btn" onclick="_gaq.push(['_trackEvent', 'Auth', 'Flickr', 'start']);"> 
                  Authenticate 
@@ -25,7 +25,7 @@
          </div>
          
          <div class="span3 picasa-login">
-             <img src = "/assets/picasa.png">
+             <div><img src = "/assets/picasa.png"> </div>
              <% if not @picasa_user %>
              <a href="/google-auth" onclick="_gaq.push(['_trackEvent', 'Auth', 'Picasa', 'start']);" style="color: #FE63BB; font-size: 22px"> 
                  <table>
