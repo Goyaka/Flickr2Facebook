@@ -41,7 +41,7 @@ addCheckHandlers =->
 @loadSetsToMigrate = loadSetsToMigrate = (api, template, source)->
     
     updateLoadingMessage =->
-        if sourcesToLoad.length == 0
+        if sourcesToLoad.length == 0    
             $('.loading-box').hide()
         else
             loadingtext = 'Loading your '  + sourcesToLoad.join(' and ' ) + ' albums'
@@ -69,8 +69,7 @@ addCheckHandlers =->
             
             sourcesToLoad.remove(source)
             updateLoadingMessage()
-            $('#sets').show()
-            
+            $('.import-sets-button').show()
             #add select all handler
             if $('#select_all')
                 $('#select_all').click ->
