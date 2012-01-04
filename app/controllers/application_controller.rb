@@ -23,6 +23,17 @@ class ApplicationController < ActionController::Base
       return @fb_user, @flickr_user, @google_user
     end
   end
+  
+  def get_fb_user
+    begin 
+      facebook_user = Mogli::User.find("me",Mogli::Client.new(session[:at])) if session[:at]
+    rescue Mogli::Client::HTTPException
+    end
+     if facebook_user
+        @fb_user = User.find_by_user(facebook_user.id)
+    end
+    return @fb_user
+  end
     
   public
   def index
@@ -33,19 +44,22 @@ class ApplicationController < ActionController::Base
   end
   
   def main
-    @fb_user, @flickr_user, @google_user = get_user_details
+    @fb_user = get_fb_user
     if not @fb_user
       redirect_to :action => 'facebook_login' and return
-    elsif not @flickr_user and not @google_user
-      redirect_to :action => 'services_login' and return
-    elsif @flickr_user or @google_user
-      redirect_to :action => 'migrate' and return
+    else
+      @fb_user, @flickr_user, @google_user = get_user_details
+      if not @flickr_user and not @google_user
+        redirect_to :action => 'services_login' and return
+      elsif @flickr_user or @google_user
+        redirect_to :action => 'migrate' and return
+      end
     end
   end
   
   def facebook_login
-    @fb_user, @flickr_user, @google_user = get_user_details
-
+    @fb_user = get_fb_user
+    
     @step1, @step2, @step3 = "active", "", ""
     @step = 1
   end
