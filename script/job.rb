@@ -224,13 +224,18 @@ class Job
       albumcount = (albuminfo['entry'].length + Job::MAX_FACEBOOK_PHOTO_COUNT) / Job::MAX_FACEBOOK_PHOTO_COUNT
       albumids = self.create_fb_albums(albumname, '', albumcount)
       
+      puts albuminfo['entry'].length.to_s + "photos in this album"
+      
       albuminfo['entry'].each_with_index do |pic, index|
         facebook_album = albumids[(index + 1)/Job::MAX_FACEBOOK_PHOTO_COUNT]
         pic['photo'] = pic['id'][1]
 
         puts "Adding picasa photo " + pic['id'][1] + " to facebook album http://facebook.com/" + facebook_album
+        photo_id = pic['id'][1]
+        pic['id'] = nil
         photometa = PhotoMeta.create(pic)
-        photo = Photo.new(:photo => pic['id'][1],
+        photometa.save
+        photo = Photo.new(:photo => photo_id,
                           :photoset_id => photoset,
                           :facebook_photo => '',
                           :facebook_album => facebook_album,
@@ -266,6 +271,7 @@ class Job
         facebook_album = albumids[(index + 1)/Job::MAX_FACEBOOK_PHOTO_COUNT]
         puts "Adding flickr photo " + pic['photo'].to_s + " to facebook album http://facebook.com/" + facebook_album
         photometa = PhotoMeta.create(pic)
+        photometa.save
         photo = Photo.new(:photo => pic['photo'],
                           :photoset_id => photoset,
                           :facebook_photo => '',

@@ -5,7 +5,7 @@ class Worker < ActiveRecord::Base
   
   MAX_JOB_LIMIT = 500
  
-  def self.upload_loop_batch(sort_criteria = 'ASC')
+  def self.upload_loop_batch
     config = YAML.load_file(Rails.root.join("config/beanstalk.yml"))[Rails.env]
     beanstalk = Beanstalk::Pool.new([config['host']])
     begin
@@ -100,7 +100,6 @@ class Worker < ActiveRecord::Base
         #Pick 100 photos from db and push to beanstalk
         photos = Photo.where("status = ?", Constants::PHOTO_NOTPROCESSED).limit(100)
         if photos.empty?
-          puts "No photos in db, waiting"
           sleep 10
         end
 
