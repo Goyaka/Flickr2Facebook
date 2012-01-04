@@ -16,7 +16,7 @@ class AuthController < ApplicationController
     # Facebook scope to define what all permission one needs
     facebook_scope = 'offline_access,publish_stream,user_photos,user_photo_video_tags,email'
     
-    redirect_to facebook_authenticator.authorize_url(:scope => facebook_scope)
+    redirect_to facebook_authenticator.authorize_url(:scope => facebook_scope) and return
   end
 
   def facebook_auth
@@ -24,7 +24,7 @@ class AuthController < ApplicationController
     redirect_to :action => 'facebook_authenticate' and return unless session[:at]
     
     # Alright he is authenticated, go straight to main page
-    redirect_to :controller => 'application', :action => 'main'
+    redirect_to :controller => 'application', :action => 'main' and return
   end
   
   def facebook_callback
@@ -55,7 +55,7 @@ class AuthController < ApplicationController
     user.fb_code = params['code']
     
     # Go back to main page
-    redirect_to :controller => 'application', :action => 'main'
+    redirect_to :controller => 'application', :action => 'main' and return
   end
   
   def flickr_auth
