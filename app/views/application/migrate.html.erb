@@ -2,12 +2,8 @@
 
 <div class="main">
     <%= render "steps" %>
-    
+    <div class="box">
     <% if @fb_user and (@flickr_user or @google_user) %>
-        <ul class="tabs navtab">
-          <li class="active first"><a href="/migrate">Move photos</a></li>
-          <li><a href="/status">Uploaded photos</a></li>
-        </ul>
         <div id="sets">
             <div class="sets-wrapper">
                 <div id="select_all_wrapper" class="pull-right span2"> <label for="select_all">Select all</label><input type="checkbox" id="select_all"></div>
@@ -21,7 +17,7 @@
                 </div>
                 <div class="import-sets-button hide">
                     <center class="push-down">
-                        <button class="btn large success"> Import Sets Now! </button>
+                        <button class="btn large success"> Migrate albums now! </button>
                     </center>
                 </div>
                  <div class="import-sets-placemark"></div>
@@ -29,6 +25,7 @@
             </div>
         </div>
     <% end %>
+    </div>
 </div>
 
 
@@ -45,7 +42,7 @@
             </div>
             <div style="clear:both;"></div>
         </label>    
-        <div class="thumb-title">
+        <div class="thumb-title push-down">
             <input type="checkbox" onclick="_gaq.push(['_trackEvent', 'Select_Sets', '#{set.id}']);" name="flickr_set[]" value="${set.id}" id="${set.id}">
             ${set.title} 
             <a target="_blank" href="http://flickr.com/photos/<%= @fb_user.flickr_user_nsid %>/sets/${set.id}">
@@ -68,7 +65,7 @@
                 <div style="clear:both;"></div>
             </div>
         </label>
-        <div class="thumb-title">
+        <div class="thumb-title push-down">
             <input type="checkbox" onclick="_gaq.push(['_trackEvent', 'Select Picasa Album']);" name="picasa_album[]" value="${album['id'][1]}" id="${album['id'][1]}">
             ${album['title'][0]['content']} 
             <a target="_blank" href="${album['link'][1]['href']}">

@@ -151,6 +151,17 @@ small {
             margin-top: 11px;
         }
     }
+    
+    .box {
+        padding: 30px 0px;
+        border-bottom-right-radius: 10px;
+        border-bottom-left-radius: 10px;
+        border-left: 1px dotted #CCC; 
+        border-right: 1px dotted #CCC; 
+        border-bottom: 1px dotted #CCC; 
+        background: #ffffff;
+        
+    }
 }
 
 ul {
@@ -285,9 +296,8 @@ footer {
 
 
 #steps.tabs { 
-
+    margin: 0px;
     border-bottom: 1px dotted #CCC;
-    border-top: 1px dotted #CCC;
 
     var {
         display: block;
@@ -304,7 +314,7 @@ footer {
         -webkit-border-radius: 10px;
         -moz-border-radius: 10px;
         border-radius: 10px;
-        padding:10px;
+        padding: 10px;
         -webkit-box-shadow: rgba(0,0,0,.15) 0 1px 2px;
         -moz-box-shadow: rgba(0,0,0,.15) 0 1px 2px;
         -o-box-shadow: rgba(0,0,0,.15) 0 1px 2px;
@@ -312,30 +322,28 @@ footer {
     }
 
     li {
-        width: 30%;
+        width: 320px;
         vertical-align: middle;
         border: 0 none;
-        padding: 10px;
+        padding: 0px;
+        
+        a {
+            padding: 10px 5px;
+            padding-left: 25px;
+            margin: 0px;
+        }
+        
         b {
-            color: #999999;
-            padding: 10px 60px;
+            color: #666666;
+            padding: 10px;
             display: block;
         }    
     }
 
     li.active {
-        background: #DDF4FB;
-        border-color: #C6EDF9;
         b {
             color: #404040;
             font-size: 1.1em;
-        }
-    }
-
-    li.done {
-        b {
-            color: #cccccc;
-            font-size: 0.9em;
         }
     }
 

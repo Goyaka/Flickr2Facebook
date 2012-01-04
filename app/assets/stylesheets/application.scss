@@ -9,12 +9,15 @@
  *= require_self
 */
 
+.row {
+    margin-left: 0px;
+}
+
 #sets {
     min-height: 400px;
     text-align: center;
     margin: 0 auto;
     font-size: 15px;
-    background-color:#fff;
     border-radius:5px;
     padding-bottom:10px;
     
@@ -81,7 +84,7 @@
             border: 2px solid transparent;
             background: transparent;
             min-height: 75px;
-            margin: 10px 0px;
+            margin: 15px 0px;
             
             .count {
                 float: left;
@@ -157,5 +160,6 @@
     
     .set.fixedheight label {
         height:95px;
+        margin-bottom: 10px;
     }
 }
