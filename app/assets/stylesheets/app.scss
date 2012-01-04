@@ -284,52 +284,71 @@ footer {
 }
 
 
-.pgStyle1{ 
+#steps.tabs { 
 
-border-bottom: 1px dotted #CCC;
-border-top: 1px dotted #CCC;
+    border-bottom: 1px dotted #CCC;
+    border-top: 1px dotted #CCC;
 
-td {
-    border: 0 none;
-}
+    var {
+        display: block;
+        float: left;
+        background-color:#fff;
+        border: 1px solid #CCC;
+        color: black;
+        width: 20px;
+        height: 20px;
+        line-height: 19px;
+        text-align: center;
+        font-size: 85%;
+        font-style: normal;
+        -webkit-border-radius: 10px;
+        -moz-border-radius: 10px;
+        border-radius: 10px;
+        padding:10px;
+        -webkit-box-shadow: rgba(0,0,0,.15) 0 1px 2px;
+        -moz-box-shadow: rgba(0,0,0,.15) 0 1px 2px;
+        -o-box-shadow: rgba(0,0,0,.15) 0 1px 2px;
+        box-shadow: rgba(0,0,0,.15) 0 1px 2px;
+    }
 
-var {
-    display: block;
-    float: left;
-    background-color:#fff;
-    border: 1px solid #CCC;
-    color: black;
-    width: 20px;
-    height: 20px;
-    line-height: 19px;
-    text-align: center;
-    font-size: 85%;
-    font-style: normal;
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
-    border-radius: 10px;
-    padding:10px;
-    -webkit-box-shadow: rgba(0,0,0,.15) 0 1px 2px;
-    -moz-box-shadow: rgba(0,0,0,.15) 0 1px 2px;
-    -o-box-shadow: rgba(0,0,0,.15) 0 1px 2px;
-    box-shadow: rgba(0,0,0,.15) 0 1px 2px;
-}
-  
-td.t {
-    vertical-align:middle;
-}
+    li {
+        width: 30%;
+        vertical-align: middle;
+        border: 0 none;
+        padding: 10px;
+        b {
+            color: #999999;
+            padding: 10px 60px;
+            display: block;
+        }    
+    }
 
-.selected var {
-    background: #FFF7C0;
-    color: black;
-    border: 1px solid #E6DEAD;
-    font-weight: bold;
-}
+    li.active {
+        background: #DDF4FB;
+        border-color: #C6EDF9;
+        b {
+            color: #404040;
+            font-size: 1.1em;
+        }
+    }
 
-.done var {
-background: #CCC;
-}
+    li.done {
+        b {
+            color: #cccccc;
+            font-size: 0.9em;
+        }
+    }
 
+    .active var {
+        background: #FFF7C0;
+        color: black;
+        border: 1px solid #E6DEAD;
+        font-weight: bold;
+    }
+
+    .done var {
+        background: #CCC;
+    }
 }
 
 .like-button {

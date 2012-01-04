@@ -10,6 +10,7 @@
 */
 
 #sets {
+    min-height: 400px;
     text-align: center;
     margin: 0 auto;
     font-size: 15px;
@@ -80,6 +81,7 @@
             border: 2px solid transparent;
             background: transparent;
             min-height: 75px;
+            margin: 10px 0px;
             
             .count {
                 float: left;
