@@ -1,6 +1,7 @@
-@fb_user<% content_for :content do %>
+<% content_for :content do %>
 
 <div class="main">
+    <%= render "steps" %>
     <% if @fb_user and @flickr_user %>
         <ul class="tabs navtab">
           <li class="first"><a href="/migrate">Move photos</a></li>
@@ -14,8 +15,8 @@
                 <a data-controls-modal="modal-share-friends" data-backdrop="true" data-keyboard="true" class="btn small" href="#" id="share-with-friends">See how</a></div>
             <div id="queue">
                 <div>
-                        <div class="sets">
-                        </div>
+                    <div class="sets">
+                    </div>
                 </div>
             </div>
         </div>
