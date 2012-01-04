@@ -3,15 +3,12 @@ class ApplicationController < ActionController::Base
   
   protected 
   def get_user_details
-    puts session[:at]
     begin 
       facebook_user = Mogli::User.find("me",Mogli::Client.new(session[:at])) if session[:at]
     rescue Mogli::Client::HTTPException
       session[:at] = nil
       redirect_to :controller => 'auth', :action => 'facebook_auth' and return
     end
-
-    puts facebook_user.inspect
     
     if facebook_user
       @fb_user = User.find_by_user(facebook_user.id)
@@ -37,33 +34,49 @@ class ApplicationController < ActionController::Base
   
   def main
     @fb_user, @flickr_user, @google_user = get_user_details
-    if @fb_user and (@flickr_user or @google_user) 
-      redirect_to :action => 'migrate' and return
-    end
-    
     if not @fb_user
-      @step1, @step2, @step3 = "selected", "", ""
-      @step = 1
-    elsif @fb_user and not (@flickr_user or @google_user)
-      @step1, @step2, @step3 = "done", "selected", ""
-      @step = 2
-    else
-      @step = 3 
-      @step1, @step2, @step3 = "done", "done", ""
+      redirect_to :action => 'facebook_login' and return
+    elsif not @flickr_user and not @google_user
+      redirect_to :action => 'services_login' and return
+    elsif @flickr_user or @google_user
+      redirect_to :action => 'migrate' and return
     end
   end
   
-  def migrate
+  def facebook_login
     @fb_user, @flickr_user, @google_user = get_user_details
-    @client = Mogli::Client.new(session[:at])
-    
-    if not @flickr_user and not @fb_user
-      redirect_to :action => 'main' and return
+
+    @step1, @step2, @step3 = "active", "", ""
+    @step = 1
+  end
+  
+  def services_login
+    @fb_user, @flickr_user, @picasa_user = get_user_details
+    if not @fb_user
+      redirect_to :action => 'facebook_login' and return
     end
+
+    @step1, @step2, @step3 = "done", "active", ""
+    @step = 2
+  end
+  
+  def migrate
+    @fb_user, @flickr_user, @picasa_user = get_user_details
+    if not @flickr_user and not @fb_user
+      redirect_to :action => 'services_login' and return
+    end
+    
+    @step1, @step2, @step3 = "done", "done", "active"
+    @step = 3 
+
+    @client = Mogli::Client.new(session[:at])
   end
 
   def status
-    @fb_user, @flickr_user, @google_user = get_user_details
+    @fb_user, @flickr_user, @picasa_user = get_user_details
+    
+    @step1, @step2, @step3 = "done", "done", "active"
+    @step = 3 
   end
   
   def upload_status
