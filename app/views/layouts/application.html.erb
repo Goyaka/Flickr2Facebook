@@ -29,14 +29,14 @@
 <body>
     <header>
         <div class="header-wrap">            
-            <% if @user and @fb_user%>
+            <% if @fb_user%>
             <ul class="nav secondary-nav menu-buttons">
                 <li class="dropdown" data-dropdown="dropdown">
-                    Logged in as <a style="display:inline-block" href="#" class="dropdown-toggle"><%= @fb_user.fb_first_name %> <%= @fb_user.fb_last_name %></a>
+                    <a style="display:inline-block" href="#" class="dropdown-toggle"><%= @fb_user.fb_first_name %> <%= @fb_user.fb_last_name %></a>
                     <ul class="dropdown-menu" id="lilo-dropdown">
                         <% if @flickr_user  %>
                         <li> <div class="info">Linked accounts:<br>
-                            <a class="flickr-account" href="http://flickr.com/<%= @user.flickr_user_nsid %>" target="_blank"> <%= @flickr_user %></a>  </div></li>
+                            <a class="flickr-account" href="http://flickr.com/<%= @fb_user.flickr_user_nsid %>" target="_blank"> <%= @flickr_user %></a>  </div></li>
                         <% end %>
                         <li><a href="/logout">Logout</a></li>
                     </ul>
