@@ -1,12 +1,15 @@
 <% content_for :content do %>
 
 <div class="main">
-    <%= render "steps" %>
-    <% if @fb_user and @flickr_user %>
-        <ul class="tabs navtab">
-          <li class="first"><a href="/migrate">Move photos</a></li>
-          <li class="active"><a href="/status">Uploaded photos</a></li>
-        </ul>
+    <div class="alert-message" style="margin-bottom: 0px;">
+            <div class="share">
+                If you liked this service, let your friends know!
+                <a name="fb_share" share_url="http://export.goyaka.com">Share with Friends!</a> 
+                <script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share" type="text/javascript"></script>
+            </div>
+    </div>
+    <div class="box">
+        <% if @fb_user and @flickr_user %>
         <div id="sets" class="row">
             <div class="pull-right">
             <a href="/status" class="btn small"> <img src="/assets/refresh.png" style="vertical-align: middle;"> Refresh</a>
@@ -20,16 +23,8 @@
                 </div>
             </div>
         </div>
-        <div class="alert-message">
-                <div class="share">
-                    If you liked this service, let your friends know!
-                    <a name="fb_share" share_url="http://export.goyaka.com">Share with Friends!</a> 
-                    <script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share" type="text/javascript">
-                    </script>
-                </div>
-        </div>
-    <% else %>
-    <% end %>
+        <% end %>
+    </div>
 </div>
 
 <% if @fb_user %>
