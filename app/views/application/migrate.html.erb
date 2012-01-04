@@ -1,5 +1,8 @@
 <% content_for :content do %>
+
 <div class="main">
+    <%= render "steps" %>
+    
     <% if @fb_user and (@flickr_user or @google_user) %>
         <ul class="tabs navtab">
           <li class="active first"><a href="/migrate">Move photos</a></li>
@@ -16,9 +19,11 @@
                         <center><img src= "assets/loading.gif"><div class="loading-message"></div></center>
                     </div>
                 </div>
-                <center class="import-sets-button" class="push-down">
-                     <button class="btn large success"> Import Sets Now! </button>
-                 </center>
+                <div class="import-sets-button hide">
+                    <center class="push-down">
+                        <button class="btn large success"> Import Sets Now! </button>
+                    </center>
+                </div>
                  <div class="import-sets-placemark"></div>
                  </form>
             </div>
