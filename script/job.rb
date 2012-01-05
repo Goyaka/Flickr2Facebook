@@ -239,7 +239,11 @@ class Job
         if not fb_photo_ids[index]
           error = Error.create({'type' => 'PHOTO_UPLOAD_FAILED',
                                 'data' => {"response" => response,
-                                           "payload" => payload}})
+                                           "payload" => payload,
+                                           "fb_photo_ids" => fb_photo_ids,
+                                           "index" => index
+                                           },
+                                })
           error.save
           photo.status = Constants::PHOTO_FAILED
           
