@@ -6,7 +6,7 @@ class PicasaController < ApplicationController
     album_entries = user.get_all_picasa_albums
     
     existing_albums = Photoset.select('photoset').where('user_id = ? and source = ?',
-      @user, Constants::SOURCE_PICASA).map {|set| set.photoset}.compact
+      user, Constants::SOURCE_PICASA).map {|set| set.photoset}.compact
     
     albums_to_return = []
     
