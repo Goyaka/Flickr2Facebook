@@ -12,7 +12,7 @@ FlickRaw.shared_secret = FlickrConfig[:API_SECRET]
 
 class Job
   
-  MAX_FACEBOOK_PHOTO_COUNT = 200
+  MAX_FACEBOOK_PHOTO_COUNT = 500
   
   def initialize(fb_access_token, flickr_access_token, flickr_access_secret, initialize_flickr = false)
     @fb_access_token = fb_access_token
@@ -119,11 +119,14 @@ class Job
             albumids   = self.create_multiple_fb_albums(albumname, albumdesc, albumcount, user[:fb_session])
 
             photo_ids  = Photo.select('id').where('photoset_id = ?', photoset)
-            index = 0
-            photo_batch_ids  = photo_ids.shift(Job::MAX_FACEBOOK_PHOTO_COUNT)
 
+            photo_batch_ids  = photo_ids.shift(Job::MAX_FACEBOOK_PHOTO_COUNT)
+            
+            index = 0
             while photo_batch_ids.length > 0
-              album_name       = albumids[(index + 1)/Job::MAX_FACEBOOK_PHOTO_COUNT]
+              puts albumids.inspect
+              puts index.inspect
+              album_name       = albumids[index]
               puts "Updating #{photo_batch_ids.length} photos queued for fb album #{album_name}"
               Photo.where("id IN (?)", photo_batch_ids).update_all("facebook_album = #{album_name}")
               index = index+1
@@ -174,9 +177,7 @@ class Job
           error = Error.create({'type' => 'FACEBOOK_ALBUM_NOT_FILLED',
                                 'data' => {
                                            "photo_id" => job[:photo][:id],
-                                           "jobs" => jobs.to_a,
-                                           "photo_ids" => jobs.collect { |job| job[:photo].photo }.compact }
-                                })
+                                           "jobs" => jobs.to_a }})
           error.save
           return {}
         end
