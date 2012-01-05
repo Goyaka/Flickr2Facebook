@@ -224,7 +224,7 @@ class Job
         photo = Photo.find_by_photo(photo_ids[response_id].to_s)
         if body.has_key?('id')
           photo.status = Constants::PHOTO_PROCESSED
-          photo.facebook_photo = "http://www.facebook.com/#{fb_photo_ids[index]}"
+          photo.facebook_photo = "http://www.facebook.com/#{body['id']}"
           photo.save
           puts "Uploaded http://facebook.com/" + body['id'].to_s
         else
@@ -233,7 +233,6 @@ class Job
             'data' => {
               'response' => response,
               'payload' => payload,
-              'fb_photo_ids' => fb_photo_ids,
               'failed_id' => photo.id,
               'index' => response_id
             }
