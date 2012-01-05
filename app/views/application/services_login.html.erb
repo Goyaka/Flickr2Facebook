@@ -7,6 +7,7 @@
         
             <div class="span3 flickr-login">
                  <div> <img src = "/assets/flickr.png"> </div>
+                 <div class="push-down">
                  <% if not @flickr_user %>
                  <a href="/flickr-auth" class="btn" onclick="_gaq.push(['_trackEvent', 'Auth', 'Flickr', 'start']);"> 
                      Authenticate 
@@ -14,6 +15,7 @@
                  <% else %>
                  Logged in as <br> <a href="http://www.flickr.com/"> <%= @flickr_user %> </a>
                  <% end %>
+                 </div>
                  &nbsp;
              </div>
          
@@ -26,13 +28,17 @@
              <div class="span3 picasa-login">
                  <div><img src = "/assets/picasa.png"> </div>
                  <% if not @picasa_user %>
+                 <!-- 
                  <a href="/google-auth" onclick="_gaq.push(['_trackEvent', 'Auth', 'Picasa', 'start']);" style="color: #FE63BB; font-size: 22px"> 
+
                      <table>
                          <tr>
                              <td class="bbl"></td><td class="bbm">Authenticate</td><td class="bbr"></td>
                          </tr>
                      </table> 
                  </a> 
+                 -->
+                 <div class="label success"> Coming Soon! </div> 
                  <% else %>
                     Logged in as <br> <a href="http://picasaweb.google.com/"> <%= @picasa_user %> </a>
                  <% end %>
