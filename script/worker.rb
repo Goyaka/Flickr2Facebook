@@ -27,7 +27,7 @@ class Worker < ActiveRecord::Base
         
         puts "Uploading  " + photo_ids.inspect
         
-        photos = Photo.where("id IN (?)", photo_ids)
+        photos = Photo.where("id IN (?) and status=?", photo_ids, Constants::PHOTO_PROCESSING)
         
         if photos.nil? or photos.empty?
           sleep 3
@@ -115,11 +115,7 @@ class Worker < ActiveRecord::Base
         photo_id_batches.each do |photo_batch|
           #Change status of each photo to processing.
         puts "Pushing #{photo_batch.inspect} to beanstalk"
-        photo_batch.each do |photo|
-          photo_object = Photo.find(photo)
-          photo_object.status = Constants::PHOTO_PROCESSING
-          photo_object.save
-        end
+        Photo.where('id IN (?)', photo_batch).update_all("status = #{Constants::PHOTO_PROCESSING}")
         beanstalk.put(photo_batch.to_json)
         end
       end
