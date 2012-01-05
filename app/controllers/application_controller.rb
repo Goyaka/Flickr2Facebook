@@ -21,7 +21,7 @@ class ApplicationController < ActionController::Base
       @google_user = @fb_user.google_name
       
       return @fb_user, @flickr_user, @google_user
-    end
+    end    
   end
   
   def get_fb_user
@@ -39,10 +39,7 @@ class ApplicationController < ActionController::Base
   def index
      @photo_count = Rails.cache.read('photo_count').to_s
   end
-  
-  def login
-  end
-  
+    
   def main
     @fb_user = get_fb_user
     if not @fb_user
@@ -65,13 +62,14 @@ class ApplicationController < ActionController::Base
   end
   
   def services_login
-    @fb_user, @flickr_user, @picasa_user = get_user_details
+    @fb_user = get_fb_user
     if not @fb_user
       redirect_to :action => 'facebook_login' and return
     end
-
+    
     @step1, @step2, @step3 = "done", "active", ""
     @step = 2
+
   end
   
   def migrate
@@ -88,9 +86,6 @@ class ApplicationController < ActionController::Base
 
   def status
     @fb_user, @flickr_user, @picasa_user = get_user_details
-    
-    @step1, @step2, @step3 = "done", "done", "active"
-    @step = 3 
   end
   
   def upload_status
