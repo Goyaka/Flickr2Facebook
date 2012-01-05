@@ -114,7 +114,9 @@ class ApplicationController < ActionController::Base
       #Remap them by our photoset primary key
       sets_tracked_flickr = {}
       sets_tracked_array.each do |set|
-        sets_tracked_flickr[set.id] = set
+        if flickr_sets.include? set.photoset
+          sets_tracked_flickr[set.id] = set
+        end
       end
     
       sets_progress  = Photo.select('count(status) as count, status, photoset_id').where('photoset_id IN (?)', sets_tracked_array).group('photoset_id, status')
@@ -131,6 +133,7 @@ class ApplicationController < ActionController::Base
       sets_tracked_flickr.each do |id,set|
         
         sets_tracked_flickr[id]['done']  ||= 0
+
         sets_tracked_flickr[id]['total'] ||= flickr_sets[set.photoset]['photos']
         
         if sets_tracked_flickr[id]['total'] == 0
@@ -138,8 +141,9 @@ class ApplicationController < ActionController::Base
         else
           sets_tracked_flickr[id]['percent'] = sets_tracked_flickr[id]['done'].to_f * 100 / sets_tracked_flickr[id]['total'].to_f 
         end
-        
+
         sets_tracked_flickr[id]['flickr_data'] = flickr_sets[set.photoset]
+
       end
     end
     
