@@ -5,6 +5,7 @@ module Constants
 
   PHOTO_NOTPROCESSED = 0
   PHOTO_PROCESSING   = 1
+  PHOTO_UPLOADING    = 11
   PHOTO_PROCESSED    = 2
   PHOTO_FAILED       = 42
 
