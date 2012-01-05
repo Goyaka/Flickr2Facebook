@@ -68,7 +68,7 @@ class ApplicationController < ActionController::Base
   end
   
   def services_login
-    @fb_user = get_fb_user
+    @fb_user, @flickr_user, @picasa_user = get_user_details
     if not @fb_user
       redirect_to :action => 'facebook_login' and return
     end
