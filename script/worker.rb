@@ -5,6 +5,36 @@ class Worker < ActiveRecord::Base
   
   MAX_JOB_LIMIT = 500
  
+ 
+  def self.create_fb_albums
+    config        = YAML.load_file(Rails.root.join("config/beanstalk.yml"))[Rails.env]
+    beanstalk     = Beanstalk::Pool.new([config['host']])
+    beanstalk.watch "fbalbums"
+    beanstalk.ignore "default"
+    job           = Job.new("","","", false)
+    
+    begin
+      while true
+          if File.exists?('/tmp/PAUSE_FBALBUM')
+            puts "Pause upload file is present. Pausing..."
+            sleep 30
+            next
+          elsif File.exists?('/tmp/STOP_FBALBUM')
+            puts "Stop upload file is present. Exiting..."
+            break
+          end
+          beanstalk_job = beanstalk.reserve
+          set_id        = (beanstalk_job.body).to_i
+          job.create_albums_for_photoset(set_id)      
+          beanstalk_job.delete
+      end
+    rescue Exception => e
+      puts "Exception reached => " + e
+      puts e.backtrace
+    end    
+  end
+  
+  
   def self.upload_loop_batch
     config = YAML.load_file(Rails.root.join("config/beanstalk.yml"))[Rails.env]
     beanstalk = Beanstalk::Pool.new([config['host']])

@@ -96,63 +96,51 @@ class Job
   end
   
   def create_albums_for_photoset(set_id)
-      puts "Creating facebook albums"
-      lock_key = "LOCK-PHOTOSET-#{set_id}"
-      
-      while true
-        if Rails.cache.read(lock_key).nil?
-          
-          fb_albums = Photo.select('distinct(facebook_album) as facebook_album').where('photoset_id = ?', set_id).collect {|photo| photo[:facebook_album]}
-                      
-          if fb_albums.length > 1
-            puts "Albums already created"
-            break #Albums have been created.
-          elsif fb_albums.length == 1 and (fb_albums.include? nil or fb_albums.include? "")
-            puts "Creating albums for set #{set_id}, fetching album info"
-            #No albums created.
-            #No one has locked it, lock it.
-            Rails.cache.write(lock_key, 'lock')
-            photoset   = Photoset.find(set_id)
-            user       = User.find(photoset[:user_id])
-            albumname, albumdesc, photocount = photoset.get_album_info 
-            albumcount = (photocount + Job::MAX_FACEBOOK_PHOTO_COUNT) / Job::MAX_FACEBOOK_PHOTO_COUNT
-            albumids   = self.create_multiple_fb_albums(albumname, albumdesc, albumcount, user[:fb_session], photoset[:private])
-
-            photo_ids  = Photo.select('id').where('photoset_id = ?', photoset)
-
-            photo_batch_ids  = photo_ids.shift(Job::MAX_FACEBOOK_PHOTO_COUNT)
-            
-            index = 0
-            while photo_batch_ids.length > 0
-              puts albumids.inspect
-              puts index.inspect
-              album_name       = albumids[index]
-              puts "Updating #{photo_batch_ids.length} photos queued for fb album #{album_name}"
-              Photo.where("id IN (?)", photo_batch_ids).update_all("facebook_album = #{album_name}")
-              index = index+1
-              photo_batch_ids  = photo_ids.shift(Job::MAX_FACEBOOK_PHOTO_COUNT)
-            end
-
-            Rails.cache.delete(lock_key)
-            break
-          else
-            puts "..already created. Albums = #{fb_albums.inspect}"
-            break
-          end 
-          
-        else
-          puts "Waiting for lock to free #{lock_key} " + Rails.cache.read(lock_key)
-        end
-      end
-  end
+    #This function should be called only once per set.
+    puts "Creating facebook albums for set " + set_id.to_s
+    fb_albums = Photo.select('distinct(facebook_album) as facebook_album').where('photoset_id = ?', set_id).collect {|photo| photo[:facebook_album]}
+                
+    if fb_albums.length > 1
+      puts "Albums already created"
+      return #Albums have been created.
+    elsif fb_albums.length == 1 and (fb_albums.include? nil or fb_albums.include? "")
+      puts "Creating albums for set #{set_id}, fetching album info"
+      #No albums created.
+      #No one has locked it, lock it.
+      photoset   = Photoset.find(set_id)
+      user       = User.find(photoset[:user_id])
+      albumname, albumdesc, photocount = photoset.get_album_info 
+      albumcount = (photocount + Job::MAX_FACEBOOK_PHOTO_COUNT) / Job::MAX_FACEBOOK_PHOTO_COUNT
+      albumids   = self.create_multiple_fb_albums(albumname, albumdesc, albumcount, user[:fb_session], photoset[:private])
+      puts "Created albums  #{albumids.join(',')})"
+       
+      photo_ids  = Photo.select('id').where('photoset_id = ?', photoset)
     
+      photo_batch_ids  = photo_ids.shift(Job::MAX_FACEBOOK_PHOTO_COUNT)
+      
+      index = 0
+      while photo_batch_ids.length > 0
+        album_name       = albumids[index]
+        puts "Updating #{photo_batch_ids.length} photos queued for fb album #{album_name}"
+        Photo.where("id IN (?)", photo_batch_ids).update_all("facebook_album = #{album_name}")
+        index = index+1
+        photo_batch_ids  = photo_ids.shift(Job::MAX_FACEBOOK_PHOTO_COUNT)
+      end
+      return
+    else
+      puts "..already created. Albums = #{fb_albums.join(',')}"
+      return
+    end
+  end
+  
   def prepare_payload(jobs)
     payload = {}
     batch   = [] 
     access_token = ''
     remove_files = []
     
-    
+    config        = YAML.load_file(Rails.root.join("config/beanstalk.yml"))[Rails.env]
+    beanstalk     = Beanstalk::Pool.new([config['host']])
     jobs.each_with_index do |job, index|
       # get flickr photo id
       photo_id = job[:photo].photo
@@ -165,26 +153,25 @@ class Job
       end
       
       #check if facebook album is created. If not, create it
-      facebook_album = job[:photo][:facebook_album]
+      photo          = Photo.find(job[:photo][:id])
+      facebook_album = photo[:facebook_album]
+      set_id         = job[:photo][:photoset_id]
+
       if facebook_album.nil? or facebook_album.empty?
-        create_albums_for_photoset(job[:photo][:photoset_id])
-        
-        #Albums have been filled up, find the album again from db.
-        photo = Photo.find(job[:photo][:id])
-        facebook_album = photo[:facebook_album]
-        if facebook_album.nil?
-          puts "Facebook album still not filled"
-          error = Error.create({'type' => 'FACEBOOK_ALBUM_NOT_FILLED',
-                                'data' => {
-                                           "photo_id" => job[:photo][:id],
-                                           "jobs" => jobs.to_a }})
-          error.save
-          return {}
+        beanstalk.use "fbalbums"
+        beanstalk.put set_id
+        #Add to queue. set_id
+        while true
+          puts "Waiting for albums to be created for #{set_id} (Photo : #{job[:photo][:id]})"
+          sleep 10
+          photo = Photo.find(job[:photo][:id])
+          facebook_album = photo[:facebook_album]
+          if not facebook_album.nil?
+            break
+          end
         end
       end
-      
-  
-      
+          
       access_token = job[:user].fb_session
 
       batch_data = {
