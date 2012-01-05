@@ -129,8 +129,8 @@ class Worker < ActiveRecord::Base
   end
   
   def self.photo_count_cron
-    photo_count = Photo.where("status = ?", Constants::PHOTO_PROCESSED).length
-    Rails.cache.write('photo_count', photo_count)
+    photo_count = Photo.select('count(*) as count').where('status = ?', Constants::PHOTO_PROCESSED).first
+    Rails.cache.write('photo_count', photo_count[:count])
   end
  
 end
