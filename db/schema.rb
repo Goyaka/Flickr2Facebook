@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120102113810) do
+ActiveRecord::Schema.define(:version => 20120105105607) do
 
   create_table "photos", :force => true do |t|
     t.string   "photo"
@@ -34,6 +34,7 @@ ActiveRecord::Schema.define(:version => 20120102113810) do
     t.datetime "updated_at"
     t.integer  "photos_count"
     t.string   "source",       :default => "F"
+    t.boolean  "private",      :default => true
   end
 
   add_index "photosets", ["status"], :name => "index_photosets_on_status"

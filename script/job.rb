@@ -116,7 +116,7 @@ class Job
             user       = User.find(photoset[:user_id])
             albumname, albumdesc, photocount = photoset.get_album_info 
             albumcount = (photocount + Job::MAX_FACEBOOK_PHOTO_COUNT) / Job::MAX_FACEBOOK_PHOTO_COUNT
-            albumids   = self.create_multiple_fb_albums(albumname, albumdesc, albumcount, user[:fb_session])
+            albumids   = self.create_multiple_fb_albums(albumname, albumdesc, albumcount, user[:fb_session], photoset[:private])
 
             photo_ids  = Photo.select('id').where('photoset_id = ?', photoset)
 
@@ -261,25 +261,32 @@ class Job
     end
   end
   
-  def create_album(albumname, description, access_token)
+  def create_album(albumname, description, access_token, privacy)
      url = "https://graph.facebook.com/me/albums?access_token=#{access_token}"
      response = RestClient.post(url, {
                                 :name => albumname,
                                 :message => description,
-                                :privacy => '{"value":"SELF"}'})
+                                :privacy => privacy
+                                })
      return (JSON.parse response.to_s)['id']
   end
   
-  def create_multiple_fb_albums(albumname, description, albumcount, access_token)
+  def create_multiple_fb_albums(albumname, description, albumcount, access_token, privacy)
+    if privacy 
+      privacry_string = '{"value":"SELF"}'
+    else
+      privacry_string = '{"value":"EVERYONE"}'
+    end
+    
     albumids = []
     if albumcount == 1
-      albumids.push(self.create_album(albumname, description, access_token))
+      albumids.push(self.create_album(albumname, description, access_token, privacry_string))
     else
       for albumindex in 1..albumcount do 
         begin
           albumname_with_index = albumname + " (#{albumindex.to_s}) " 
           puts "Creating album " + albumname_with_index
-          albumids.push(self.create_album(albumname_with_index, description, access_token))
+          albumids.push(self.create_album(albumname_with_index, description, access_token, privacry_string))
         rescue Exception => error
           puts "Erroring + " + error.to_s
         end

@@ -206,18 +206,21 @@ class ApplicationController < ActionController::Base
     @user = @fb_user
     
     if params["flickr_set"].nil? and params["picasa_album"].nil?
-      redirect_to :controller => 'application', :action => 'main'
-      return
+      redirect_to :controller => 'application', :action => 'main' and return
     end
     
     response = {}
+    album_privacy = true
+    if params['enable_public_viewing'] == "on"
+      album_privacy = false
+    end
 
     if @user
       if not params["flickr_set"].nil?
         params["flickr_set"].each do |set| 
           photoset = Photoset.where(:user_id => @user.id, :photoset => set)
           if photoset.empty?
-            photoset = Photoset.new(:user_id => @user.id, :photoset => set, :status => Constants::PHOTOSET_NOTPROCESSED, :source => Constants::SOURCE_FLICKR)
+            photoset = Photoset.new(:user_id => @user.id, :photoset => set, :status => Constants::PHOTOSET_NOTPROCESSED, :source => Constants::SOURCE_FLICKR, :private => album_privacy)
             photoset.save!
           end
         end
@@ -227,7 +230,7 @@ class ApplicationController < ActionController::Base
         params["picasa_album"].each do |album|
           photoset = Photoset.where(:user_id => @user.id, :photoset => album)
           if photoset.empty?
-            photoset = Photoset.new(:user_id => @user.id, :photoset => album, :status => Constants::PHOTOSET_NOTPROCESSED, :source => Constants::SOURCE_PICASA)
+            photoset = Photoset.new(:user_id => @user.id, :photoset => album, :status => Constants::PHOTOSET_NOTPROCESSED, :source => Constants::SOURCE_PICASA, :private => album_privacy)
             photoset.save!
           end
         end
