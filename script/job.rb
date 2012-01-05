@@ -27,18 +27,6 @@ class Job
     end        
   end
   
-  def download(source, destination)
-    uri  = URI.parse(source)
-    host = uri.host
-    path = uri.path
-    Net::HTTP.start(host) do |http|
-        resp = http.get(path)
-        open(destination, "wb") do |file|
-            file.write(resp.body)
-        end
-    end
-  end
-
   def get_photo_meta(photo_id, source)
     photo = {}
     
@@ -69,6 +57,8 @@ class Job
       photo[:photo_source] = info['content']['src']
       photo[:message] = info['summary'][0]['content']
       photo[:date] = info['timestamp'][0].to_i/1000
+      
+      
     end
       
     return photo
@@ -152,15 +142,7 @@ class Job
         end
       end
   end
-  
-  def download_photo(photometa, service_photo_id)
-    puts "Downloading photo " + service_photo_id.to_s
-    filename =  service_photo_id.to_s #   (Time.now.to_f*1000).to_i.to_s + "#{service_photo_id}.jpg"
-    filepath = '/tmp/' + filename
-    download(photometa[:photo_source], filepath)
-    return filename
-  end
-  
+    
   def prepare_payload(jobs)
     payload = {}
     batch   = [] 
@@ -200,11 +182,7 @@ class Job
         end
       end
       
-      filename = download_photo(photometa, job[:photo][:photo])
-      filepath = '/tmp/' + filename
-      remove_files.push(filepath)
   
-      payload[filename] = File.open(filepath)
       
       access_token = job[:user].fb_session
 
@@ -212,8 +190,7 @@ class Job
         "method" => "POST",
         "relative_url" => "#{facebook_album}/photos",
         "access_token" => job[:user].fb_session,
-        "body" => "message=#{photometa[:message]}&backdated_time=#{photometa[:date]}",
-        "attached_files" => filename
+        "body" => "message=#{photometa[:message]}&url=#{photometa[:photo_source]}&backdated_time=#{photometa[:date]}"
       }
       batch.push(batch_data)            
     end
