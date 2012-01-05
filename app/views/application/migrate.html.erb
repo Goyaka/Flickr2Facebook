@@ -1,7 +1,9 @@
 <% content_for :content do %>
 
 <div class="main">
+    <% if @show_flow %>
     <%= render "steps" %>
+    <% end %>
     <div class="box">
     <% if @fb_user and (@flickr_user or @google_user) %>
         <div id="sets">

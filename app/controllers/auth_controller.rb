@@ -21,7 +21,9 @@ class AuthController < ApplicationController
 
   def facebook_auth
     # if session is null, then user has not authenticated.
-    redirect_to :action => 'facebook_authenticate' and return unless session[:at]
+    if not session[:at]
+      redirect_to :action => 'facebook_authenticate' and return
+    end
     
     # Alright he is authenticated, go straight to main page
     redirect_to :controller => 'application', :action => 'main' and return
@@ -62,7 +64,9 @@ class AuthController < ApplicationController
     # We recognize our users by facebook authentication.
     fb_user = Mogli::User.find("me",Mogli::Client.new(session[:at]))
     user = User.where(:user => fb_user.id)[0]
-    redirect_to :action => 'facebook_authenticate' and return unless user
+    if not user
+      redirect_to :action => 'facebook_authenticate' and return 
+    end
 
     # Flickraw implementation for Flickr authentication.
     # Refer: http://www.flickr.com/services/api/auth.oauth.html
@@ -82,7 +86,7 @@ class AuthController < ApplicationController
         
     # Make the user authenticate into Flickr with read permissions
     auth_url = flickr.get_authorize_url(token['oauth_token'], :perms => 'read')
-    redirect_to auth_url 
+    redirect_to auth_url
   end
   
   def flickr_callback
@@ -141,7 +145,7 @@ class AuthController < ApplicationController
     
     if user.nil?
       session[:at] = nil
-      redirect_to :facebook_auth
+      redirect_to :facebook_auth and return
     end
     
     #Sample tutorial - http://runerb.com/2010/01/12/ruby-oauth-youtube/
