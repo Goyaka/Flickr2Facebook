@@ -236,9 +236,7 @@ class Job
     if payload.empty?
       return
     end
-    
-    puts "Files downloaded : " + remove_files.join(',')
-    
+        
     fb_photo_ids = []
     begin
       response = RestClient.post("https://graph.facebook.com/", payload)
