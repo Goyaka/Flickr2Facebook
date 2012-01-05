@@ -1,3 +1,5 @@
+require 'flickraw-cached'
+
 class Photoset < ActiveRecord::Base
   belongs_to :users
   has_many :photos
@@ -10,9 +12,18 @@ class Photoset < ActiveRecord::Base
       albumdesc  = ''
       photocount = (albuminfo['entry'].length)
     elsif self[:source] == Constants::SOURCE_FLICKR
-      setinfo     = flickr.photosets.getInfo(:photoset_id => photoset_id)
+      config = YAML.load_file(Rails.root.join("config/flickr.yml"))[Rails.env]
+      FlickRaw.api_key = config['app_id']
+      FlickRaw.shared_secret = config['shared_secret']
+    
+      user       = User.find(self[:user_id])
+    
+      flickr.access_token  = user.flickr_access_token
+      flickr.access_secret = user.flickr_access_secret
+      
+      setinfo     = flickr.photosets.getInfo(:photoset_id => self[:photoset])
       albumname   = setinfo.title
-      albumdesc = setinfo.description
+      albumdesc   = setinfo.description
       photocount  = photos.length
     end
     

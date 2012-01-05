@@ -327,6 +327,8 @@ class Job
     photoset    = Photoset.where('photoset = ? AND status = ? AND source=?',
                   set_id, Constants::PHOTOSET_NOTPROCESSED, Constants::SOURCE_FLICKR).first
     if photoset
+      puts "Splitting flickr set " + photoset[:photoset]
+      
       photoset.status = Constants::PHOTOSET_PROCESSING
       photoset.save
       setinfo         = flickr.photosets.getInfo(:photoset_id => set_id)
@@ -337,15 +339,14 @@ class Job
 
       index = 0
       photos.each do |pic|
-        puts "Adding photo " + pic['photo'].to_s + " from photoset "+set_id+"to upload queue"
+        puts "Adding flickr photo " + pic['photo'].to_s + " for flickr set " + set_id
         photometa = PhotoMeta.create(pic)
         photometa.save
         photo = Photo.new(:photo => pic['photo'],
                           :photoset_id => photoset,
                           :source => Constants::SOURCE_FLICKR,
-                          :status => FlickrController::PHOTO_NOTPROCESSED)
+                          :status => Constants::PHOTO_NOTPROCESSED)
         photo.save()
-        puts "Photo set details updated in photo"
         index = index + 1
       end
       
