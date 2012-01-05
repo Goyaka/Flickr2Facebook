@@ -39,7 +39,7 @@ class Job
     end
   end
 
-  def get_photo_info(photo_id, source)
+  def get_photo_meta(photo_id, source)
     photo = {}
     
     if source == Constants::SOURCE_FLICKR
@@ -77,13 +77,17 @@ class Job
 
   def getphotos_from_set(set_id)
      photos = []
+     metalist = "date_upload,geo,date_taken,icon_server,original_format, url_sq,url_o,url_m,url_b,description"
      
-     info = flickr.photosets.getPhotos(:photoset_id => set_id,:extras => " date_upload,geo, date_taken, icon_server, original_format, url_sq,url_o,url_m,url_b,description")
+     info = flickr.photosets.getPhotos(:photoset_id => set_id,
+                                       :extras => metalist)
      photos = photos + info.photo
      
      if info.pages > 1 
        for page in 2..info.pages
-         info = flickr.photosets.getPhotos(:photoset_id => set_id,:page => page, :extras => " date_upload,geo, date_taken, icon_server, original_format,url_m, url_b, url_sq,url_o,description")
+         info = flickr.photosets.getPhotos(:photoset_id => set_id,
+                                           :page => page,
+                                           :extras => metalist)
          photos = photos + info.photo
        end
      end
@@ -101,50 +105,142 @@ class Job
      return newphotos
   end
   
-  def batch_upload(jobs)
+  def create_albums_for_photoset(set_id)
+      puts "Creating facebook albums"
+      lock_key = "LOCK-PHOTOSET-#{set_id}"
+      
+      while true
+        if Rails.cache.read(lock_key).nil?
+          
+          fb_albums = Photo.select('distinct(facebook_album) as facebook_album').where('photoset_id = ?', set_id).collect {|photo| photo[:facebook_album]}
+                      
+          if fb_albums.length > 1
+            puts "Albums already created"
+            break #Albums have been created.
+          elsif fb_albums.length == 1 and (fb_albums.include? nil or fb_albums.include? "")
+            puts "Creating albums for set #{set_id}, fetching album info"
+            #No albums created.
+            #No one has locked it, lock it.
+            Rails.cache.write(lock_key, 'lock')
+            photoset   = Photoset.find(set_id)
+            user       = User.find(photoset[:user_id])
+            albumname, albumdesc, photocount = photoset.get_album_info 
+            albumcount = (photocount + Job::MAX_FACEBOOK_PHOTO_COUNT) / Job::MAX_FACEBOOK_PHOTO_COUNT
+            albumids   = self.create_multiple_fb_albums(albumname, albumdesc, albumcount, user[:fb_session])
+
+            photo_ids  = Photo.select('id').where('photoset_id = ?', photoset)
+            index = 0
+            photo_batch_ids  = photo_ids.shift(Job::MAX_FACEBOOK_PHOTO_COUNT)
+
+            while photo_batch_ids.length > 0
+              album_name       = albumids[(index + 1)/Job::MAX_FACEBOOK_PHOTO_COUNT]
+              puts "Updating #{photo_batch_ids.length} photos queued for fb album #{album_name}"
+              Photo.where("id IN (?)", photo_batch_ids).update_all("facebook_album = #{album_name}")
+              index = index+1
+              photo_batch_ids  = photo_ids.shift(Job::MAX_FACEBOOK_PHOTO_COUNT)
+            end
+
+            Rails.cache.delete(lock_key)
+            break
+          else
+            puts "..already created. Albums = #{fb_albums.inspect}"
+            break
+          end 
+          
+        else
+          puts "Waiting for lock to free #{lock_key} " + Rails.cache.read(lock_key)
+        end
+      end
+  end
+  
+  def download_photo(photometa, service_photo_id)
+    puts "Downloading photo " + service_photo_id.to_s
+    filename =  service_photo_id.to_s #   (Time.now.to_f*1000).to_i.to_s + "#{service_photo_id}.jpg"
+    filepath = '/tmp/' + filename
+    download(photometa[:photo_source], filepath)
+    return filename
+  end
+  
+  def prepare_payload(jobs)
     payload = {}
-    batch   = []
+    batch   = [] 
     access_token = ''
     remove_files = []
-
-    # set status of all photos to PHOTO_PROCESSING
-    photo_ids = jobs.collect { |job| job[:photo].photo }.compact
-
+    
+    
     jobs.each_with_index do |job, index|
       # get flickr photo id
       photo_id = job[:photo].photo
 
       # If photo information is nil, set status as -1
-      photo = get_photo_info(photo_id, job[:photo].source) 
-      if photo.nil?
+      photometa = get_photo_meta(photo_id, job[:photo].source) 
+      if photometa.nil?
         Photo.update(photo_id, :status => -1)
         next
       end
       
-      puts "Downloading photo " + photo_id.to_s
-      filename = photo_id  #(Time.now.to_f*1000).to_i.to_s + '.jpg'  
-      filepath = '/tmp/' + filename
-      download(photo[:photo_source], filepath)
-      remove_files.push(filepath)
+      #check if facebook album is created. If not, create it
+      facebook_album = job[:photo][:facebook_album]
+      if facebook_album.nil? or facebook_album.empty?
+        create_albums_for_photoset(job[:photo][:photoset_id])
+        
+        #Albums have been filled up, find the album again from db.
+        photo = Photo.find(job[:photo][:id])
+        facebook_album = photo[:facebook_album]
+        if facebook_album.nil?
+          puts "Facebook album still not filled"
+          error = Error.create({'type' => 'FACEBOOK_ALBUM_NOT_FILLED',
+                                'data' => {
+                                           "photo_id" => job[:photo][:id],
+                                           "jobs" => jobs.to_a,
+                                           "photo_ids" => jobs.collect { |job| job[:photo].photo }.compact }
+                                })
+          error.save
+          return {}
+        end
+      end
       
+      filename = download_photo(photometa, job[:photo][:photo])
+      filepath = '/tmp/' + filename
+      remove_files.push(filepath)
+  
       payload[filename] = File.open(filepath)
+      
       access_token = job[:user].fb_session
 
       batch_data = {
         "method" => "POST",
-        "relative_url" => "#{job[:photo].facebook_album}/photos",
+        "relative_url" => "#{facebook_album}/photos",
         "access_token" => job[:user].fb_session,
-        "body" => "message=#{photo[:message]}",
+        "body" => "message=#{photometa[:message]}&backdated_time=#{photometa[:date]}",
         "attached_files" => filename
       }
       batch.push(batch_data)            
     end
     
+    payload[:batch] = batch.to_json
+    payload[:access_token] = access_token
+    
+    return payload, remove_files
+  end
+  
+  def batch_upload(jobs)
+   remove_files = []
+
+    # set status of all photos to PHOTO_UPLOADING
+    photo_ids = jobs.collect { |job| job[:photo].photo }.compact
+    Photo.where('id IN (?)', photo_ids).update_all("status = #{Constants::PHOTO_UPLOADING}")
+    
+    payload,remove_files   = prepare_payload(jobs)
+    
+    if payload.empty?
+      return
+    end
+    
+    puts "Files downloaded : " + remove_files.join(',')
+    
     fb_photo_ids = []
     begin
-      payload[:batch] = batch.to_json
-      payload[:access_token] = access_token
-
       response = RestClient.post("https://graph.facebook.com/", payload)
 
       response_obj = JSON.parse response
@@ -165,7 +261,12 @@ class Job
         photo.status = Constants::PHOTO_PROCESSED
         photo.facebook_photo = "http://www.facebook.com/#{fb_photo_ids[index]}"
         if not fb_photo_ids[index]
+          error = Error.create({'type' => 'PHOTO_UPLOAD_FAILED',
+                                'data' => {"response" => response,
+                                           "payload" => payload}})
+          error.save
           photo.status = Constants::PHOTO_FAILED
+          
         end
         photo.save
       end
@@ -184,22 +285,25 @@ class Job
     end
   end
   
-  def create_album(albumname, description)
-     response = RestClient.post("https://graph.facebook.com/me/albums?access_token=#{@fb_access_token}", {
-       :name => albumname, :message => description, :privacy => '{"value":"SELF"}' })
+  def create_album(albumname, description, access_token)
+     url = "https://graph.facebook.com/me/albums?access_token=#{access_token}"
+     response = RestClient.post(url, {
+                                :name => albumname,
+                                :message => description,
+                                :privacy => '{"value":"SELF"}'})
      return (JSON.parse response.to_s)['id']
   end
   
-  def create_fb_albums(albumname, description, albumcount)
+  def create_multiple_fb_albums(albumname, description, albumcount, access_token)
     albumids = []
     if albumcount == 1
-      albumids.push(self.create_album(albumname, description))
+      albumids.push(self.create_album(albumname, description, access_token))
     else
       for albumindex in 1..albumcount do 
         begin
-          albumname_with_index = albumname + " " + albumindex.to_s
-          puts "Creating album" + albumname_with_index
-          albumids.push(self.create_album(albumname_with_index, description))
+          albumname_with_index = albumname + " (#{albumindex.to_s}) " 
+          puts "Creating album " + albumname_with_index
+          albumids.push(self.create_album(albumname_with_index, description, access_token))
         rescue Exception => error
           puts "Erroring + " + error.to_s
         end
@@ -210,7 +314,8 @@ class Job
   end
   
   def split_picasa_sets(user, set_id)
-    photoset    = Photoset.where('photoset = ? AND status = ? AND source=?', set_id, Constants::PHOTOSET_NOTPROCESSED, Constants::SOURCE_PICASA).first
+    photoset    = Photoset.where('photoset = ? AND status = ? AND source=?',
+                  set_id, Constants::PHOTOSET_NOTPROCESSED, Constants::SOURCE_PICASA).first
     
     
     if photoset
@@ -219,26 +324,17 @@ class Job
       photoset.status = Constants::PHOTOSET_PROCESSING
       photoset.save
       
-      albuminfo = user.get_picasa_album_info(set_id)
-      albumname = albuminfo['title'][0]['content']
-      albumcount = (albuminfo['entry'].length + Job::MAX_FACEBOOK_PHOTO_COUNT) / Job::MAX_FACEBOOK_PHOTO_COUNT
-      albumids = self.create_fb_albums(albumname, '', albumcount)
-      
-      puts albuminfo['entry'].length.to_s + "photos in this album"
+      albuminfo  = user.get_picasa_album_info(photoset[:photoset])
       
       albuminfo['entry'].each_with_index do |pic, index|
-        facebook_album = albumids[(index + 1)/Job::MAX_FACEBOOK_PHOTO_COUNT]
         pic['photo'] = pic['id'][1]
-
-        puts "Adding picasa photo " + pic['id'][1] + " to facebook album http://facebook.com/" + facebook_album
+        puts "Adding picasa photo " + pic['id'][1] + " for picasa set " + photoset[:photoset].to_s
         photo_id = pic['id'][1]
         pic['id'] = nil
         photometa = PhotoMeta.create(pic)
         photometa.save
         photo = Photo.new(:photo => photo_id,
                           :photoset_id => photoset,
-                          :facebook_photo => '',
-                          :facebook_album => facebook_album,
                           :source => Constants::SOURCE_PICASA,
                           :status => Constants::PHOTO_NOTPROCESSED)
                     
@@ -252,7 +348,8 @@ class Job
   end
   
   def split_flickr_sets(user, set_id) 
-    photoset    = Photoset.where('photoset = ? AND status = ? AND source=?', set_id, Constants::PHOTOSET_NOTPROCESSED, Constants::SOURCE_FLICKR).first
+    photoset    = Photoset.where('photoset = ? AND status = ? AND source=?',
+                  set_id, Constants::PHOTOSET_NOTPROCESSED, Constants::SOURCE_FLICKR).first
     if photoset
       photoset.status = Constants::PHOTOSET_PROCESSING
       photoset.save
@@ -262,23 +359,17 @@ class Job
       photos          = self.getphotos_from_set(set_id)
       piclist         = []
 
-      albumcount = (photos.length + Job::MAX_FACEBOOK_PHOTO_COUNT) / Job::MAX_FACEBOOK_PHOTO_COUNT
-      albumids   = self.create_fb_albums(albumname, description, albumcount)
-
       index = 0
-      photoset_photos = photos
-      for pic in photoset_photos
-        facebook_album = albumids[(index + 1)/Job::MAX_FACEBOOK_PHOTO_COUNT]
-        puts "Adding flickr photo " + pic['photo'].to_s + " to facebook album http://facebook.com/" + facebook_album
+      photos.each do |pic|
+        puts "Adding photo " + pic['photo'].to_s + " from photoset "+set_id+"to upload queue"
         photometa = PhotoMeta.create(pic)
         photometa.save
         photo = Photo.new(:photo => pic['photo'],
                           :photoset_id => photoset,
-                          :facebook_photo => '',
-                          :facebook_album => facebook_album,
                           :source => Constants::SOURCE_FLICKR,
-                          :status => Constants::PHOTO_NOTPROCESSED)
+                          :status => FlickrController::PHOTO_NOTPROCESSED)
         photo.save()
+        puts "Photo set details updated in photo"
         index = index + 1
       end
       
