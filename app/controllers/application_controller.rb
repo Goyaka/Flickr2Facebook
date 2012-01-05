@@ -49,7 +49,13 @@ class ApplicationController < ActionController::Base
       if not @flickr_user and not @google_user
         redirect_to :action => 'services_login' and return
       elsif @flickr_user or @google_user
-        redirect_to :action => 'migrate' and return
+        photosets = @fb_user.photosets
+        puts photosets
+        if photosets.empty?
+          redirect_to :action => 'migrate' and return
+        else
+          redirect_to :action => 'status' and return
+        end
       end
     end
   end
