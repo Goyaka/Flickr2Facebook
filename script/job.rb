@@ -214,43 +214,36 @@ class Job
     if payload.empty?
       return
     end
-        
-    fb_photo_ids = []
+  
     begin
       response = RestClient.post("https://graph.facebook.com/", payload)
 
       response_obj = JSON.parse response
-      response_obj.each do |response_item| 
+      response_obj.each_with_index do |response_item, response_id| 
         body =  JSON.parse response_item['body']
+        photo = Photo.find_by_photo(photo_ids[response_id].to_s)
         if body.has_key?('id')
-          fb_photo_ids.push(body['id'])
+          photo.status = Constants::PHOTO_PROCESSED
+          photo.facebook_photo = "http://www.facebook.com/#{fb_photo_ids[index]}"
+          photo.save
           puts "Uploaded http://facebook.com/" + body['id'].to_s
         else
-          puts response_item['body']
-          fb_photo_ids.push(nil)
-        end
-      end
-      
-      photos = Photo.where('photo in (?)', photo_ids)
-      #Set status as processing.
-      photos.each_with_index do |photo, index|
-        photo.status = Constants::PHOTO_PROCESSED
-        photo.facebook_photo = "http://www.facebook.com/#{fb_photo_ids[index]}"
-        if not fb_photo_ids[index]
-          error = Error.create({'type' => 'PHOTO_UPLOAD_FAILED',
-                                'data' => {"response" => response,
-                                           "payload" => payload,
-                                           "fb_photo_ids" => fb_photo_ids,
-                                           "index" => index
-                                           },
-                                })
+          error = Error.create({
+            'type' => 'PHOTO_UPLOAD_FAILED',
+            'data' => {
+              'response' => response,
+              'payload' => payload,
+              'fb_photo_ids' => fb_photo_ids,
+              'failed_id' => photo.id,
+              'index' => response_id
+            }
+          })
           error.save
-          photo.status = Constants::PHOTO_FAILED
           
+          photo.status = Constants::PHOTO_FAILED
+          photo.save
         end
-        photo.save
       end
-      
     rescue Exception => msg
       puts msg.inspect
     ensure
