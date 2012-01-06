@@ -1,5 +1,6 @@
 require 'job' 
 require 'beanstalk-client'
+require 'pp'
 
 class Worker < ActiveRecord::Base
   
@@ -163,6 +164,10 @@ class Worker < ActiveRecord::Base
       puts "Set id=" + photoset['id'].to_s + ' Photos:' + photos_in_sets.to_s
       count += photos_in_sets
     end
+    
+    puts "Session information : "
+    session_info = RestClient.get("https://graph.facebook.com/me?access_token=#{user.fb_session}")
+    pp (JSON.parse session_info)
     
     print "#{count} photos of #{user.fb_first_name} #{user.fb_last_name} will be skipped. (Yes/No)? "
     execute = gets
