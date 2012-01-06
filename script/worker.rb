@@ -188,7 +188,7 @@ class Worker < ActiveRecord::Base
       photosets.each do |photoset|
         photoset.photos.update_all("status = #{Constants::PHOTO_ACCESS_DENIED}")
       end
-      puts "..Deleted."
+      puts "..done."
     else
       puts " This was a dry run."
     end
