@@ -162,10 +162,18 @@ class Worker < ActiveRecord::Base
       photos_in_sets = photoset.photos.length
       puts "Set id=" + photoset['id'].to_s + ' Photos:' + photos_in_sets.to_s
       count += photos_in_sets
-      photoset.photos.update_all("status = #{Constants::PHOTO_ACCESS_DENIED}")
     end
     
-    puts "#{count} photos will be skipped."
+    print "#{count} photos of #{user.fb_first_name} #{user.fb_last_name} will be skipped. (Yes/No)? "
+    execute = gets
+    if execute == "Yes\n"
+      photosets.each do |photoset|
+        photoset.photos.update_all("status = #{Constants::PHOTO_ACCESS_DENIED}")
+      end
+      puts "Done."
+    else
+      puts "Ok. I didn't do anything."
+    end
   end
   
   def self.beanstalk_queue_count
