@@ -138,7 +138,7 @@ class Worker < ActiveRecord::Base
         #Split into batches of 5.
         photo_id_batches = []
         while photo_ids.length > 0
-          photo_id_batches.push(photo_ids.shift(5))
+          photo_id_batches.push(photo_ids.shift(3))
         end
         
         #Push them into beanstalk
@@ -149,6 +149,17 @@ class Worker < ActiveRecord::Base
         beanstalk.put(photo_batch.to_json)
         end
       end
+    end
+  end
+  
+  def self.clear_user_queue(user_id)
+    #If user has removed access clear his queue
+    puts "All photos of user #{user_id} will be skipped while processing."
+    user = User.find(user_id)
+    photosets = user.photosets
+    photosets.each do |photoset|
+      puts "Set id=" + photoset['id'].to_s + ' Photos:' + photoset.photos.length.to_s
+      photoset.photos.update_all("status = #{Constants::PHOTO_ACCESS_DENIED}")
     end
   end
   

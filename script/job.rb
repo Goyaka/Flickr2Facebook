@@ -6,7 +6,6 @@ require 'json'
 require 'net/http'
 require 'time'
 
-
 FlickRaw.api_key = FlickrConfig[:API_KEY] 
 FlickRaw.shared_secret = FlickrConfig[:API_SECRET]
 
@@ -112,7 +111,7 @@ class Job
       albumname, albumdesc, photocount = photoset.get_album_info 
       albumcount = (photocount + Job::MAX_FACEBOOK_PHOTO_COUNT) / Job::MAX_FACEBOOK_PHOTO_COUNT
       albumids   = self.create_multiple_fb_albums(albumname, albumdesc, albumcount, user[:fb_session], photoset[:private])
-      puts "Created albums  #{albumids.join(',')})"
+      puts "Created albums  #{albumids.join(',')}"
        
       photo_ids  = Photo.select('id').where('photoset_id = ?', photoset)
     
@@ -163,7 +162,7 @@ class Job
         #Add to queue. set_id
         while true
           puts "Waiting for albums to be created for #{set_id} (Photo : #{job[:photo][:id]})"
-          sleep 10
+          sleep 4
           photo = Photo.find(job[:photo][:id])
           facebook_album = photo[:facebook_album]
           if not facebook_album.nil?
@@ -203,7 +202,8 @@ class Job
     end
   
     begin
-      response = RestClient.post("https://graph.facebook.com/", payload)
+      resource = RestClient::Resource.new "https://graph.facebook.com/", :timeout => 900000, :open_timeout => 900000
+      response = resource.post payload
 
       response_obj = JSON.parse response
       response_obj.each_with_index do |response_item, response_id| 
@@ -217,11 +217,13 @@ class Job
         else
           error = Error.create({
             'type' => 'PHOTO_UPLOAD_FAILED',
+            'photo' => photo.id,
             'data' => {
               'response' => response,
               'payload' => payload,
               'failed_id' => photo.id,
               'index' => response_id
+              
             }
           })
           error.save
@@ -231,16 +233,8 @@ class Job
         end
       end
     rescue Exception => msg
-      puts msg.inspect
-    ensure
-      remove_files.each do |filepath|
-        begin
-          puts "Deleting " + filepath
-          File.delete(filepath)
-        rescue
-          puts "Couldn't delete " + filepath
-        end
-      end
+      puts msg
+      puts msg.backtrace
     end
   end
   
