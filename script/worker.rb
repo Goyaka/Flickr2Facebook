@@ -159,7 +159,7 @@ class Worker < ActiveRecord::Base
     end
   end
   
-  def self.clear_user_queue(user_id)
+  def self.clear_user_queue(user_id, execute = false)
     #If user has removed access clear his queue
     puts "All photos of user #{user_id} will be skipped while processing."
     user = User.find(user_id)
@@ -181,15 +181,14 @@ class Worker < ActiveRecord::Base
     end 
     
     
-    print "#{count} photos of #{user.fb_first_name} #{user.fb_last_name} will be skipped. (Yes/No)? "
-    execute = gets
-    if execute == "Yes\n"
+    print "#{count} photos of #{user.fb_first_name} #{user.fb_last_name} will be skipped."
+    if execute
       photosets.each do |photoset|
         photoset.photos.update_all("status = #{Constants::PHOTO_ACCESS_DENIED}")
       end
-      puts "Done."
+      puts "..Deleted."
     else
-      puts "Ok. I didn't do anything."
+      puts " This was a dry run."
     end
   end
   
