@@ -166,8 +166,14 @@ class Worker < ActiveRecord::Base
     end
     
     puts "Session information : "
-    session_info = RestClient.get("https://graph.facebook.com/me?access_token=#{user.fb_session}")
-    pp (JSON.parse session_info)
+    begin
+      session_info = RestClient.get("https://graph.facebook.com/me?access_token=#{user.fb_session}")
+      pp (JSON.parse session_info)
+    rescue Exception => e
+      puts "Exception reached => " + e
+      puts e.inspect
+    end 
+    
     
     print "#{count} photos of #{user.fb_first_name} #{user.fb_last_name} will be skipped. (Yes/No)? "
     execute = gets
