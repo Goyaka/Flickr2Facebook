@@ -26,7 +26,13 @@ class Worker < ActiveRecord::Base
           end
           beanstalk_job = beanstalk.reserve
           set_id        = (beanstalk_job.body).to_i
-          job.create_albums_for_photoset(set_id)      
+          begin
+            job.create_albums_for_photoset(set_id)
+          rescue Exception => e
+            puts e.to_s
+            puts e.inspect
+          end
+              
           beanstalk_job.delete
       end
     rescue Exception => e
