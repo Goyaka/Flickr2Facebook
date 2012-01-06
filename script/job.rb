@@ -193,7 +193,6 @@ class Job
 
     # set status of all photos to PHOTO_UPLOADING
     photo_ids = jobs.collect { |job| job[:photo].photo }.compact
-    Photo.where('id IN (?)', photo_ids).update_all("status = #{Constants::PHOTO_UPLOADING}")
     
     payload,remove_files   = prepare_payload(jobs)
     
