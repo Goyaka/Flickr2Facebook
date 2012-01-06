@@ -157,10 +157,15 @@ class Worker < ActiveRecord::Base
     puts "All photos of user #{user_id} will be skipped while processing."
     user = User.find(user_id)
     photosets = user.photosets
+    count = 0
     photosets.each do |photoset|
-      puts "Set id=" + photoset['id'].to_s + ' Photos:' + photoset.photos.length.to_s
+      photos_in_sets = photoset.photos.length
+      puts "Set id=" + photoset['id'].to_s + ' Photos:' + photos_in_sets.to_s
+      count += photos_in_sets
       photoset.photos.update_all("status = #{Constants::PHOTO_ACCESS_DENIED}")
     end
+    
+    puts "#{count} photos will be skipped."
   end
   
   def self.beanstalk_queue_count
