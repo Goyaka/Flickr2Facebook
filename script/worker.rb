@@ -29,6 +29,8 @@ class Worker < ActiveRecord::Base
           begin
             job.create_albums_for_photoset(set_id)
           rescue Exception => e
+            Photo.where('photoset_id = ?', set_id).update_all('facebook_album = "-1"')
+            Photoset.where('id = ?', set_id).update_all("status = #{Constants::PHOTOSET_AUTH_FAILED}")
             puts e.to_s
             puts e.inspect
           end

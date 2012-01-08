@@ -137,6 +137,7 @@ class Job
     batch   = [] 
     access_token = ''
     remove_files = []
+    photo_ids  = []
     
     config        = YAML.load_file(Rails.root.join("config/beanstalk.yml"))[Rails.env]
     beanstalk     = Beanstalk::Pool.new([config['host']])
@@ -170,6 +171,13 @@ class Job
           end
         end
       end
+
+      if facebook_album == "-1"
+        Photo.update(photo_id, :status => Constants::PHOTO_ACCESS_DENIED)
+        next
+      else
+        photo_ids.push photo_id
+      end
           
       access_token = job[:user].fb_session
 
@@ -185,16 +193,13 @@ class Job
     payload[:batch] = batch.to_json
     payload[:access_token] = access_token
     
-    return payload, remove_files
+    return payload, remove_files , photo_ids
   end
   
   def batch_upload(jobs)
    remove_files = []
 
-    # set status of all photos to PHOTO_UPLOADING
-    photo_ids = jobs.collect { |job| job[:photo].photo }.compact
-    
-    payload,remove_files   = prepare_payload(jobs)
+    payload,remove_files,photo_ids  = prepare_payload(jobs)
     
     if payload.empty?
       return
