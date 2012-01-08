@@ -178,7 +178,7 @@ class Job
       end
 
       if facebook_album == "-1"
-        Photo.update(photo_id, :status => Constants::PHOTO_ACCESS_DENIED)
+        Photo.update(job[:photo][:id], :status => Constants::PHOTO_ACCESS_DENIED)
         next
       else
         photo_ids.push photo_id
