@@ -148,7 +148,12 @@ class Job
       # If photo information is nil, set status as -1
       photometa = get_photo_meta(photo_id, job[:photo].source) 
       if photometa.nil?
-        Photo.update(photo_id, :status => -1)
+        begin
+          Photo.update(photo_id, :status => -1)
+          puts "Photo #{photo_id} has no meta data"
+        rescue
+          puts "Photo #{photo_id} has no meta data and db entry"
+        end
         next
       end
       
