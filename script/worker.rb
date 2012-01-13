@@ -160,6 +160,33 @@ class Worker < ActiveRecord::Base
       end
     end
   end
+
+  def self.get_user_stats(user_id)
+    #If user has removed access clear his queue
+    user = User.find(user_id)
+    puts "Photos of user #{user.fb_first_name}"
+    photosets = user.photosets
+    count = 0
+    photosets.each do |photoset|
+      photos_in_sets = photoset.photos.length
+      puts "Set id=" + photoset['id'].to_s + ' Photos:' + photos_in_sets.to_s
+      photo_status = photoset.photos.select('status, count(status) as count').group('status')
+      photo_status.each do |status|
+ 	puts "      #{status.count} photos in status #{status.status}"
+      end 
+      count += photos_in_sets
+    end
+    
+    puts "Session information : "
+    begin
+      session_info = RestClient.get("https://graph.facebook.com/me?access_token=#{user.fb_session}")
+      pp (JSON.parse session_info)
+    rescue Exception => e
+      puts "Exception reached => " + e
+      puts e.inspect
+    end 
+    
+  end
   
   def self.clear_user_queue(user_id, execute = false)
     #If user has removed access clear his queue
