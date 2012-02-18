@@ -147,7 +147,7 @@ class Worker < ActiveRecord::Base
         #Split into batches of 5.
         photo_id_batches = []
         while photo_ids.length > 0
-          photo_id_batches.push(photo_ids.shift(3))
+          photo_id_batches.push(photo_ids.shift(5))
         end
         
         #Push them into beanstalk
@@ -229,6 +229,7 @@ class Worker < ActiveRecord::Base
   
   def self.photo_count_cron
     photo_count = Photo.select('count(*) as count').where('status = ?', Constants::PHOTO_PROCESSED).first
+    puts photo_count[:count]
     Rails.cache.write('photo_count', photo_count[:count])
   end
  
