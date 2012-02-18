@@ -28,7 +28,6 @@
              <div class="span3 picasa-login">
                  <div><img src = "/assets/picasa.png"> </div>
                  <% if not @picasa_user %>
-                 <!-- 
                  <a href="/google-auth" onclick="_gaq.push(['_trackEvent', 'Auth', 'Picasa', 'start']);" style="color: #FE63BB; font-size: 22px"> 
 
                      <table>
@@ -37,8 +36,6 @@
                          </tr>
                      </table> 
                  </a> 
-                 -->
-                 <div class="label success"> Coming Soon! </div> 
                  <% else %>
                     Logged in as <br> <a href="http://picasaweb.google.com/"> <%= @picasa_user %> </a>
                  <% end %>
