@@ -101,6 +101,7 @@ class Job
                 
     if fb_albums.length > 1
       puts "Albums already created"
+      pp fb_albums
       return #Albums have been created.
     elsif fb_albums.length == 1 and (fb_albums.include? nil or fb_albums.include? "")
       puts "Creating albums for set #{set_id}, fetching album info"
