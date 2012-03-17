@@ -77,8 +77,14 @@ class Worker < ActiveRecord::Base
         jobs = []
 
         photos.each do |photo|
-          photoset = Photoset.find(photo.photoset_id)
-          user     = User.find(photoset.user_id)
+          user = nil
+          photoset = nil
+          begin
+            photoset = Photoset.find(photo.photoset_id)
+            user     = User.find(photoset.user_id)
+          rescue Exception => e
+            puts e
+          end
           if user.nil? or photoset.nil?
             next
           end
