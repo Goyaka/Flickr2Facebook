@@ -79,12 +79,16 @@ class Worker < ActiveRecord::Base
         photos.each do |photo|
           photoset = Photoset.find(photo.photoset_id)
           user     = User.find(photoset.user_id)
+          if user.nil? or photoset.nil?
+            next
+          end
           job      = { :photo => photo, :user => user} 
           jobs.push(job)
         end
-
-        job = Job.new("","","",false)
-        job.batch_upload(jobs)
+        if not jobs.empty?
+          job = Job.new("","","",false)
+          job.batch_upload(jobs)
+        end
       end
     rescue Exception => e
       puts "Exception reached => " + e
