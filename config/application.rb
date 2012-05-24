@@ -1,6 +1,6 @@
 require File.expand_path('../boot', __FILE__)
 
-require 'rails/all'
+# require 'rails/all'
 require "action_controller/railtie"
 require "action_mailer/railtie"
 require "active_resource/railtie"
@@ -52,8 +52,8 @@ module Flickr2facebook
     
     config.cache_store = :mem_cache_store, "localhost"
     
-    config.generators do |g| 
-      g.orm :active_record 
-    end
+    # config.generators do |g| 
+      # g.orm :active_record 
+    # end
   end
 end

@@ -20,13 +20,6 @@ gem 'bson_ext'
 
 gem "oauth"
 gem "oauth-plugin"
-group :production do
-  gem "mysql2"
-end
-
-group :development do
-  gem "sqlite3"
-end
 
 
 # Gems used only for assets and not required
