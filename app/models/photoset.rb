@@ -1,6 +1,8 @@
 require 'flickraw-cached'
 
-class Photoset < ActiveRecord::Base
+class Photoset
+
+  include Mongoid::Document
   belongs_to :users
   has_many :photos
   

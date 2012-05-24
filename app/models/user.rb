@@ -1,6 +1,7 @@
 require 'xmlsimple'
 
-class User < ActiveRecord::Base
+class User
+  include Mongoid::Document
   has_many :photosets
   
   def get_display_name
