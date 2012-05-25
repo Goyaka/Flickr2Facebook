@@ -4,6 +4,12 @@ class User
   include Mongoid::Document
   has_many :photosets
   
+  field :user
+  field :fb_first_name
+  field :fb_last_name
+  field :fb_code
+  field :fb_session
+
   def get_display_name
     display_name = ""
     display_name += self.fb_first_name + " " if self.fb_first_name
