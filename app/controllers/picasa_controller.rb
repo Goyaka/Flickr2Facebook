@@ -1,7 +1,7 @@
 class PicasaController < ApplicationController
   
   def get_sets_notuploaded
-    user = User.find_by_fb_session(session[:at])
+    user = User.where(:fb_session => session[:at]).first
     
     album_entries = user.get_all_picasa_albums
     

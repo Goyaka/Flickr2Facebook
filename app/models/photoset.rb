@@ -6,6 +6,15 @@ class Photoset
   belongs_to :users
   has_many :photos
   
+  field :user_id
+  field :photoset
+  field :status
+  field :created_at
+  field :updated_at
+  field :photos_count
+  field :source
+  field :private
+
   def get_album_info
     if self[:source] == Constants::SOURCE_PICASA
       user       = User.find(self[:user_id])

@@ -141,7 +141,7 @@ class AuthController < ApplicationController
   def google_callback
     
     fb_access_token = session[:at] if session[:at]
-    user = User.find_by_fb_session(fb_access_token)
+    user = User.where(:fb_session => fb_access_token).first
     
     if user.nil?
       session[:at] = nil

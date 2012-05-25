@@ -30,7 +30,7 @@ class ApplicationController < ActionController::Base
     rescue Mogli::Client::HTTPException
     end
      if facebook_user
-        @fb_user = User.find_by_user(facebook_user.id)
+        @fb_user = User.where(:user=>facebook_user.id).first
     end
     return @fb_user
   end
@@ -90,7 +90,7 @@ class ApplicationController < ActionController::Base
   
   def upload_status
     
-    user = User.find_by_fb_session(session[:at])
+    user = User.where(:fb_session => session[:at]).first
     
     if user.nil?
       render :json => {'STATUS' => 'ERROR'}

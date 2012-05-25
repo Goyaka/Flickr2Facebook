@@ -1,0 +1,7 @@
+development:
+  client_id: '258618021508.apps.googleusercontent.com'
+  client_secret: '1Rd6RsL2YnPYAE-_Wrcjm79i'
+
+production:
+  client_id: ''
+  client_secret: ''

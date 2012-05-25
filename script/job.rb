@@ -218,7 +218,7 @@ class Job
       response_obj = JSON.parse response
       response_obj.each_with_index do |response_item, response_id| 
         body =  JSON.parse response_item['body']
-        photo = Photo.find_by_photo(photo_ids[response_id].to_s)
+        photo = Photo.where(:photo => photo_ids[response_id].to_s)
         if body.has_key?('id')
           photo.status = Constants::PHOTO_PROCESSED
           photo.facebook_photo = "http://www.facebook.com/#{body['id']}"
