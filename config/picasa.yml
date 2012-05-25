@@ -3,5 +3,5 @@ development:
   client_secret: '1Rd6RsL2YnPYAE-_Wrcjm79i'
 
 production:
-  client_id: ''
-  client_secret: ''
+  client_id: '741016501006.apps.googleusercontent.com'
+  client_secret: 'dNPZw8SNeUR2B-us3QePkHlC'
