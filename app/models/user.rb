@@ -5,10 +5,23 @@ class User
   has_many :photosets
   
   field :user
-  field :fb_first_name
-  field :fb_last_name
   field :fb_code
   field :fb_session
+  field :flickr_oauth_token
+  field :flickr_oauth_secret
+  field :flickr_oauth_verifier
+  field :created_at
+  field :updated_at
+  field :flickr_access_token
+  field :flickr_access_secret
+  field :flickr_username
+  field :flickr_user_nsid
+  field :fb_first_name
+  field :fb_last_name
+  field :google_access_token
+  field :google_access_secret
+  field :google_name
+  field :google_userid
 
   def get_display_name
     display_name = ""

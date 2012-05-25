@@ -37,7 +37,7 @@ class AuthController < ApplicationController
     # get FB user handle
     fb_user = Mogli::User.find("me",Mogli::Client.new(session[:at])) if session[:at]
     #Check if user is already registered
-    user = User.find_by_user(fb_user.id)
+    user = User.where(:user=>fb_user.id).first
     
     #If the user is not already registered, add new user
     if not user
