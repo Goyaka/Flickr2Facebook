@@ -6,7 +6,6 @@ require 'active_record'
 
 class Worker
   MAX_JOB_LIMIT = 500
-  logger = logger.new('log.txt')
  
   def self.create_fb_albums
     config        = YAML.load_file(Rails.root.join("config/beanstalk.yml"))[Rails.env]
@@ -109,16 +108,16 @@ class Worker
           puts "Stop upload file is present. Exiting..."
           break
         end
-        logger.info("Getting unprocessed photosets")
+        puts "Getting unprocessed photosets"
         set = Photoset.where("status = ?", Constants::PHOTOSET_NOTPROCESSED).first
         if set
           user = User.find(set.user_id)
           if set.source == Constants::SOURCE_FLICKR
-            logger.info("Splitting flickr set " + set.photoset + " to photos")
+            puts "Splitting flickr set " + set.photoset + " to photos"
             job = Job.new(user.fb_session, user.flickr_access_token, user.flickr_access_secret, true)
             job.split_flickr_sets(user, set.photoset)
           elsif set.source == Constants::SOURCE_PICASA
-            logger.info("Splitting picasa set " + set.photoset + " to photos")
+            puts "Splitting picasa set " + set.photoset + " to photos"
             job = Job.new(user.fb_session,"","", false)
             job.split_picasa_sets(user, set.photoset) 
           end
@@ -126,7 +125,8 @@ class Worker
           sleep 4
         end
       rescue Exception => msg
-        logger.error("Exception raised" + msg)
+        puts msg
+        puts "error is #{msg}"
       end
     end
   end
