@@ -1,6 +1,6 @@
  development:
-  app_id: '432551743429874'
-  secret_key: '50287a37688a9e585e5bab103ea73570'
+  app_id: '132158180215640'
+  secret_key: '4917b5392b949980e6ba12357c46e181'
 
  production:
   app_id: '432551743429874'

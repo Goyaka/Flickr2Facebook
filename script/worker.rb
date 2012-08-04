@@ -1,11 +1,12 @@
 require 'job' 
 require 'beanstalk-client'
 require 'pp'
+require 'logger'
+require 'active_record'
 
-class Worker < ActiveRecord::Base
-  
+class Worker
   MAX_JOB_LIMIT = 500
- 
+  logger = logger.new('log.txt')
  
   def self.create_fb_albums
     config        = YAML.load_file(Rails.root.join("config/beanstalk.yml"))[Rails.env]
@@ -42,8 +43,7 @@ class Worker < ActiveRecord::Base
       puts e.backtrace
     end    
   end
-  
-  
+
   def self.upload_loop_batch
     config = YAML.load_file(Rails.root.join("config/beanstalk.yml"))[Rails.env]
     beanstalk = Beanstalk::Pool.new([config['host']])

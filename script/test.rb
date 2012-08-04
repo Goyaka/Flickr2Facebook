@@ -8,7 +8,7 @@ require 'time'
 require 'getopt/long'
 require 'Job'
 
-class Test < ActiveRecord::Base
+class Test
   def find_album_mapping
     user = User.find(181)
     sets = user.photosets
