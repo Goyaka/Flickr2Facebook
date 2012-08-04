@@ -109,7 +109,7 @@ class Worker
           break
         end
         puts "Getting unprocessed photosets"
-        set = Photoset.where("status = ?", Constants::PHOTOSET_NOTPROCESSED).first
+        set = Photoset.where(:status =>Constants::PHOTOSET_NOTPROCESSED).first
         if set
           user = User.find(set.user_id)
           if set.source == Constants::SOURCE_FLICKR
@@ -118,8 +118,11 @@ class Worker
             job.split_flickr_sets(user, set.photoset)
           elsif set.source == Constants::SOURCE_PICASA
             puts "Splitting picasa set " + set.photoset + " to photos"
+            puts "!"
             job = Job.new(user.fb_session,"","", false)
+            puts "@"
             job.split_picasa_sets(user, set.photoset) 
+            puts "#"
           end
         else
           sleep 4
@@ -127,6 +130,7 @@ class Worker
       rescue Exception => msg
         puts msg
         puts "error is #{msg}"
+        break
       end
     end
   end

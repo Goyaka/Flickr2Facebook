@@ -284,42 +284,53 @@ class Job
   end
   
   def split_picasa_sets(user, set_id)
-    photoset    = Photoset.where('photoset = ? AND status = ? AND source=?',
-                  set_id, Constants::PHOTOSET_NOTPROCESSED, Constants::SOURCE_PICASA).first
-    
+    photoset    = Photoset.where(:photoset => set_id, :status => Constants::PHOTOSET_NOTPROCESSED,:source=>Constants::SOURCE_PICASA).first
+    puts "1"
     
     if photoset
       puts "Splitting picasa set " + photoset[:photoset]
       
       photoset.status = Constants::PHOTOSET_PROCESSING
+      puts "2"
       photoset.save
       
+      puts "3"
       albuminfo  = user.get_picasa_album_info(photoset[:photoset])
       
+      puts "4"
       albuminfo['entry'].each_with_index do |pic, index|
+        puts "5"
         pic['photo'] = pic['id'][1]
+        puts "6"
         puts "Adding picasa photo " + pic['id'][1] + " for picasa set " + photoset[:photoset].to_s
+        puts "7"
         photo_id = pic['id'][1]
+        puts "8"
         pic['id'] = nil
+        puts "9"
         photometa = PhotoMeta.create(pic)
+        puts "10"
         photometa.save
+        puts "11"
         photo = Photo.new(:photo => photo_id,
-                          :photoset_id => photoset,
+                          :photoset_id => photoset.id,
                           :source => Constants::SOURCE_PICASA,
                           :status => Constants::PHOTO_NOTPROCESSED)
-                    
+        puts "12"
         photo.save()
+        puts "13"
       end
-      
+      puts "14"
       photoset.status = Constants::PHOTOSET_PROCESSED
+      puts "15"
       photoset.save
+      puts "16"
     end
     
   end
   
   def split_flickr_sets(user, set_id) 
-    photoset    = Photoset.where('photoset = ? AND status = ? AND source=?',
-                  set_id, Constants::PHOTOSET_NOTPROCESSED, Constants::SOURCE_FLICKR).first
+    photoset    = Photoset.where(:photoset => set_id, :status => Constants::PHOTOSET_NOTPROCESSED,:source=>Constants::SOURCE_FLICKR).first
     if photoset
       puts "Splitting flickr set " + photoset[:photoset]
       
@@ -337,7 +348,7 @@ class Job
         photometa = PhotoMeta.create(pic)
         photometa.save
         photo = Photo.new(:photo => pic['photo'],
-                          :photoset_id => photoset,
+                          :photoset_id => photoset.id,
                           :source => Constants::SOURCE_FLICKR,
                           :status => Constants::PHOTO_NOTPROCESSED)
         photo.save()
