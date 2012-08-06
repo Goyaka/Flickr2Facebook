@@ -97,7 +97,12 @@ class Job
   def create_albums_for_photoset(set_id)
     #This function should be called only once per set.
     puts "Creating facebook albums for set " + set_id.to_s
-    fb_albums = Photo.select('distinct(facebook_album) as facebook_album').where('photoset_id = ?', set_id).collect {|photo| photo[:facebook_album]}
+    set_id = BSON.ObjectId(set_id.to_s)
+    fb_albums = Photo.where(:photoset_id => set_id).map {|photo| photo.facebook_album}.uniq
+    puts "ERRRRRRRRRR"
+    puts fb_albums
+    puts fb_albums.length
+    puts "ECCCCCCCCCC"
                 
     if fb_albums.length > 1
       puts "Albums already created"
@@ -114,7 +119,7 @@ class Job
       albumids   = self.create_multiple_fb_albums(albumname, albumdesc, albumcount, user[:fb_session], photoset[:private])
       puts "Created albums  #{albumids.join(',')}"
        
-      photo_ids  = Photo.select('id').where('photoset_id = ?', photoset)
+      photo_ids  = Photo.where(:photoset_id =>  photoset.id).map {|photo| photo.id}
     
       photo_batch_ids  = photo_ids.shift(Job::MAX_FACEBOOK_PHOTO_COUNT)
       
@@ -122,7 +127,8 @@ class Job
       while photo_batch_ids.length > 0
         album_name       = albumids[index]
         puts "Updating #{photo_batch_ids.length} photos queued for fb album #{album_name}"
-        Photo.where("id IN (?)", photo_batch_ids).update_all("facebook_album = #{album_name}")
+        # Photo.where("id IN (?)", photo_batch_ids).update_all("facebook_album = #{album_name}")
+        Photo.any_in(_id:photo_batch_ids).update_all(facebook_album:album_name)
         index = index+1
         photo_batch_ids  = photo_ids.shift(Job::MAX_FACEBOOK_PHOTO_COUNT)
       end
@@ -131,6 +137,7 @@ class Job
       puts "..already created. Albums = #{fb_albums.join(',')}"
       return
     end
+    puts "DEBUG1"
   end
   
   def prepare_payload(jobs)
@@ -145,7 +152,6 @@ class Job
     jobs.each_with_index do |job, index|
       # get flickr photo id
       photo_id = job[:photo].photo
-
       # If photo information is nil, set status as -1
       photometa = get_photo_meta(photo_id, job[:photo].source) 
       if photometa.nil?
@@ -159,19 +165,21 @@ class Job
       end
       
       #check if facebook album is created. If not, create it
-      photo          = Photo.find(job[:photo][:id])
-      facebook_album = photo[:facebook_album]
-      set_id         = job[:photo][:photoset_id]
+      #photo          = Photo.find(job[:photo].id]) Why finding???
+      photo          = job[:photo]
+      facebook_album = photo.facebook_album
+      set_id         = job[:photo].photoset_id
+      puts set_id
 
       if facebook_album.nil? or facebook_album.empty?
         beanstalk.use "fbalbums"
         beanstalk.put set_id
         #Add to queue. set_id
         while true
-          puts "Waiting for albums to be created for #{set_id} (Photo : #{job[:photo][:id]})"
+          puts "Waiting for albums to be created for #{set_id} (Photo : #{job[:photo].id})"
           sleep 4
-          photo = Photo.find(job[:photo][:id])
-          facebook_album = photo[:facebook_album]
+          photo = Photo.find(job[:photo].id)
+          facebook_album = photo.facebook_album
           if not facebook_album.nil?
             break
           end
@@ -182,6 +190,8 @@ class Job
         Photo.update(job[:photo][:id], :status => Constants::PHOTO_ACCESS_DENIED)
         next
       else
+        puts "Pushing"
+        puts photo_id
         photo_ids.push photo_id
       end
           
@@ -203,22 +213,33 @@ class Job
   end
   
   def batch_upload(jobs)
+    puts "34"
    remove_files = []
 
     payload,remove_files,photo_ids  = prepare_payload(jobs)
+    puts photo_ids
     
+    puts "34"
     if payload.empty?
       return
     end
   
+    puts "33"
     begin
       resource = RestClient::Resource.new "https://graph.facebook.com/", :timeout => 900000, :open_timeout => 900000
       response = resource.post payload
 
+    puts "34"
       response_obj = JSON.parse response
+      puts "345"
+      puts response_obj
       response_obj.each_with_index do |response_item, response_id| 
         body =  JSON.parse response_item['body']
-        photo = Photo.where(:photo => photo_ids[response_id].to_s)
+        puts body
+        photo = Photo.where(:photo => photo_ids[response_id].to_s).first
+        puts photo_ids
+        puts photo
+    puts "35"
         if body.has_key?('id')
           photo.status = Constants::PHOTO_PROCESSED
           photo.facebook_photo = "http://www.facebook.com/#{body['id']}"

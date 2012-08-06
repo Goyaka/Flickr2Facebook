@@ -1,8 +1,6 @@
 require 'job' 
 require 'beanstalk-client'
 require 'pp'
-require 'logger'
-require 'active_record'
 
 class Worker
   MAX_JOB_LIMIT = 500
@@ -25,12 +23,13 @@ class Worker
             break
           end
           beanstalk_job = beanstalk.reserve
-          set_id        = (beanstalk_job.body).to_i
+          set_id        = (beanstalk_job.body).to_s
+          puts set_id
           begin
             job.create_albums_for_photoset(set_id)
           rescue Exception => e
-            Photo.where('photoset_id = ?', set_id).update_all('facebook_album = "-1"')
-            Photoset.where('id = ?', set_id).update_all("status = #{Constants::PHOTOSET_AUTH_FAILED}")
+            # Photo.where(:photoset_id => set_id).update_all(facebook_album:"-1")
+            # Photoset.where(:id => set_id).update_all(status:Constants::PHOTOSET_AUTH_FAILED)
             puts e.to_s
             puts e.inspect
           end
@@ -64,8 +63,10 @@ class Worker
         beanstalk_job.delete
         
         puts "Uploading  " + photo_ids.inspect
+        puts photo_ids
         
-        photos = Photo.where("id IN (?) and status=?", photo_ids, Constants::PHOTO_PROCESSING)
+        photos = Photo.any_in(_id:photo_ids).where(:status=>Constants::PHOTO_PROCESSING)
+        puts photos
         
         if photos.nil? or photos.empty?
           sleep 3
@@ -75,6 +76,7 @@ class Worker
         
         jobs = []
 
+        puts "ER1"
         photos.each do |photo|
           user = nil
           photoset = nil
@@ -90,9 +92,13 @@ class Worker
           job      = { :photo => photo, :user => user} 
           jobs.push(job)
         end
+        puts "DFDF"
         if not jobs.empty?
+            puts "ERx"
           job = Job.new("","","",false)
+            puts "ERx"
           job.batch_upload(jobs)
+            puts "ERx"
         end
       end
     rescue Exception => e
@@ -151,7 +157,7 @@ class Worker
       else
 
         #Pick 100 photos from db and push to beanstalk
-        photos = Photo.where("status = ?", Constants::PHOTO_NOTPROCESSED).limit(100)
+        photos = Photo.where(:status =>Constants::PHOTO_NOTPROCESSED).limit(100)
         if photos.empty?
           sleep 10
         end
@@ -168,7 +174,7 @@ class Worker
         photo_id_batches.each do |photo_batch|
           #Change status of each photo to processing.
         puts "Pushing #{photo_batch.inspect} to beanstalk"
-        Photo.where('id IN (?)', photo_batch).update_all("status = #{Constants::PHOTO_PROCESSING}")
+        Photo.any_in(_id:photo_batch).update(status:Constants::PHOTO_PROCESSING)
         beanstalk.put(photo_batch.to_json)
         end
       end
@@ -242,9 +248,8 @@ class Worker
   end
   
   def self.photo_count_cron
-    photo_count = Photo.select('count(*) as count').where('status = ?', Constants::PHOTO_PROCESSED).first
-    puts photo_count[:count]
-    Rails.cache.write('photo_count', photo_count[:count])
+    photo_count = Photo.where(:status => Constant::PHOTO_PROCESSED).count
+    Rails.cache.write('photo_count', photo_count)
   end
  
 end
