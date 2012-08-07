@@ -141,6 +141,19 @@ class Worker
     end
   end
   
+  def self.tester
+    set = Photoset.where(:status =>Constants::PHOTOSET_NOTPROCESSED).first
+    if set
+      user = User.find(set.user_id)
+      puts "Splitting picasa set " + set.photoset + " to photos"
+      puts "!"
+      job = Job.new(user.fb_session,"","", false)
+      puts "@"
+      job.split_picasa_sets(user, set.photoset) 
+      puts "#"
+    end
+  end
+  
   def self.beanstalk_pusher
     config = YAML.load_file(Rails.root.join("config/beanstalk.yml"))[Rails.env]
     

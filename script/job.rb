@@ -146,17 +146,28 @@ class Job
     access_token = ''
     remove_files = []
     photo_ids  = []
+    puts jobs
     
     config        = YAML.load_file(Rails.root.join("config/beanstalk.yml"))[Rails.env]
     beanstalk     = Beanstalk::Pool.new([config['host']])
     jobs.each_with_index do |job, index|
       # get flickr photo id
       photo_id = job[:photo].photo
-      # If photo information is nil, set status as -1
-      photometa = get_photo_meta(photo_id, job[:photo].source) 
+      puts "1"
+      puts photo_id
+      puts "2"
+      puts job
+      puts "3"
+      puts index
+      source = Photo.find(job[:photo].id).source
+      puts "###CRITITCAL"
+      puts source
+      photometa = get_photo_meta(photo_id, source) 
       if photometa.nil?
         begin
-          Photo.update(photo_id, :status => -1)
+          p = Photo.find(photo_id)
+          p.status = -1
+          p.save
           puts "Photo #{photo_id} has no meta data"
         rescue
           puts "Photo #{photo_id} has no meta data and db entry"
@@ -213,18 +224,15 @@ class Job
   end
   
   def batch_upload(jobs)
-    puts "34"
    remove_files = []
 
     payload,remove_files,photo_ids  = prepare_payload(jobs)
     puts photo_ids
     
-    puts "34"
     if payload.empty?
       return
     end
   
-    puts "33"
     begin
       resource = RestClient::Resource.new "https://graph.facebook.com/", :timeout => 900000, :open_timeout => 900000
       response = resource.post payload
@@ -306,46 +314,35 @@ class Job
   
   def split_picasa_sets(user, set_id)
     photoset    = Photoset.where(:photoset => set_id, :status => Constants::PHOTOSET_NOTPROCESSED,:source=>Constants::SOURCE_PICASA).first
-    puts "1"
-    
+    puts photoset
     if photoset
       puts "Splitting picasa set " + photoset[:photoset]
       
       photoset.status = Constants::PHOTOSET_PROCESSING
-      puts "2"
       photoset.save
       
-      puts "3"
       albuminfo  = user.get_picasa_album_info(photoset[:photoset])
+      puts albuminfo
       
-      puts "4"
       albuminfo['entry'].each_with_index do |pic, index|
-        puts "5"
+        puts pic
+        puts index
         pic['photo'] = pic['id'][1]
-        puts "6"
         puts "Adding picasa photo " + pic['id'][1] + " for picasa set " + photoset[:photoset].to_s
-        puts "7"
         photo_id = pic['id'][1]
-        puts "8"
         pic['id'] = nil
-        puts "9"
-        photometa = PhotoMeta.create(pic)
-        puts "10"
-        photometa.save
-        puts "11"
+        pic.delete(:id)
+        pic.delete('id')
+        photometa = PhotoMeta.new(pic)
+        photometa.save()
         photo = Photo.new(:photo => photo_id,
                           :photoset_id => photoset.id,
                           :source => Constants::SOURCE_PICASA,
                           :status => Constants::PHOTO_NOTPROCESSED)
-        puts "12"
         photo.save()
-        puts "13"
       end
-      puts "14"
       photoset.status = Constants::PHOTOSET_PROCESSED
-      puts "15"
       photoset.save
-      puts "16"
     end
     
   end
