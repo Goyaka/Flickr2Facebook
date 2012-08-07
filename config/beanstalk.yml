@@ -2,4 +2,4 @@ development:
   host: 'localhost:11300'
 
 production:
-  host: ''
+  host: 'localhost:11300'
