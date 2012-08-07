@@ -90,7 +90,6 @@ class Job
        newphotos.push(photo_h)
      end
 
-     puts photos.length
      return newphotos
   end
   
@@ -99,10 +98,6 @@ class Job
     puts "Creating facebook albums for set " + set_id.to_s
     set_id = BSON.ObjectId(set_id.to_s)
     fb_albums = Photo.where(:photoset_id => set_id).map {|photo| photo.facebook_album}.uniq
-    puts "ERRRRRRRRRR"
-    puts fb_albums
-    puts fb_albums.length
-    puts "ECCCCCCCCCC"
                 
     if fb_albums.length > 1
       puts "Albums already created"
@@ -137,7 +132,6 @@ class Job
       puts "..already created. Albums = #{fb_albums.join(',')}"
       return
     end
-    puts "DEBUG1"
   end
   
   def prepare_payload(jobs)
@@ -146,22 +140,13 @@ class Job
     access_token = ''
     remove_files = []
     photo_ids  = []
-    puts jobs
     
     config        = YAML.load_file(Rails.root.join("config/beanstalk.yml"))[Rails.env]
     beanstalk     = Beanstalk::Pool.new([config['host']])
     jobs.each_with_index do |job, index|
       # get flickr photo id
       photo_id = job[:photo].photo
-      puts "1"
-      puts photo_id
-      puts "2"
-      puts job
-      puts "3"
-      puts index
       source = Photo.find(job[:photo].id).source
-      puts "###CRITITCAL"
-      puts source
       photometa = get_photo_meta(photo_id, source) 
       if photometa.nil?
         begin
@@ -180,7 +165,6 @@ class Job
       photo          = job[:photo]
       facebook_album = photo.facebook_album
       set_id         = job[:photo].photoset_id
-      puts set_id
 
       if facebook_album.nil? or facebook_album.empty?
         beanstalk.use "fbalbums"
@@ -201,7 +185,6 @@ class Job
         Photo.update(job[:photo][:id], :status => Constants::PHOTO_ACCESS_DENIED)
         next
       else
-        puts "Pushing"
         puts photo_id
         photo_ids.push photo_id
       end
@@ -227,7 +210,6 @@ class Job
    remove_files = []
 
     payload,remove_files,photo_ids  = prepare_payload(jobs)
-    puts photo_ids
     
     if payload.empty?
       return
@@ -237,17 +219,11 @@ class Job
       resource = RestClient::Resource.new "https://graph.facebook.com/", :timeout => 900000, :open_timeout => 900000
       response = resource.post payload
 
-    puts "34"
       response_obj = JSON.parse response
-      puts "345"
       puts response_obj
       response_obj.each_with_index do |response_item, response_id| 
         body =  JSON.parse response_item['body']
-        puts body
         photo = Photo.where(:photo => photo_ids[response_id].to_s).first
-        puts photo_ids
-        puts photo
-    puts "35"
         if body.has_key?('id')
           photo.status = Constants::PHOTO_PROCESSED
           photo.facebook_photo = "http://www.facebook.com/#{body['id']}"
@@ -322,11 +298,8 @@ class Job
       photoset.save
       
       albuminfo  = user.get_picasa_album_info(photoset[:photoset])
-      puts albuminfo
       
       albuminfo['entry'].each_with_index do |pic, index|
-        puts pic
-        puts index
         pic['photo'] = pic['id'][1]
         puts "Adding picasa photo " + pic['id'][1] + " for picasa set " + photoset[:photoset].to_s
         photo_id = pic['id'][1]

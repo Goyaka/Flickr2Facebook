@@ -76,7 +76,6 @@ class Worker
         
         jobs = []
 
-        puts "ER1"
         photos.each do |photo|
           user = nil
           photoset = nil
@@ -92,7 +91,6 @@ class Worker
           job      = { :photo => photo, :user => user} 
           jobs.push(job)
         end
-        puts "DFDF"
         if not jobs.empty?
             puts "ERx"
           job = Job.new("","","",false)
@@ -124,11 +122,8 @@ class Worker
             job.split_flickr_sets(user, set.photoset)
           elsif set.source == Constants::SOURCE_PICASA
             puts "Splitting picasa set " + set.photoset + " to photos"
-            puts "!"
             job = Job.new(user.fb_session,"","", false)
-            puts "@"
             job.split_picasa_sets(user, set.photoset) 
-            puts "#"
           end
         else
           sleep 4
@@ -146,11 +141,8 @@ class Worker
     if set
       user = User.find(set.user_id)
       puts "Splitting picasa set " + set.photoset + " to photos"
-      puts "!"
       job = Job.new(user.fb_session,"","", false)
-      puts "@"
       job.split_picasa_sets(user, set.photoset) 
-      puts "#"
     end
   end
   
